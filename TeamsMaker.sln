@@ -1,0 +1,43 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{BAD096E1-4728-4F46-A565-84273D937299}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamsMaker.Api", "src\TeamsMaker.Api\TeamsMaker.Api.csproj", "{85F16D1A-5258-4D77-9525-FCF5FFC85567}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{B3A22878-EDBB-476D-B40E-08107A820A08}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamsMaker.Tests", "test\TeamsMaker.Tests\TeamsMaker.Tests.csproj", "{CDB1E762-300C-4D2E-85B7-BD50AAEFC573}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamsMaker.IntegrationTests", "test\TeamsMaker.IntegrationTests\TeamsMaker.IntegrationTests.csproj", "{19913E37-F820-4885-A8B3-64B9D2BABB93}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{85F16D1A-5258-4D77-9525-FCF5FFC85567}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{85F16D1A-5258-4D77-9525-FCF5FFC85567}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{85F16D1A-5258-4D77-9525-FCF5FFC85567}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{85F16D1A-5258-4D77-9525-FCF5FFC85567}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CDB1E762-300C-4D2E-85B7-BD50AAEFC573}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CDB1E762-300C-4D2E-85B7-BD50AAEFC573}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CDB1E762-300C-4D2E-85B7-BD50AAEFC573}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CDB1E762-300C-4D2E-85B7-BD50AAEFC573}.Release|Any CPU.Build.0 = Release|Any CPU
+		{19913E37-F820-4885-A8B3-64B9D2BABB93}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{19913E37-F820-4885-A8B3-64B9D2BABB93}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{19913E37-F820-4885-A8B3-64B9D2BABB93}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{19913E37-F820-4885-A8B3-64B9D2BABB93}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{85F16D1A-5258-4D77-9525-FCF5FFC85567} = {BAD096E1-4728-4F46-A565-84273D937299}
+		{CDB1E762-300C-4D2E-85B7-BD50AAEFC573} = {B3A22878-EDBB-476D-B40E-08107A820A08}
+		{19913E37-F820-4885-A8B3-64B9D2BABB93} = {B3A22878-EDBB-476D-B40E-08107A820A08}
+	EndGlobalSection
+EndGlobal
