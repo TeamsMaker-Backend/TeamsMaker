@@ -5,26 +5,25 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.11"/>
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0"/>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.14"/>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="7.0.14"/>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.14"/>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="7.0.14"/>
-    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="7.0.14"/>
-    <PackageReference Include="Serilog.AspNetCore" Version="8.0.0"/>
-    <PackageReference Include="Serilog.Enrichers.Environment" Version="3.0.0-dev-00806"/>
-    <PackageReference Include="Serilog.Sinks.Console" Version="5.0.0"/>
-    <PackageReference Include="Serilog.Sinks.MSSqlServer" Version="6.3.0"/>
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.11" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.14" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="7.0.14" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.14" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="7.0.14" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="7.0.14" />
+    <PackageReference Include="Serilog.AspNetCore" Version="8.0.0" />
+    <PackageReference Include="Serilog.Enrichers.Environment" Version="3.0.0-dev-00806" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="5.0.0" />
+    <PackageReference Include="Serilog.Sinks.MSSqlServer" Version="6.3.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.14" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Contracts/"/>
-    <Folder Include="Contracts/Requests/"/>
-    <Folder Include="Contracts/Responses/"/>
-    <Folder Include="Controllers/"/>
-    <Folder Include="DataAccess/"/>
-    <Folder Include="DataAccess/Context/"/>
-    <Folder Include="DataAccess/Models/"/>
-    <Folder Include="Services/"/>
+    <Folder Include="Contracts/" />
+    <Folder Include="Contracts/Requests/" />
+    <Folder Include="Contracts/Responses/" />
+    <Folder Include="Controllers/" />
+    <Folder Include="Services/" />
+    <Folder Include="SharedKernel/" />
   </ItemGroup>
 </Project>
