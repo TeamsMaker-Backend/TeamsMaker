@@ -1,13 +1,12 @@
-namespace DataAccess.Models;
+using DataAccess.Base.Interfaces;
 
-public class Role : IdentityRole
+namespace TeamsMaker.Api.DataAccess.Models;
+
+public class Role : IdentityRole<Ulid>, IActivable, IReadOnlyOrganizationInfo
 {
-    private Role()
-    {
-        IsActive = true;
-    }
+    public bool IsOrganizationAdmin { get; set; }
+    public bool IsActive { get; set; }
+    public int OrganizationId { get; set; }
 
-    public bool IsActive { get; private set; }
-
-    public static Role Create() => new();
+    public Organization Organization { get; set; } = null!;
 }

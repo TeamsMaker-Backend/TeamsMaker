@@ -9,26 +9,22 @@ public static class ServiceRegistrationExtensions
 {
     public static IServiceCollection RegisterDataServices(this IServiceCollection services, IConfiguration configuration)
     {
-        // add the DbContext
-        services.AddDbContext<BaseContext>(options =>
-            options.UseLazyLoadingProxies().UseSqlServer(configuration.GetConnectionString("DefaultConnection"))
-        );
-        services.AddScoped(typeof(AppDBContext));
+        services.AddScoped<EntitySaveChangesInterceptor>();
 
-        #region hangfire
-        // services.AddHangfire(config => config
-        //     .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
-        //     .UseSimpleAssemblyNameTypeSerializer()
-        //     .UseRecommendedSerializerSettings()
-        //     .UseSqlServerStorage(configuration.GetConnectionString("SqlConnection"), new SqlServerStorageOptions
-        //     {
-        //         CommandBatchMaxTimeout = TimeSpan.FromMinutes(5),
-        //         SlidingInvisibilityTimeout = TimeSpan.FromMinutes(5),
-        //         QueuePollInterval = TimeSpan.Zero,
-        //         UseRecommendedIsolationLevel = true,
-        //         DisableGlobalLocks = true
-        //     }));
-        #endregion
+        // add the DbContext
+        services.AddDbContext<AppDBContext>(options =>
+            options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
+
+        services.AddIdentity<User, Role>(options =>
+            {
+                options.Password.RequireDigit = true;
+                options.Password.RequireLowercase = true;
+                options.Password.RequireUppercase = true;
+                options.Password.RequireNonAlphanumeric = true;
+                options.Password.RequiredLength = 8;
+            })
+            .AddEntityFrameworkStores<AppDBContext>()
+            .AddDefaultTokenProviders();
 
         return services;
     }
@@ -36,6 +32,7 @@ public static class ServiceRegistrationExtensions
     public static IServiceCollection RegisterBusinessServices(this IServiceCollection services)
     {
         services.AddScoped<IUserInfo, UserInfo>();
+        services.AddScoped<IAuthService, AuthService>();
 
         return services;
     }

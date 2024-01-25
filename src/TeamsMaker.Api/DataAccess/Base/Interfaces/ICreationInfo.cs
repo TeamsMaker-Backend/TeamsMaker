@@ -2,6 +2,6 @@ namespace DataAccess.Base.Interfaces;
 
 public interface ICreationInfo
 {
-    string CreatedBy { get; }
-    DateTime? CreationDate { get; }
+    public string CreatedBy { get; }
+    public DateTime? CreationDate { get; }
 }

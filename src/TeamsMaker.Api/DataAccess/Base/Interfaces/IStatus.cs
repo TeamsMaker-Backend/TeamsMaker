@@ -10,5 +10,5 @@ namespace DataAccess.Base.Interfaces;
 /// <seealso cref="IEntity<T>"/>
 public interface IStatus : IEntity<long>, ICreationInfo
 {
-    int Status { get; }
+    public int Status { get; }
 }

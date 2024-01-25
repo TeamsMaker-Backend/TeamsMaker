@@ -2,5 +2,5 @@ namespace DataAccess.Base.Interfaces;
 
 public interface IOrganizationInfo
 {
-    int OrganizationId { get; set; }
+    public int OrganizationId { get; set; }
 }

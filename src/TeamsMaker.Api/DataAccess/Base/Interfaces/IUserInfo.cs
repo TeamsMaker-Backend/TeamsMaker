@@ -2,8 +2,8 @@ namespace DataAccess.Base.Interfaces;
 
 public interface IUserInfo
 {
-    string UserName { get; }
-    string UserId { get; }
-    IEnumerable<string> Roles { get; }
-    int OrganizationId { get; }
+    public string UserName { get; }
+    public Ulid UserId { get; }
+    public IEnumerable<string> Roles { get; }
+    public int OrganizationId { get; }
 }

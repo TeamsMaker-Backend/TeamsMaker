@@ -1,56 +1,78 @@
-using System.Text;
-using DataAccess.Context;
-using DataAccess.Interceptors;
-
+using Core.ResultMessages;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using TeamsMaker.Api;
+using TeamsMaker.Api.Configurations;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllers();
 
-#region  AddCors
-// string[] allowedOrigin = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>()!;
-// builder.Services.AddCors(options =>
-// {
-//     options.AddPolicy("CorsPolicy",
-//         policy =>
-//             policy
-//                 .WithOrigins(allowedOrigin!)
-//                 .AllowAnyMethod()
-//                 .AllowAnyHeader());
-// });
-#endregion
-
-builder.Services.RegisterDataServices(builder.Configuration);
 builder.Services.RegisterBusinessServices();
+builder.Services.RegisterDataServices(builder.Configuration);
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddScoped<EntitySaveChangesInterceptor>();
+
+// model state validation
+builder.Services.Configure<ApiBehaviorOptions>(options => {
+    options.InvalidModelStateResponseFactory = actionContext => 
+    {
+        var errors = actionContext.ModelState
+            .Where(e => e.Value!.Errors.Any())
+            .Select(e => new
+            {
+                Name = e.Key,
+                Message = e.Value!.Errors.First().ErrorMessage.Split(',')[0]
+            })
+            .ToArray();
+
+        ResultMessage message = new()
+        {
+            EngMsg = "Validation Error",
+            LocMsg = "خطأ فى البيانات المدخلة",
+            Success = false,
+            exception = errors,
+            ReturnObject = null
+        };
+
+        return new BadRequestObjectResult(message);
+    };
+});
+
 #region JWT
-// builder.Services.AddIdentity<ApplicationUser, IdentityRole>().AddEntityFrameworkStores<AppDBContext>().AddDefaultTokenProviders();
-// builder.Services.AddAuthentication(options =>
-// {
-//     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-//     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-//     options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-// }).AddJwtBearer(options =>
-// {
-//     options.SaveToken = true;
-//     options.RequireHttpsMetadata = false;
-//     options.TokenValidationParameters = new TokenValidationParameters()
-//     {
-//         ValidateIssuer = false,
-//         ValidateAudience = false,
-//         ValidAudience = builder.Configuration["SiteConfig:Audience"],
-//         ValidIssuer = builder.Configuration["SiteConfig:Issuer"],
-//         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["SiteConfig:Secret"]!))
-//     };
-// });
+builder.Services.Configure<JwtConfig>(builder.Configuration.GetSection("JwtConfig"));
+
+var key = Encoding.ASCII.GetBytes(builder.Configuration["JwtConfig:Secret"]!);
+
+var tokenValidationParams = new TokenValidationParameters
+{
+    ValidateIssuerSigningKey = true,
+    IssuerSigningKey = new SymmetricSecurityKey(key),
+    ValidateIssuer = false,
+    ValidateAudience = false,
+    ValidateLifetime = true,
+    RequireExpirationTime = false
+};
+
+builder.Services.AddSingleton(tokenValidationParams);
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(jwt =>
+{
+    jwt.SaveToken = true;
+    jwt.TokenValidationParameters = tokenValidationParams;
+});
 #endregion
 
-// Learn more about configuring Swagger/OpenAPI
+
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -67,6 +89,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

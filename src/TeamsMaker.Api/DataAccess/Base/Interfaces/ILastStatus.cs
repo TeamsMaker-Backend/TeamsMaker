@@ -8,8 +8,8 @@ namespace DataAccess.Base.Interfaces;
 /// <typeparam name="TStatus">a Status Entity which is implementing an `IStatus` interface</typeparam>
 public interface ILastStatus<TStatus> where TStatus : IStatus
 {
-    int LastStatusId { get; }
-    string LastStatusCreatedBy { get; }
-    DateTime? LastStatusDateTime { get; }
-    ICollection<TStatus> StatusHistory { get; }
+    public int LastStatusId { get; }
+    public string LastStatusCreatedBy { get; }
+    public DateTime? LastStatusDateTime { get; }
+    public ICollection<TStatus> StatusHistory { get; }
 }

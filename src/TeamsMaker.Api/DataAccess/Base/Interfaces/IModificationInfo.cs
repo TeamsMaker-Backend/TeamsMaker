@@ -2,6 +2,6 @@ namespace DataAccess.Base.Interfaces;
 
 public interface IModificationInfo
 {
-    string ModifiedBy { get; }
-    DateTime? LastModificationDate { get; }
+    public string ModifiedBy { get; }
+    public DateTime? LastModificationDate { get; }
 }

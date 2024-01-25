@@ -1,5 +1,4 @@
 using DataAccess.Base.Interfaces;
-
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 
@@ -52,8 +51,6 @@ public class EntitySaveChangesInterceptor : SaveChangesInterceptor
             AddModificationInfo(entityEntry);
             UpdateModificationInfo(entityEntry);
         }
-
-
     }
 
     private void FreezeOrganizationInfo(EntityEntry entityEntry)
@@ -106,9 +103,8 @@ public class EntitySaveChangesInterceptor : SaveChangesInterceptor
 
     private void AddUserInfo(EntityEntry entityEntry)
     {
-        //TODO:
-        // if (entityEntry.Entity is IUserRelatedEntity userRelatedEntity)
-        //     entityEntry.Property(nameof(userRelatedEntity.UserId)).CurrentValue = _userInfo.UserId;
+        if (entityEntry.Entity is IUserRelatedEntity userRelatedEntity)
+            entityEntry.Property(nameof(userRelatedEntity.UserId)).CurrentValue = _userInfo.UserId;
     }
 
     private void AddOrganizationInfo(EntityEntry entityEntry)

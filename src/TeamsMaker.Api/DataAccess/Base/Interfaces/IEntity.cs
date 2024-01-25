@@ -6,5 +6,5 @@ namespace DataAccess.Base.Interfaces;
 /// <typeparam name="TId">Entity Id, e.g int, long, Guid</typeparam>
 public interface IEntity<TId>
 {
-    TId Id { get;}
+    public TId Id { get;}
 }
