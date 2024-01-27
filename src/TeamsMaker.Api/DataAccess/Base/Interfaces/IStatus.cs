@@ -1,4 +1,4 @@
-namespace DataAccess.Base.Interfaces;
+namespace TeamsMaker.Api.DataAccess.Base.Interfaces;
 
 /// <summary>
 ///     this Interface extends `IEntity` with an `Id` of type `long`.

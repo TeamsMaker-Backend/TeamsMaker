@@ -1,8 +1,9 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using DataAccess.Context;
 using Microsoft.IdentityModel.Tokens;
+using TeamsMaker.Api.Configurations;
 using TeamsMaker.Api.Contracts.Requests;
+using TeamsMaker.Api.DataAccess.Context;
 using TeamsMaker.Api.DataAccess.Models;
 
 namespace TeamsMaker.Api;
@@ -12,23 +13,22 @@ public class AuthService : IAuthService
     private readonly AppDBContext _db;
     private readonly UserManager<User> _userManager;
     private readonly RoleManager<Role> _roleManager;
-    // private readonly JwtConfig _jwtConfig;
+    private readonly JwtConfig _jwtConfig;
     private readonly TokenValidationParameters _tokenValidationParams;
 
-    public AuthService(AppDBContext db, UserManager<User> userManager, RoleManager<Role> roleManager,  TokenValidationParameters tokenValidationParams)
+    public AuthService(AppDBContext db,
+        UserManager<User> userManager,
+        RoleManager<Role> roleManager,
+        JwtConfig jwtConfig, 
+        TokenValidationParameters tokenValidationParams)
     {
         _db = db;
         _userManager = userManager;
         _roleManager = roleManager;
-        //_jwtConfig = jwtConfig;
+        _jwtConfig = jwtConfig;
         _tokenValidationParams = tokenValidationParams;
     }
 
-
-    public Task LoginAsync(UserLoginRequest loginRequest, CancellationToken ct)
-    {
-        throw new NotImplementedException();
-    }
 
     public Task RegisterAsync(UserRegisterationRequest registerationRequest, CancellationToken ct)
     {
@@ -39,6 +39,13 @@ public class AuthService : IAuthService
     {
         throw new NotImplementedException();
     }
+
+    public Task LoginAsync(UserLoginRequest loginRequest, CancellationToken ct)
+    {
+        throw new NotImplementedException();
+    }
+
+
 
     // private async Task<string> GenerateTokenAsync(User user, CancellationToken ct)
     // {

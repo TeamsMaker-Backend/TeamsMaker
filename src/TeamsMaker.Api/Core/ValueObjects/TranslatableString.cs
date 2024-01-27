@@ -1,7 +1,7 @@
 ﻿namespace Core.ValueObjects;
 
 // TODO: refactor
-public record TranslatableString
+public record class TranslatableString
 {
     public static readonly TranslatableString Empty = new();
 

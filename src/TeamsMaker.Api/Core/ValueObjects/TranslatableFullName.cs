@@ -1,6 +1,6 @@
 ﻿namespace Core.ValueObjects;
 
-public class TranslatableFullName
+public record class TranslatableFullName
 {
     public static readonly TranslatableFullName Empty = new(TranslatableString.Empty, TranslatableString.Empty, TranslatableString.Empty, TranslatableString.Empty, TranslatableString.Empty);
 

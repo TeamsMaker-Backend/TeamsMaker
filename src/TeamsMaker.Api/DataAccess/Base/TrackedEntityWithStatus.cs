@@ -1,6 +1,6 @@
-using DataAccess.Base.Interfaces;
+using TeamsMaker.Api.DataAccess.Base.Interfaces;
 
-namespace DataAccess.Base;
+namespace TeamsMaker.Api.DataAccess.Base;
 
 /// <summary>
 ///     Is an entity that keeps track of the adminstrative and lastStatus info.

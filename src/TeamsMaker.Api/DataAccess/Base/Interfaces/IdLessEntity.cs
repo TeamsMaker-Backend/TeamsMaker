@@ -1,3 +1,3 @@
-namespace DataAccess.Base.Interfaces;
+namespace TeamsMaker.Api.DataAccess.Base.Interfaces;
 
 public interface IdLessEntity{}

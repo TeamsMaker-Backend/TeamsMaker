@@ -1,8 +1,8 @@
-using DataAccess.Base.Interfaces;
+using TeamsMaker.Api.DataAccess.Base.Interfaces;
 
 namespace TeamsMaker.Api.DataAccess.Models;
 
-public class Role : IdentityRole<Ulid>, IActivable, IReadOnlyOrganizationInfo
+public class Role : IdentityRole, IActivable, IReadOnlyOrganizationInfo
 {
     public bool IsOrganizationAdmin { get; set; }
     public bool IsActive { get; set; }

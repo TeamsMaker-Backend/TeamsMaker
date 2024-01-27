@@ -1,7 +1,7 @@
-using DataAccess.Base;
+using TeamsMaker.Api.DataAccess.Interceptors;
+using TeamsMaker.Api.DataAccess.Context;
 using DataAccess.Base.Interfaces;
-using DataAccess.Context;
-using DataAccess.Interceptors;
+using DataAccess.Base;
 
 namespace TeamsMaker.Api;
 
@@ -9,11 +9,13 @@ public static class ServiceRegistrationExtensions
 {
     public static IServiceCollection RegisterDataServices(this IServiceCollection services, IConfiguration configuration)
     {
+        // add the DbContext
+        services.AddDbContext<BaseContext>(options =>
+            options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
+
         services.AddScoped<EntitySaveChangesInterceptor>();
 
-        // add the DbContext
-        services.AddDbContext<AppDBContext>(options =>
-            options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
+        services.AddScoped<AppDBContext>();
 
         services.AddIdentity<User, Role>(options =>
             {

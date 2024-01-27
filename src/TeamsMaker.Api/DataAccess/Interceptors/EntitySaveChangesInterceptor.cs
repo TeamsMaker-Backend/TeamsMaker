@@ -1,8 +1,9 @@
-using DataAccess.Base.Interfaces;
+using TeamsMaker.Api.DataAccess.Base.Interfaces;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using DataAccess.Base.Interfaces;
 
-namespace DataAccess.Interceptors;
+namespace TeamsMaker.Api.DataAccess.Interceptors;
 
 public class EntitySaveChangesInterceptor : SaveChangesInterceptor
 {

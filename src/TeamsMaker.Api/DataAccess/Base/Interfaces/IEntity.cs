@@ -1,4 +1,4 @@
-namespace DataAccess.Base.Interfaces;
+namespace TeamsMaker.Api.DataAccess.Base.Interfaces;
 
 /// <summary>
 ///     A marker class contains the most basic unit of any entity which is the Id

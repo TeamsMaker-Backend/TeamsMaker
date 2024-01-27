@@ -1,4 +1,4 @@
-﻿using DataAccess.Base;
+﻿using TeamsMaker.Api.DataAccess.Base;
 
 namespace TeamsMaker.Api.DataAccess.Models;
 
@@ -11,6 +11,6 @@ public class RefreshToken : BaseEntity<int>
     public DateTime AddedOn { get; set; }
     public DateTime ExpiresOn { get; set; }
 
-    public Ulid UserId { get; set; }
+    public string UserId { get; set; } = string.Empty;
     public User User { get; set; } = null!;
 }

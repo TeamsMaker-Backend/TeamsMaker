@@ -1,23 +1,24 @@
 using DataAccess.Base.Interfaces;
-using DataAccess.Context;
+using Microsoft.AspNetCore.Authentication;
+using TeamsMaker.Api.DataAccess.Context;
 
 namespace DataAccess.Base;
 
 public class UserInfo : IUserInfo
 {
     public string UserName { get; private set; } = string.Empty;
-    public Ulid UserId { get; private set; } = Ulid.Empty;
+    public string UserId { get; private set; } = string.Empty;
     public IEnumerable<string> Roles { get; private set; } = [];
     public int OrganizationId { get; private set; } = 0;
 
-    public UserInfo(IHttpContextAccessor accessor, AppDBContext db)
+    public UserInfo(IHttpContextAccessor accessor, BaseContext db)
     {
         var contextClaims = accessor.HttpContext?.User?.Claims;
         if (contextClaims is null || !contextClaims.Any()) return;
 
-        var contextUserId = Ulid.Parse(contextClaims.FirstOrDefault(a => a.Type == "UserId")?.Value);
+        var contextUserId = contextClaims.FirstOrDefault(a => a.Type == "UserId")?.Value;
         
-        if (contextUserId == Ulid.Empty) return;
+        if (string.IsNullOrEmpty(contextUserId)) return;
 
         var user = db.Users
             .IgnoreQueryFilters()
@@ -28,12 +29,12 @@ public class UserInfo : IUserInfo
 
         UserId = user.Id;
         UserName = user.UserName!;
-        //TODO:: OrganizationId = user.OrganizationId;
+        OrganizationId = user.OrganizationId;
         Roles = GetRoles(db, UserId);
     }
 
 
-    private IEnumerable<string> GetRoles(AppDBContext db, Ulid userId)
+    private IEnumerable<string> GetRoles(BaseContext db, string userId)
     {
         var roles = db.UserRoles
             .Join(

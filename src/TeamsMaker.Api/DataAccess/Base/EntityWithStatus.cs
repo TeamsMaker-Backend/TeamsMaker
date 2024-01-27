@@ -1,6 +1,6 @@
-using DataAccess.Base.Interfaces;
+using TeamsMaker.Api.DataAccess.Base.Interfaces;
 
-namespace DataAccess.Base;
+namespace TeamsMaker.Api.DataAccess.Base;
 
 /// <summary>
 ///     EntityWithStatus: Is an abstract class for entities that store LastStatus data and keeps track of

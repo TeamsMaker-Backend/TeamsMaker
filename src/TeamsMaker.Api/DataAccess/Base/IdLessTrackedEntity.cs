@@ -1,4 +1,4 @@
-namespace DataAccess.Base.Interfaces;
+namespace TeamsMaker.Api.DataAccess.Base.Interfaces;
 
 #nullable disable
 

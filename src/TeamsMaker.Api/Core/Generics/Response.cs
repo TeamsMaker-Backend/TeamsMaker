@@ -1,4 +1,4 @@
-﻿using Core.ResultMessages;
+﻿using TeamsMaker.Api.Core.ResultMessages;
 
 namespace Core.Generics;
 

@@ -1,4 +1,4 @@
-using Core.ResultMessages;
+using TeamsMaker.Api.Core.ResultMessages;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -10,6 +10,35 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllers();
+
+#region JWT;
+builder.Services.AddSingleton(builder.Configuration.GetSection("JwtConfig").Get<JwtConfig>()!);
+var key = Encoding.ASCII.GetBytes(builder.Configuration["JwtConfig:Secret"]!);
+
+TokenValidationParameters tokenValidationParams = new()
+{
+    ValidateIssuerSigningKey = true,
+    IssuerSigningKey = new SymmetricSecurityKey(key),
+    ValidateIssuer = false,
+    ValidateAudience = false,
+    ValidateLifetime = true,
+    RequireExpirationTime = false
+};
+
+builder.Services.AddSingleton(tokenValidationParams);
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(jwt =>
+{
+    jwt.SaveToken = true;
+    jwt.TokenValidationParameters = tokenValidationParams;
+});
+#endregion
 
 builder.Services.RegisterBusinessServices();
 builder.Services.RegisterDataServices(builder.Configuration);
@@ -40,37 +69,6 @@ builder.Services.Configure<ApiBehaviorOptions>(options => {
         return new BadRequestObjectResult(message);
     };
 });
-
-#region JWT
-builder.Services.Configure<JwtConfig>(builder.Configuration.GetSection("JwtConfig"));
-
-var key = Encoding.ASCII.GetBytes(builder.Configuration["JwtConfig:Secret"]!);
-
-var tokenValidationParams = new TokenValidationParameters
-{
-    ValidateIssuerSigningKey = true,
-    IssuerSigningKey = new SymmetricSecurityKey(key),
-    ValidateIssuer = false,
-    ValidateAudience = false,
-    ValidateLifetime = true,
-    RequireExpirationTime = false
-};
-
-builder.Services.AddSingleton(tokenValidationParams);
-
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-})
-.AddJwtBearer(jwt =>
-{
-    jwt.SaveToken = true;
-    jwt.TokenValidationParameters = tokenValidationParams;
-});
-#endregion
-
 
 
 builder.Services.AddEndpointsApiExplorer();

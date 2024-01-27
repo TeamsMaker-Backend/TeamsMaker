@@ -1,4 +1,4 @@
-﻿namespace Core.ResultMessages;
+﻿namespace TeamsMaker.Api.Core.ResultMessages;
 
 public class ResultMessageWithPagination : ResultMessage
 {
