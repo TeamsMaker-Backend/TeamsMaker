@@ -13,7 +13,7 @@ public class Organization : TrackedEntity<int>, IActivable
     public byte[]? Logo { get; set; }
     public string? Description { get; set; }
 
-    public bool IsActive { get; set; }
+    public bool IsActive { get; set; } = true;
 
     public ICollection<User>? Users { get; set; }
     public ICollection<Role>? Roles { get; set; }

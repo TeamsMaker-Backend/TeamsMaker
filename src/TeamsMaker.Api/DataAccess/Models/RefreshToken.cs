@@ -11,6 +11,6 @@ public class RefreshToken : BaseEntity<int>
     public DateTime AddedOn { get; set; }
     public DateTime ExpiresOn { get; set; }
 
-    public string UserId { get; set; } = string.Empty;
+    public string UserId { get; set; } = null!;
     public User User { get; set; } = null!;
 }

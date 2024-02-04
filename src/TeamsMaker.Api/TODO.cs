@@ -6,7 +6,7 @@
     
     * *Task#2:
         * TODO: handle connection string
-        * ? waiting
+        * ? done
     
     * *Task#3
         * TODO: add new entities to erd diagram
@@ -20,10 +20,10 @@
             4- .NET 6 Web API Create Refresh Tokens - JSON Web Tokens (JWT) https://www.youtube.com/watch?v=2_H0Zj-C8EM
             5- .NET 8 .🚀🔥: Understanding CORS with ASP.NET https://youtu.be/WAKsZwzXhf4?si=Rmywucg_N3kbOq4W
             6- 
-        * ? 
+        * ? done
 
     * *Task#5
-        * TODO: dotnet add package Microsoft.AspNetCore.Identity.UI --version 8.0.0
+        * TODO: Add Organization service and complete seeding functions
         * ?  waiting
         
 */

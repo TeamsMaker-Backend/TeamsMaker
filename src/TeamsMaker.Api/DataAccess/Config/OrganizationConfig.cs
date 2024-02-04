@@ -19,11 +19,11 @@ public class OrganizationConfig : IEntityTypeConfiguration<Organization>
         builder
             .HasMany(x => x.Users)
             .WithOne(y => y.Organization)
-            .HasForeignKey(x => x.OrganizationId);
+            .HasForeignKey(y => y.OrganizationId);
 
         builder
             .HasMany(x => x.Roles)
             .WithOne(y => y.Organization)
-            .HasForeignKey(x => x.OrganizationId);
+            .HasForeignKey(y => y.OrganizationId);
     }
 }

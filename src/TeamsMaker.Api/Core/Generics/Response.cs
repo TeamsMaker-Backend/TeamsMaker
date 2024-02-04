@@ -11,7 +11,7 @@ public class Response<T> where T : class
     /// <param name="engMessage">strig: English message that describe what happened</param>
     /// <param name="locMessage">string: Arabic message that describe what happened</param>
     /// <returns>ResultMessage Object</returns>
-    public ResultMessage SuccessResponse(object successObject, string engMessage = "Successful operation", string locMessage = "تم بنجاح")
+    public ResultMessage SuccessResponse(object? successObject, string engMessage = "Successful operation", string locMessage = "تم بنجاح")
         => ResponseObject(successObject, null, true, engMessage, locMessage);
 
 

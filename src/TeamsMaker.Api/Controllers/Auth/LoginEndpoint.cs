@@ -1,5 +1,8 @@
 ﻿using Core.Generics;
+
 using Microsoft.AspNetCore.Mvc;
+
+using TeamsMaker.Api.Services.Auth;
 namespace TeamsMaker.Api.Controllers.Auth;
 
 
@@ -15,7 +18,8 @@ public class LoginEndpoint : BaseApiController
     [HttpPost("user/login")]
     public async Task<IActionResult> Login(UserLoginRequest request, CancellationToken ct)
     {
-        await _authService.LoginAsync(request, ct);
-        throw new NotImplementedException();
+        var token = await _authService.LoginAsync(request, ct).ConfigureAwait(false);
+
+        return Ok(_response.SuccessResponse(token));
     }
 }

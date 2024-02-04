@@ -4,7 +4,7 @@ using TeamsMaker.Core.Enums;
 namespace TeamsMaker.Api.DataAccess.Models;
 
 
-public class User : IdentityUser, IOrganizationInfo, IActivable
+public class User : IdentityUser, IReadOnlyOrganizationInfo, IActivable
 {
     public string FirstName { get; set; } = string.Empty;
     public string LastName { get; set; } = string.Empty;
@@ -15,7 +15,7 @@ public class User : IdentityUser, IOrganizationInfo, IActivable
     public string? About { get; set; }
     public int Gender { get; set; } = (int) GenderEnum.Unknown;
     public string? City { get; set; }
-    public bool IsActive { get; set; }
+    public bool IsActive { get; set; } = true;
     public int OrganizationId { get; set; }
     public Organization Organization { get; set; } = null!;
     // TODO: Dept

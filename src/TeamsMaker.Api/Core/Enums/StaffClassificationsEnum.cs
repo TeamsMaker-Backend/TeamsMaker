@@ -1,7 +1,7 @@
 ﻿namespace TeamsMaker.Api;
 
 
-[Flags] // 0 0 0 0 0
+[Flags] // 0 0 0 0
 public enum StaffClassificationsEnum
 {
     HeadOfOrg = 0b0001, //1

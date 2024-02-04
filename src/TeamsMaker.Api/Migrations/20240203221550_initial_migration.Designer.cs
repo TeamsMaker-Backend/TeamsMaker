@@ -12,8 +12,8 @@ using TeamsMaker.Api.DataAccess.Context;
 namespace TeamsMaker.Api.Migrations
 {
     [DbContext(typeof(AppDBContext))]
-    [Migration("20240127210143_initial")]
-    partial class Initial_migration
+    [Migration("20240203221550_initial_migration")]
+    partial class initial_migration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

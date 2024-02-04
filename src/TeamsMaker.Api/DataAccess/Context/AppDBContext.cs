@@ -19,9 +19,9 @@ public class AppDBContext : BaseContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Organization>().HasQueryFilter(b => b.Id == _userInfo.OrganizationId);
-        modelBuilder.Entity<User>().HasQueryFilter(b => b.OrganizationId == _userInfo.OrganizationId);
-        modelBuilder.Entity<Role>().HasQueryFilter(b => b.OrganizationId == _userInfo.OrganizationId);
+        // modelBuilder.Entity<Organization>().HasQueryFilter(b => b.Id == _userInfo.OrganizationId);
+        // modelBuilder.Entity<User>().HasQueryFilter(b => b.OrganizationId == _userInfo.OrganizationId);
+        // modelBuilder.Entity<Role>().HasQueryFilter(b => b.OrganizationId == _userInfo.OrganizationId);
 
         base.OnModelCreating(modelBuilder);
     }

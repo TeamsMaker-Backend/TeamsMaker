@@ -1,14 +1,24 @@
-﻿
+﻿using Microsoft.AspNetCore.Mvc;
+
+using TeamsMaker.Api.Contracts.Requests;
+using TeamsMaker.Api.Services.Auth;
+
 namespace TeamsMaker.Api.Controllers.Auth;
 
 public class RegisterEndpoint : BaseApiController
 {
-    private readonly UserManager<User> _userManager;
+    private readonly IAuthService _authService;
 
-    public RegisterEndpoint(UserManager<User> userManager)
+    public RegisterEndpoint(IAuthService authService)
     {
-        _userManager = userManager;
+        _authService = authService;
     }
 
+    [HttpPost("user/register")]
+    public async Task<IActionResult> Register(UserRegisterationRequest request, CancellationToken ct)
+    {
+        var token = await _authService.RegisterAsync(request, ct).ConfigureAwait(false);
 
+        return Created("", _response.SuccessResponse(token));
+    }
 }

@@ -1,9 +1,10 @@
+using TeamsMaker.Api;
+using Microsoft.AspNetCore.Mvc;
+using TeamsMaker.Api.Configurations;
+using Microsoft.IdentityModel.Tokens;
 using TeamsMaker.Api.Core.ResultMessages;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
-using TeamsMaker.Api;
-using TeamsMaker.Api.Configurations;
+using TeamsMaker.Api.DataAccess.Seeds;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -83,8 +84,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+SeedDB.Initialize(app.Services.GetRequiredService<IServiceScopeFactory>().CreateScope().ServiceProvider);
 // app.UseCors();
-
 app.UseHttpsRedirection();
 
 app.UseAuthentication();

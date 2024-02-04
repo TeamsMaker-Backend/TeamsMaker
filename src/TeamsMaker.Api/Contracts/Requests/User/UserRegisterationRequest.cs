@@ -2,12 +2,9 @@
 
 public class UserRegisterationRequest
 {
-    [Required]
+    public required string FirstName { get; init; }
+    public required string LastName { get; init; }
     public required string UserName { get; init; }
-
-    [EmailAddress, Required]
-    public required string Email { get; init; }
-
-    [Required]
+    [EmailAddress] public required string Email { get; init; }
     public required string Password { get; init; }
 }

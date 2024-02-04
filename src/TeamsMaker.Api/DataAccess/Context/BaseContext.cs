@@ -33,6 +33,6 @@ public class BaseContext(DbContextOptions<BaseContext> options) : IdentityDbCont
         base.OnModelCreating(modelBuilder);
     }
 
-    public override int SaveChanges() => base.SaveChanges();
-    public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default) => base.SaveChangesAsync(cancellationToken);
+    // public override int SaveChanges() => base.SaveChanges();
+    // public override Task<int> SaveChangesAsync(CancellationToken ct = default) => base.SaveChangesAsync(ct);
 }
