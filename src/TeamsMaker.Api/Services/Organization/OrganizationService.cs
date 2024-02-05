@@ -14,9 +14,21 @@ public class OrganizationService : IOrganizationService
         _db = db;
     }
 
-    public async Task<GetOrganizationResponse> GetAsync()
+    public async Task<List<GetOrganizationResponse>> GetAsync(CancellationToken ct)
     {
-        throw new NotImplementedException();
+        var organizations = await _db.Organizations
+            .Select(org => new GetOrganizationResponse{
+                Id = org.Id,
+                EngName = org.Name.Eng,
+                LocName = org.Name.Loc,
+                Address = org.Address,
+                Phone = org.Phone,
+                Description = org.Description,
+                Logo = org.Logo
+            })
+            .ToListAsync();
+
+        return organizations;
     }
 
     public async Task AddAsync(AddOrganizationRequest organizationRequest, CancellationToken ct)
@@ -27,7 +39,7 @@ public class OrganizationService : IOrganizationService
             Address = organizationRequest.Address,
             Phone = organizationRequest.Phone,
             Description = organizationRequest.Description,
-            Logo = organizationRequest.Logo,
+            //Logo = organizationRequest.Logo,
         };
 
         await _db.Organizations.AddAsync(organization);
@@ -45,7 +57,7 @@ public class OrganizationService : IOrganizationService
         if (!string.IsNullOrEmpty(organizationRequest.Address)) organization!.Address = organizationRequest.Address;
         if (!string.IsNullOrEmpty(organizationRequest.Description)) organization!.Description = organizationRequest.Description;
         if (!string.IsNullOrEmpty(organizationRequest.Phone)) organization!.Phone = organizationRequest.Phone;
-        if (organizationRequest.Logo != null && organizationRequest.Logo.Length > 0) organization!.Logo = organizationRequest.Logo;
+        //if (organizationRequest.Logo != null && organizationRequest.Logo.Length > 0) organization!.Logo = organizationRequest.Logo;
 
         await _db.SaveChangesAsync();
     }

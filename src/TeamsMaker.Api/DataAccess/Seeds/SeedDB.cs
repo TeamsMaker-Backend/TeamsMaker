@@ -4,7 +4,7 @@ namespace TeamsMaker.Api.DataAccess.Seeds;
 
 public static class SeedDB
 {
-    public static async void Initialize(IServiceProvider serviceProvider)
+    public static async Task Initialize(IServiceProvider serviceProvider)
     {
         var db = serviceProvider.GetRequiredService<AppDBContext>();
         var roleManager = serviceProvider.GetRequiredService<RoleManager<Role>>();
@@ -13,6 +13,6 @@ public static class SeedDB
 
         await DefaultOrganization.SeedOrganization(db);
         await DefaultRoles.SeedRoles(db, roleManager);
-        await DefaultUsers.SeedAdminUser(userManager);
+        await DefaultUsers.SeedAdminUser(db, userManager);
     }
 }

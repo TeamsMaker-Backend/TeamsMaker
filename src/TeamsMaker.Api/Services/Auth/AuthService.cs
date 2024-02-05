@@ -46,7 +46,7 @@ public class AuthService : IAuthService
             LastName = registerationRequest.LastName,
             Email = registerationRequest.Email,
             UserName = registerationRequest.UserName,
-            Classification = StaffClassificationsEnum.Professor
+            Classification = StaffClassificationsEnum.Professor // child property
         };
 
         var isCreated = await _userManager.CreateAsync(user, registerationRequest.Password);

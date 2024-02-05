@@ -11,7 +11,7 @@ public class UserInfo : IUserInfo
     public IEnumerable<string> Roles { get; private set; } = [];
     public int OrganizationId { get; private set; } = 0;
 
-    public UserInfo(IHttpContextAccessor accessor, BaseContext db)
+    public UserInfo(IHttpContextAccessor accessor, AppDBContext db)
     {
         var contextClaims = accessor.HttpContext?.User?.Claims;
         if (contextClaims is null || !contextClaims.Any()) return;
@@ -34,7 +34,7 @@ public class UserInfo : IUserInfo
     }
 
 
-    private IEnumerable<string> GetRoles(BaseContext db, string userId)
+    private IEnumerable<string> GetRoles(AppDBContext db, string userId)
     {
         var roles = db.UserRoles
             .Join(

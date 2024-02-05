@@ -13,7 +13,7 @@ public class VerifyUserEndpoint : BaseApiController
         _authService = authService;
     }
 
-    [HttpPost("user/verify")]
+    [HttpPost("users/verify")] //TODO: as a staff or student
     public async Task<IActionResult> Verify([FromQuery] int userType, [FromBody] UserVerificationRequset request, CancellationToken ct)
     {
         var result = await _authService.VerifyUserAsync(request, ct).ConfigureAwait(false);

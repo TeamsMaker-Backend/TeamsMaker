@@ -12,7 +12,7 @@ using TeamsMaker.Api.DataAccess.Context;
 namespace TeamsMaker.Api.Migrations
 {
     [DbContext(typeof(AppDBContext))]
-    [Migration("20240203221550_initial_migration")]
+    [Migration("20240205111809_initial_migration")]
     partial class initial_migration
     {
         /// <inheritdoc />
@@ -158,8 +158,8 @@ namespace TeamsMaker.Api.Migrations
                     b.Property<DateTime?>("LastModificationDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<byte[]>("Logo")
-                        .HasColumnType("varbinary(max)");
+                    b.Property<string>("Logo")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ModifiedBy")
                         .HasColumnType("nvarchar(max)");
@@ -261,8 +261,8 @@ namespace TeamsMaker.Api.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
 
-                    b.Property<byte[]>("Avatar")
-                        .HasColumnType("varbinary(max)");
+                    b.Property<string>("Avatar")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Bio")
                         .HasMaxLength(500)
@@ -293,8 +293,8 @@ namespace TeamsMaker.Api.Migrations
                         .HasColumnType("int")
                         .HasDefaultValue(1);
 
-                    b.Property<byte[]>("Header")
-                        .HasColumnType("varbinary(max)");
+                    b.Property<string>("Header")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
@@ -376,8 +376,8 @@ namespace TeamsMaker.Api.Migrations
                 {
                     b.HasBaseType("TeamsMaker.Api.DataAccess.Models.User");
 
-                    b.Property<byte[]>("CV")
-                        .HasColumnType("varbinary(max)");
+                    b.Property<string>("CV")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("CollegeId")
                         .IsRequired()

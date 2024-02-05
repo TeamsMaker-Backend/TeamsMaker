@@ -6,5 +6,5 @@ public class Student : User
     public float GPA { get; set; }
     public DateOnly GraduationYear { get; set; }
     public int Level { get; set; }
-    public byte[]? CV { get; set; }
+    public string? CV { get; set; }
 }

@@ -14,25 +14,19 @@ public static class DefaultRoles
 
             Guard.Against.Null(organization, nameof(organization));
 
-
-            Role admin = new()
+            await roleManager.CreateAsync(new Role()
             {
                 Name = AppRoles.Admin,
                 NormalizedName = AppRoles.Admin.ToUpper(),
                 IsOrganizationAdmin = true,
-                OrganizationId = organization!.Id,
-                Organization = organization
-            };
+                OrganizationId = organization!.Id
+            });
 
-            await db.Roles.AddAsync(admin);
-            await db.SaveChangesAsync();
-
-            foreach (var role in AppRoles.OrdinaryRoles)
+            foreach (var newRole in AppRoles.OrdinaryRoles)
             {
-                // add & save
                 await roleManager.CreateAsync(new Role
                 {
-                    Name = role,
+                    Name = newRole,
                     OrganizationId = organization!.Id,
                     Organization = organization
                 });

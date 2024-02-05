@@ -1,27 +1,36 @@
 ﻿using TeamsMaker.Api.Core.Consts;
+using TeamsMaker.Api.DataAccess.Context;
 
 namespace TeamsMaker.Api.DataAccess.Seeds;
 
 public static class DefaultUsers
 {
-    public static async Task SeedAdminUser(UserManager<User> userManger)
+    public static async Task SeedAdminUser(AppDBContext db, UserManager<User> userManger)
     {
-        Staff admin = new()
+        if (!userManger.Users.Any())
         {
-            FirstName = "Default",
-            LastName = "User",
-            UserName = "default_user",
-            Email = "default_user123@gmail.com",
-            EmailConfirmed = true,
-            Classification = StaffClassificationsEnum.Professor
-        };
+            var organization = await db.Organizations.FirstOrDefaultAsync();
 
-        var user = await userManger.FindByEmailAsync(admin.Email);
+            if (organization is null) throw new ArgumentNullException(nameof(organization));
 
-        if (user is null)
-        {
-            await userManger.CreateAsync(admin, "P@ssword123");
-            await userManger.AddToRoleAsync(admin, AppRoles.Admin);
+            Staff admin = new()
+            {
+                FirstName = "Default",
+                LastName = "User",
+                UserName = "default_user",
+                Email = "default_user123@gmail.com",
+                EmailConfirmed = true,
+                Classification = StaffClassificationsEnum.Professor,
+                OrganizationId = organization.Id
+            };
+
+            var user = await userManger.FindByEmailAsync(admin.Email);
+
+            if (user is null)
+            {
+                await userManger.CreateAsync(admin, "P@ssword123");
+                await userManger.AddToRoleAsync(admin, AppRoles.Admin);
+            }
         }
     }
 }

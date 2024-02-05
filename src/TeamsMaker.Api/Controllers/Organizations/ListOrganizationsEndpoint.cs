@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TeamsMaker.Api.Contracts.Requests;
@@ -6,21 +7,23 @@ using TeamsMaker.Api.Services.Organizations;
 
 namespace TeamsMaker.Api.Controllers;
 
+
+[Authorize]
 public class ListOrganizationsEndpoint : BaseApiController
 {
-    private readonly AppDBContext _db;
+    private readonly IOrganizationService _organizationService;
 
-    public ListOrganizationsEndpoint(AppDBContext db)
+    public ListOrganizationsEndpoint(IOrganizationService organizationService)
     {
-        _db = db;
+        _organizationService = organizationService;
     }
 
 
-    [HttpGet("organization")]
-    public async Task<IActionResult> AddOrganization()
+    [HttpGet("organizations")]
+    public async Task<IActionResult> ListOrganization(CancellationToken ct)
     {
-        var count = await _db.Organizations.CountAsync();
+        var orgs = await _organizationService.GetAsync(ct);
 
-        return Ok(_response.SuccessResponse( await _db.Organizations.ToListAsync()));
+        return Ok(_response.SuccessResponse(orgs));
     }
 }

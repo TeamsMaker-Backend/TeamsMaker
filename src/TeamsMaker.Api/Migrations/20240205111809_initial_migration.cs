@@ -21,7 +21,7 @@ namespace TeamsMaker.Api.Migrations
                     LocName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Address = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Phone = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Logo = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
+                    Logo = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
                     CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -65,8 +65,8 @@ namespace TeamsMaker.Api.Migrations
                     FirstName = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
                     LastName = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
                     SSN = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
-                    Avatar = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
-                    Header = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
+                    Avatar = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Header = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Bio = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
                     About = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: true),
                     Gender = table.Column<int>(type: "int", nullable: false, defaultValue: 1),
@@ -257,7 +257,7 @@ namespace TeamsMaker.Api.Migrations
                     GPA = table.Column<float>(type: "real", nullable: false),
                     GraduationYear = table.Column<DateOnly>(type: "date", nullable: false),
                     Level = table.Column<int>(type: "int", nullable: false),
-                    CV = table.Column<byte[]>(type: "varbinary(max)", nullable: true)
+                    CV = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {

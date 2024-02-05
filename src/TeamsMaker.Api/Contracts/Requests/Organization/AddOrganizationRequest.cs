@@ -7,5 +7,5 @@ public class AddOrganizationRequest
     public required string Address { get; init; }
     public string? Phone  { get; init; }
     public string? Description  { get; init; }
-    public byte[]? Logo  { get; init; }
+    public string? Logo  { get; init; }
 }

@@ -7,14 +7,16 @@ namespace TeamsMaker.Api.DataAccess.Interceptors;
 
 public class EntitySaveChangesInterceptor : SaveChangesInterceptor
 {
-    private readonly IUserInfo _userInfo;
+    private readonly IServiceProvider _serviceProvider;
     private readonly DateTime _now;
 
-    public EntitySaveChangesInterceptor(IUserInfo userInfo)
+    public EntitySaveChangesInterceptor(IServiceProvider serviceProvider)
     {
         _now = DateTime.UtcNow;
-        _userInfo = userInfo;
+        _serviceProvider = serviceProvider;
     }
+
+    private IUserInfo _userInfo => _serviceProvider.GetRequiredService<IUserInfo>();
 
 
     public override InterceptionResult<int> SavingChanges(DbContextEventData eventData, InterceptionResult<int> result)

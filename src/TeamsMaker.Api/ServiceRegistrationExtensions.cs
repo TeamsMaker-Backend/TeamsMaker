@@ -12,17 +12,14 @@ public static class ServiceRegistrationExtensions
     public static IServiceCollection RegisterDataServices(this IServiceCollection services, IConfiguration configuration)
     {
         // add the DbContext
-        services.AddDbContext<BaseContext>(
+        services.AddDbContext<AppDBContext>(
             options =>
                 options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"),
                     o => o
                         .UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
-                        .LogTo(Console.WriteLine, LogLevel.Information));
-
+                        .LogTo(Console.WriteLine, LogLevel.Debug).EnableSensitiveDataLogging());
 
         services.AddScoped<EntitySaveChangesInterceptor>();
-
-        services.AddScoped<AppDBContext>();
 
         services.AddIdentity<User, Role>(options =>
             {

@@ -15,7 +15,7 @@ public class LoginEndpoint : BaseApiController
         _authService = authService;
     }
 
-    [HttpPost("user/login")]
+    [HttpPost("users/login")]
     public async Task<IActionResult> Login(UserLoginRequest request, CancellationToken ct)
     {
         var token = await _authService.LoginAsync(request, ct).ConfigureAwait(false);

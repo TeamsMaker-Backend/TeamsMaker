@@ -10,11 +10,11 @@ public class Organization : TrackedEntity<int>, IActivable
     public TranslatableString Name { get; set; } = TranslatableString.Empty;
     public string Address { get; set; } = string.Empty;
     public string? Phone { get; set; }
-    public byte[]? Logo { get; set; }
+    public string? Logo { get; set; } //TODO: string url
     public string? Description { get; set; }
 
     public bool IsActive { get; set; } = true;
 
-    public ICollection<User>? Users { get; set; }
-    public ICollection<Role>? Roles { get; set; }
+    public virtual ICollection<User> Users { get; set; } = [];
+    public virtual ICollection<Role> Roles { get; set; } = [];
 }

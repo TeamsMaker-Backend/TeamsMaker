@@ -14,7 +14,7 @@ public class DeleteOrganizationEndpoint : BaseApiController
         _organizationService = organizationService;
     }
 
-    [HttpDelete("organization/{id}")]
+    [HttpDelete("organizations/{id}")]
     public async Task<IActionResult> UpdateOrganization(int id,  CancellationToken ct)
     {
         await _organizationService.DeleteAsync(id, ct);

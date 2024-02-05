@@ -17,7 +17,7 @@ public class RefreshTokenEndpoint : BaseApiController
         _authService = authService;
     }
 
-    [HttpPost("user/refresh_token")]
+    [HttpPost("users/refresh_token")]
     public async Task<IActionResult> RefreshToken(TokenRequest request, CancellationToken ct)
     {
         var refreshToken = await _authService.RefreshTokenAsync(request, ct).ConfigureAwait(false);
