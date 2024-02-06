@@ -8,6 +8,8 @@ using TeamsMaker.Api.Contracts.Requests;
 using TeamsMaker.Api.Contracts.Responses;
 using TeamsMaker.Api.DataAccess.Context;
 using TeamsMaker.Api.Core.Consts;
+using TeamsMaker.Core.Enums;
+using DataAccess.Base.Interfaces;
 
 
 namespace TeamsMaker.Api.Services.Auth;
@@ -24,7 +26,8 @@ public class AuthService : IAuthService
         UserManager<User> userManager,
         RoleManager<Role> roleManager,
         JwtConfig jwtConfig,
-        TokenValidationParameters tokenValidationParams)
+        TokenValidationParameters tokenValidationParams,
+        IUserInfo userInfo)
     {
         _db = db;
         _userManager = userManager;
@@ -34,44 +37,53 @@ public class AuthService : IAuthService
     }
 
 
-    public async Task<TokenResponse> RegisterAsync(UserRegisterationRequest registerationRequest, CancellationToken ct)
+    public async Task<TokenResponse> RegisterAsync(UserRegisterationRequest registerRequest, CancellationToken ct)
     {
-        var existedUser = await _userManager.FindByEmailAsync(registerationRequest.Email);
+        // var existedUser = await _db.Users.SingleOrDefaultAsync(u => u.SSN == registerRequest.SSN , ct);
 
-        if (existedUser != null) throw new InvalidOperationException("A user with the specified email already exists.");
+        // if (existedUser is null)
+        //     throw new InvalidOperationException("This user is not allowed to register.");
 
-        Staff user = new()
-        {
-            FirstName = registerationRequest.FirstName,
-            LastName = registerationRequest.LastName,
-            Email = registerationRequest.Email,
-            UserName = registerationRequest.UserName,
-            Classification = StaffClassificationsEnum.Professor // child property
-        };
+        // if(existedUser.Email == registerRequest.Email)
+        //     throw new InvalidOperationException("A user with the specified email already exists.");
 
-        var isCreated = await _userManager.CreateAsync(user, registerationRequest.Password);
 
-        if (!isCreated.Succeeded)
-        {
-            var errors = string.Join(", ", isCreated.Errors.Select(e => e.Description));
-            throw new InvalidOperationException(errors);
-        }
+        // // dynamic user = registerRequest.UserType switch
+        // // {
+        // //     (int)UserEnum.Professor => 
+        // //         existedUser is Staff
+            
+        // //     (int)UserEnum.Student => Student
+        // //         .Create(registerRequest.FirstName, registerRequest.LastName, registerRequest.Email, registerRequest.UserName)
+        // //         .WithOrganizationId(existedUser.OrganizationId),
+            
+        // //     _ => throw new Exception("User type not recognized")
+        // // };
 
-        await _userManager.AddToRoleAsync(user, AppRoles.Professor);
-        var jwtToken = await GenerateJwtTokenAsync(user, ct);
+        // var role = registerRequest.UserType == (int)UserEnum.Professor ? AppRoles.Professor : AppRoles.Student;
 
-        return jwtToken;
+        // IdentityResult result = await _userManager.CreateAsync(user, registerRequest.Password);
+
+        // if (!result.Succeeded)
+        // {
+        //     var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+        //     throw new Exception(errors);
+        // }
+
+        // // await _userManager.AddToRoleAsync(user, role);
+        // // var tokenResponse = await GenerateJwtTokenAsync(user, ct);
+        // return tokenResponse;
+
+        throw new NotImplementedException();
     }
 
     public async Task<bool> VerifyUserAsync(UserVerificationRequset verificationRequest, CancellationToken ct)
     {
-        var user = await _db.Users.FirstOrDefaultAsync(u => u.SSN == verificationRequest.SSN, ct);
+        var user = await _db.Users.SingleOrDefaultAsync(u => u.SSN == verificationRequest.SSN, ct);
 
         Guard.Against.Null(user, nameof(user));
 
-
-
-        throw new NotImplementedException();
+        return true;
     }
 
     public async Task<TokenResponse> LoginAsync(UserLoginRequest loginRequest, CancellationToken ct)
@@ -105,6 +117,7 @@ public class AuthService : IAuthService
 
         return token;
     }
+
 
     private async Task<TokenResponse> GenerateJwtTokenAsync(User user, CancellationToken ct)
     {

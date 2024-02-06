@@ -9,11 +9,9 @@ public class UserConfig : IEntityTypeConfiguration<User>
     {
         // Properties
         builder.Property(x => x.FirstName)
-            .IsRequired()
             .HasMaxLength(255);
         
         builder.Property(x => x.LastName)
-            .IsRequired()
             .HasMaxLength(255);
         
         builder.Property(x => x.SSN)
@@ -37,10 +35,9 @@ public class UserConfig : IEntityTypeConfiguration<User>
 
         // Enums
         builder.Property(x => x.Gender)
-            .IsRequired()
             .HasConversion<int>(); // Update the conversion method
 
         builder.Property(x => x.Gender)
-            .HasDefaultValue(GenderEnum.Male);
+            .HasDefaultValue(GenderEnum.Unknown);
     }
 }

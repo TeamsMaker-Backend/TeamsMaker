@@ -6,18 +6,19 @@ namespace DataAccess.Base;
 
 public class UserInfo : IUserInfo
 {
-    public string UserName { get; private set; } = string.Empty;
     public string UserId { get; private set; } = string.Empty;
-    public IEnumerable<string> Roles { get; private set; } = [];
+    public string UserName { get; private set; } = string.Empty;
+    public string Email { get; private set; } = string.Empty;
     public int OrganizationId { get; private set; } = 0;
+    public IEnumerable<string> Roles { get; private set; } = [];
 
     public UserInfo(IHttpContextAccessor accessor, AppDBContext db)
     {
         var contextClaims = accessor.HttpContext?.User?.Claims;
         if (contextClaims is null || !contextClaims.Any()) return;
 
-        var contextUserId = contextClaims.FirstOrDefault(a => a.Type == "UserId")?.Value;
-        
+        var contextUserId = contextClaims.FirstOrDefault(a => a.Type == "Id")?.Value;
+
         if (string.IsNullOrEmpty(contextUserId)) return;
 
         var user = db.Users
@@ -29,6 +30,7 @@ public class UserInfo : IUserInfo
 
         UserId = user.Id;
         UserName = user.UserName!;
+        Email = user.Email!;
         OrganizationId = user.OrganizationId;
         Roles = GetRoles(db, UserId);
     }

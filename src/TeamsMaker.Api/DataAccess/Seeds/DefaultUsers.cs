@@ -17,6 +17,7 @@ public static class DefaultUsers
             {
                 FirstName = "Default",
                 LastName = "User",
+                SSN = "230-68-4525-879-82",
                 UserName = "default_user",
                 Email = "default_user123@gmail.com",
                 EmailConfirmed = true,

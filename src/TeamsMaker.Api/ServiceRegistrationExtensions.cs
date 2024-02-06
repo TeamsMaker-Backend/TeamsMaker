@@ -17,7 +17,8 @@ public static class ServiceRegistrationExtensions
                 options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"),
                     o => o
                         .UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
-                        .LogTo(Console.WriteLine, LogLevel.Debug).EnableSensitiveDataLogging());
+                        .LogTo(Console.WriteLine, LogLevel.Debug)
+                        .EnableSensitiveDataLogging());
 
         services.AddScoped<EntitySaveChangesInterceptor>();
 
@@ -41,7 +42,6 @@ public static class ServiceRegistrationExtensions
         services.AddScoped<IUserInfo, UserInfo>();
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IOrganizationService, OrganizationService>();
-
 
         return services;
     }

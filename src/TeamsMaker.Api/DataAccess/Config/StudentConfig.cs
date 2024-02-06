@@ -9,7 +9,5 @@ public class StudentConfig : IEntityTypeConfiguration<Student>
         builder.Property(x => x.CollegeId)
             .IsRequired()
             .HasMaxLength(50);
-
-
     }
 }

@@ -49,9 +49,9 @@ builder.Services.AddAuthorizationBuilder()
         .Build());
 #endregion
 
+builder.Services.AddHttpContextAccessor();
 builder.Services.RegisterBusinessServices();
 builder.Services.RegisterDataServices(builder.Configuration);
-builder.Services.AddHttpContextAccessor();
 
 #region  model state validation
 builder.Services.Configure<ApiBehaviorOptions>(options =>
