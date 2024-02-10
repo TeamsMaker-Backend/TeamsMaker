@@ -1,6 +1,8 @@
-using TeamsMaker.Api.DataAccess.Interceptors;
-using DataAccess.Base.Interfaces;
 using System.Reflection;
+
+using DataAccess.Base.Interfaces;
+
+using TeamsMaker.Api.DataAccess.Interceptors;
 
 namespace TeamsMaker.Api.DataAccess.Context;
 
@@ -26,6 +28,7 @@ public class AppDBContext : IdentityDbContext<User, Role, string>
     public DbSet<Staff> Staff { get; set; }
     public DbSet<RefreshToken> RefreshTokens { get; set; }
     public DbSet<Organization> Organizations { get; set; }
+    public DbSet<Department> Departments { get; set; }
     #endregion
 
 

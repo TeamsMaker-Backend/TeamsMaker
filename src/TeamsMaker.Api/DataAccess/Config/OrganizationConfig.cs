@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-using TeamsMaker.Api.DataAccess.Models;
+using TeamsMaker.Api.Core.Consts;
 
 namespace TeamsMaker.Api.DataAccess.Config;
 
@@ -8,6 +8,8 @@ public class OrganizationConfig : IEntityTypeConfiguration<Organization>
 {
     public void Configure(EntityTypeBuilder<Organization> builder)
     {
+        builder.ToTable(nameof(Organization), DatabaseSchemas.Dbo);
+
         builder.HasKey(x => x.Id);
 
         builder.OwnsOne(x => x.Name, x =>

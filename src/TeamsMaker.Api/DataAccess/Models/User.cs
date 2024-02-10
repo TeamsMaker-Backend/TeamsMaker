@@ -6,9 +6,9 @@ namespace TeamsMaker.Api.DataAccess.Models;
 
 public class User : IdentityUser, IActivable
 {
-    public string? FirstName { get; set; }
-    public string? LastName { get; set; }
-    public string SSN { get; set; } = string.Empty;
+    public string FirstName { get; set; } = null!;
+    public string LastName { get; set; } = null!;
+    public string SSN { get; set; } = null!;
     public string? Avatar { get; set; }
     public string? Header { get; set; }
     public string? Bio { get; set; }
@@ -18,7 +18,6 @@ public class User : IdentityUser, IActivable
     public bool IsActive { get; set; } = true;
     public int OrganizationId { get; set; }
     public virtual Organization Organization { get; set; } = null!;
-    // TODO: Dept
     public virtual ICollection<RefreshToken> RefreshTokens { get; set; } = [];
 
     // public static User Create(string firstName, string lastName, string email, string userName)
@@ -33,17 +32,20 @@ public class User : IdentityUser, IActivable
     // }
 
 
-    public User WithOrganizationId(int organizationId)
-    {
-        OrganizationId = organizationId;
+    // public User WithOrganizationId(int organizationId)
+    // {
+    //     OrganizationId = organizationId;
 
-        return this;
-    }
+    //     return this;
+    // }
 
-    public static implicit operator User(bool v)
-    {
-        throw new NotImplementedException();
-    }
+    // public static implicit operator User(bool v)
+    // {
+    //     throw new NotImplementedException();
+    // }
 
 }
 //TODO: Department, Contacts, Circle, Posts, UserLinks, Tags
+
+
+/// create dpt (class, appDb, )
