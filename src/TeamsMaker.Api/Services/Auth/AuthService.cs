@@ -1,11 +1,8 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security;
 using System.Security.Claims;
-
 using DataAccess.Base.Interfaces;
-
 using Microsoft.IdentityModel.Tokens;
-
 using TeamsMaker.Api.Configurations;
 using TeamsMaker.Api.Contracts.Requests;
 using TeamsMaker.Api.Contracts.Responses;
@@ -56,20 +53,26 @@ public class AuthService : IAuthService
             Student student = new();
             CreateUser(student, registerRequest);
 
+            var department = await _db.Departments.SingleOrDefaultAsync(x => x.Code == existedUser.Department, ct);
             // Student Data
             student.CollegeId = existedUser.CollegeId!;
+            student.GraduationYear = existedUser.GraduationYear!.Value;
+            student.GPA = existedUser.GPA!.Value;
+            student.OrganizationId = existedUser.OrganizationId;
+            student.Department = department;
 
             user = student;
         }
-        else if (registerRequest.UserType == (int)UserEnum.Professor)
+        else if (registerRequest.UserType == (int)UserEnum.Staff)
         {
-            Staff professor = new();
-            CreateUser(professor, registerRequest);
+            Staff staff = new();
+            CreateUser(staff, registerRequest);
 
             // Professor Data
-            professor.Classification = StaffClassificationsEnum.Professor;
+            staff.OrganizationId = existedUser.OrganizationId;
+            staff.Classification = StaffClassificationsEnum.Professor; //TODO: assign classification from imported user
 
-            user = professor;
+            user = staff;
         }
         else throw new ArgumentException("Invalid user type");
 
@@ -81,7 +84,7 @@ public class AuthService : IAuthService
             throw new Exception(errors);
         }
 
-        var role = registerRequest.UserType == (int)UserEnum.Professor ? AppRoles.Professor : AppRoles.Student;
+        var role = registerRequest.UserType == (int)UserEnum.Staff ? AppRoles.Professor : AppRoles.Student;
         await _userManager.AddToRoleAsync(user, role);
 
         var tokenResponse = await GenerateJwtTokenAsync(user, ct);
@@ -260,7 +263,10 @@ public class AuthService : IAuthService
     {
         user.FirstName = registerRequest.FirstName;
         user.LastName = registerRequest.LastName;
-        //..
+        user.Email = registerRequest.Email;
+        user.UserName = registerRequest.UserName;
+        user.SSN = registerRequest.SSN;
+        user.EmailConfirmed = true;
     }
 
     private string RandomString(int length)
