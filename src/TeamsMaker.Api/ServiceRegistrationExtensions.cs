@@ -1,7 +1,8 @@
-using TeamsMaker.Api.DataAccess.Interceptors;
-using TeamsMaker.Api.DataAccess.Context;
-using DataAccess.Base.Interfaces;
 using DataAccess.Base;
+using DataAccess.Base.Interfaces;
+
+using TeamsMaker.Api.DataAccess.Context;
+using TeamsMaker.Api.DataAccess.Interceptors;
 using TeamsMaker.Api.Services.Auth;
 using TeamsMaker.Api.Services.Organizations;
 

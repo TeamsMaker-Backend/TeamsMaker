@@ -1,6 +1,6 @@
 ﻿using Core.Generics;
+
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
 
 namespace TeamsMaker.Api;
 

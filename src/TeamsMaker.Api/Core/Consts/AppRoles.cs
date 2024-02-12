@@ -8,7 +8,7 @@ public static class AppRoles
     public const string Assistant = "Assistant";
     public const string Student = "Student";
 
-    public static List<string> OrdinaryRoles = 
+    public static List<string> OrdinaryRoles =
     [
         HeadOfDept,
         Professor,

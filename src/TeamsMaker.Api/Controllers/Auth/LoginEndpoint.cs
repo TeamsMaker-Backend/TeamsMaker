@@ -1,6 +1,4 @@
-﻿using Core.Generics;
-
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 
 using TeamsMaker.Api.Services.Auth;
 namespace TeamsMaker.Api.Controllers.Auth;

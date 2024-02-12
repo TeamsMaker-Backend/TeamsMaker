@@ -1,7 +1,9 @@
-using TeamsMaker.Api.DataAccess.Base.Interfaces;
+using DataAccess.Base.Interfaces;
+
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Diagnostics;
-using DataAccess.Base.Interfaces;
+
+using TeamsMaker.Api.DataAccess.Base.Interfaces;
 
 namespace TeamsMaker.Api.DataAccess.Interceptors;
 

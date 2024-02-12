@@ -17,7 +17,8 @@ public class OrganizationService : IOrganizationService
     public async Task<List<GetOrganizationResponse>> GetAsync(CancellationToken ct)
     {
         var organizations = await _db.Organizations
-            .Select(org => new GetOrganizationResponse{
+            .Select(org => new GetOrganizationResponse
+            {
                 Id = org.Id,
                 EngName = org.Name.Eng,
                 LocName = org.Name.Loc,

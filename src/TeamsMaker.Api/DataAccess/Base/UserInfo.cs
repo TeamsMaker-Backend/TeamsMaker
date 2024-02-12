@@ -1,5 +1,5 @@
 using DataAccess.Base.Interfaces;
-using Microsoft.AspNetCore.Authentication;
+
 using TeamsMaker.Api.DataAccess.Context;
 
 namespace DataAccess.Base;

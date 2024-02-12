@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+
 using TeamsMaker.Api.Contracts.Requests;
 using TeamsMaker.Api.Services.Organizations;
 

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+
 using TeamsMaker.Api.Services.Organizations;
 
 namespace TeamsMaker.Api.Controllers;
@@ -15,7 +16,7 @@ public class DeleteOrganizationEndpoint : BaseApiController
     }
 
     [HttpDelete("organizations/{id}")]
-    public async Task<IActionResult> UpdateOrganization(int id,  CancellationToken ct)
+    public async Task<IActionResult> UpdateOrganization(int id, CancellationToken ct)
     {
         await _organizationService.DeleteAsync(id, ct);
 

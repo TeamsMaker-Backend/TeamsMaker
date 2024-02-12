@@ -13,6 +13,6 @@ public class StaffConfig : IEntityTypeConfiguration<Staff>
         builder
             .HasMany(x => x.DepartmentStaff)
             .WithOne(y => y.Staff)
-            .HasForeignKey(y => y.DepartmentId);
+            .HasForeignKey(y => y.StaffId);
     }
 }

@@ -1,8 +1,6 @@
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using TeamsMaker.Api.Contracts.Requests;
-using TeamsMaker.Api.DataAccess.Context;
+
 using TeamsMaker.Api.Services.Organizations;
 
 namespace TeamsMaker.Api.Controllers;

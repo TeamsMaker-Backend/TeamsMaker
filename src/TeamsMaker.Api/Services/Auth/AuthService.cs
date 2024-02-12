@@ -1,15 +1,18 @@
-﻿using System.Security;
+﻿using System.IdentityModel.Tokens.Jwt;
+using System.Security;
 using System.Security.Claims;
-using TeamsMaker.Api.Core.Guards;
-using TeamsMaker.Api.Configurations;
+
+using DataAccess.Base.Interfaces;
+
 using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
+
+using TeamsMaker.Api.Configurations;
 using TeamsMaker.Api.Contracts.Requests;
 using TeamsMaker.Api.Contracts.Responses;
-using TeamsMaker.Api.DataAccess.Context;
 using TeamsMaker.Api.Core.Consts;
+using TeamsMaker.Api.Core.Guards;
+using TeamsMaker.Api.DataAccess.Context;
 using TeamsMaker.Core.Enums;
-using DataAccess.Base.Interfaces;
 
 
 namespace TeamsMaker.Api.Services.Auth;
@@ -36,52 +39,64 @@ public class AuthService : IAuthService
         _tokenValidationParams = tokenValidationParams;
     }
 
-
     public async Task<TokenResponse> RegisterAsync(UserRegisterationRequest registerRequest, CancellationToken ct)
     {
-        // var existedUser = await _db.Users.SingleOrDefaultAsync(u => u.SSN == registerRequest.SSN , ct);
+        var existedUser = await _db.ImportedUsers.SingleOrDefaultAsync(u => u.SSN == registerRequest.SSN, ct);
 
-        // if (existedUser is null)
-        //     throw new InvalidOperationException("This user is not allowed to register.");
+        if (existedUser is null)
+            throw new InvalidOperationException("This user is not allowed to register.");
 
-        // if(existedUser.Email == registerRequest.Email)
-        //     throw new InvalidOperationException("A user with the specified email already exists.");
+        if (await _db.Users.AnyAsync(x => x.Email == registerRequest.Email))
+            throw new ArgumentException("This Email already exists");
 
+        User user;
 
-        // // dynamic user = registerRequest.UserType switch
-        // // {
-        // //     (int)UserEnum.Professor => 
-        // //         existedUser is Staff
-            
-        // //     (int)UserEnum.Student => Student
-        // //         .Create(registerRequest.FirstName, registerRequest.LastName, registerRequest.Email, registerRequest.UserName)
-        // //         .WithOrganizationId(existedUser.OrganizationId),
-            
-        // //     _ => throw new Exception("User type not recognized")
-        // // };
+        if (registerRequest.UserType == (int)UserEnum.Student)
+        {
+            Student student = new();
+            CreateUser(student, registerRequest);
 
-        // var role = registerRequest.UserType == (int)UserEnum.Professor ? AppRoles.Professor : AppRoles.Student;
+            // Student Data
+            student.CollegeId = existedUser.CollegeId!;
 
-        // IdentityResult result = await _userManager.CreateAsync(user, registerRequest.Password);
+            user = student;
+        }
+        else if (registerRequest.UserType == (int)UserEnum.Professor)
+        {
+            Staff professor = new();
+            CreateUser(professor, registerRequest);
 
-        // if (!result.Succeeded)
-        // {
-        //     var errors = string.Join(", ", result.Errors.Select(e => e.Description));
-        //     throw new Exception(errors);
-        // }
+            // Professor Data
+            professor.Classification = StaffClassificationsEnum.Professor;
 
-        // // await _userManager.AddToRoleAsync(user, role);
-        // // var tokenResponse = await GenerateJwtTokenAsync(user, ct);
-        // return tokenResponse;
+            user = professor;
+        }
+        else throw new ArgumentException("Invalid user type");
 
-        throw new NotImplementedException();
+        IdentityResult result = await _userManager.CreateAsync(user, registerRequest.Password);
+
+        if (!result.Succeeded)
+        {
+            var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+            throw new Exception(errors);
+        }
+
+        var role = registerRequest.UserType == (int)UserEnum.Professor ? AppRoles.Professor : AppRoles.Student;
+        await _userManager.AddToRoleAsync(user, role);
+
+        var tokenResponse = await GenerateJwtTokenAsync(user, ct);
+        return tokenResponse;
     }
 
     public async Task<bool> VerifyUserAsync(UserVerificationRequset verificationRequest, CancellationToken ct)
     {
-        var user = await _db.Users.SingleOrDefaultAsync(u => u.SSN == verificationRequest.SSN, ct);
+        var user = await _db.ImportedUsers.SingleOrDefaultAsync(u => u.SSN == verificationRequest.SSN, ct);
 
         Guard.Against.Null(user, nameof(user));
+
+        if (verificationRequest.UserType == (int)UserEnum.Student &&
+            user!.CollegeId != verificationRequest.CollegeId)
+            throw new ArgumentException("User verification failed: User is not associated with the specified college.");
 
         return true;
     }
@@ -241,8 +256,14 @@ public class AuthService : IAuthService
         return true;
     }
 
+    private void CreateUser(User user, UserRegisterationRequest registerRequest)
+    {
+        user.FirstName = registerRequest.FirstName;
+        user.LastName = registerRequest.LastName;
+        //..
+    }
 
-    private static string RandomString(int length)
+    private string RandomString(int length)
     {
         Random random = new();
 

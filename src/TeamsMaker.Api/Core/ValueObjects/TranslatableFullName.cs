@@ -16,8 +16,8 @@ public record class TranslatableFullName
     protected TranslatableFullName()
     { }
 
-    public TranslatableFullName(TranslatableString firstName, 
-        TranslatableString secondName, TranslatableString thirdName, 
+    public TranslatableFullName(TranslatableString firstName,
+        TranslatableString secondName, TranslatableString thirdName,
         TranslatableString fourthName, TranslatableString fifthName) : this()
     {
         FirstName = firstName;

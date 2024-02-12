@@ -10,8 +10,6 @@ public class DepartmentStaffConfig : IEntityTypeConfiguration<DepartmentStaff>
     {
         builder.ToTable(nameof(DepartmentStaff), DatabaseSchemas.Dbo);
 
-
-
         builder
             .HasOne(x => x.Department)
             .WithMany(y => y.DepartmentStaff)
@@ -20,6 +18,6 @@ public class DepartmentStaffConfig : IEntityTypeConfiguration<DepartmentStaff>
         builder
             .HasOne(x => x.Staff)
             .WithMany(y => y.DepartmentStaff)
-            .HasForeignKey(y => y.DepartmentId);
+            .HasForeignKey(y => y.StaffId);
     }
 }

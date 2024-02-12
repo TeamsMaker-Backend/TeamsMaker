@@ -25,6 +25,7 @@ public class AppDBContext : IdentityDbContext<User, Role, string>
 
     #region DBSets
     public DbSet<Student> Students { get; set; }
+    public DbSet<ImportedUser> ImportedUsers { get; set; }
     public DbSet<Staff> Staff { get; set; }
     public DbSet<RefreshToken> RefreshTokens { get; set; }
     public DbSet<Organization> Organizations { get; set; }

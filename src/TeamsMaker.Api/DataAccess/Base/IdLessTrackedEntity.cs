@@ -8,7 +8,7 @@ namespace TeamsMaker.Api.DataAccess.Base.Interfaces;
 /// </summary>
 /// <seealso cref="ICreationInfo"/>
 /// <seealso cref="IModificationInfo"/>
-public abstract class IdLessTrackedEntity: IdLessEntity, ICreationInfo, IModificationInfo
+public abstract class IdLessTrackedEntity : IdLessEntity, ICreationInfo, IModificationInfo
 {
     public string CreatedBy { get; protected set; }
 

@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace TeamsMaker.Api;
+﻿namespace TeamsMaker.Api;
 
 public class UserLoginRequest
 {
