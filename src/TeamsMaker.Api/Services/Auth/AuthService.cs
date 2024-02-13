@@ -1,8 +1,11 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security;
 using System.Security.Claims;
+
 using DataAccess.Base.Interfaces;
+
 using Microsoft.IdentityModel.Tokens;
+
 using TeamsMaker.Api.Configurations;
 using TeamsMaker.Api.Contracts.Requests;
 using TeamsMaker.Api.Contracts.Responses;
@@ -36,47 +39,16 @@ public class AuthService : IAuthService
         _tokenValidationParams = tokenValidationParams;
     }
 
+
     public async Task<TokenResponse> RegisterAsync(UserRegisterationRequest registerRequest, CancellationToken ct)
     {
-        var existedUser = await _db.ImportedUsers.SingleOrDefaultAsync(u => u.SSN == registerRequest.SSN, ct);
+        User user = new();
 
-        if (existedUser is null)
-            throw new InvalidOperationException("This user is not allowed to register.");
-
-        if (await _db.Users.AnyAsync(x => x.Email == registerRequest.Email))
-            throw new ArgumentException("This Email already exists");
-
-        User user;
-
-        if (registerRequest.UserType == (int)UserEnum.Student)
-        {
-            Student student = new();
-            CreateUser(student, registerRequest);
-
-            var department = await _db.Departments.SingleOrDefaultAsync(x => x.Code == existedUser.Department, ct);
-            // Student Data
-            student.CollegeId = existedUser.CollegeId!;
-            student.GraduationYear = existedUser.GraduationYear!.Value;
-            student.GPA = existedUser.GPA!.Value;
-            student.OrganizationId = existedUser.OrganizationId;
-            student.Department = department;
-
-            user = student;
-        }
-        else if (registerRequest.UserType == (int)UserEnum.Staff)
-        {
-            Staff staff = new();
-            CreateUser(staff, registerRequest);
-
-            // Professor Data
-            staff.OrganizationId = existedUser.OrganizationId;
-            staff.Classification = StaffClassificationsEnum.Professor; //TODO: assign classification from imported user
-
-            user = staff;
-        }
+        if (registerRequest.UserType == (int)UserEnum.Student) await RegisterStudentAsync(registerRequest, user, ct);
+        else if (registerRequest.UserType == (int)UserEnum.Staff) await RegisterStaffAsync(registerRequest, user, ct);
         else throw new ArgumentException("Invalid user type");
 
-        IdentityResult result = await _userManager.CreateAsync(user, registerRequest.Password);
+        var result = await _userManager.CreateAsync(user, registerRequest.Password);
 
         if (!result.Succeeded)
         {
@@ -91,17 +63,74 @@ public class AuthService : IAuthService
         return tokenResponse;
     }
 
+    #region 
+    // public async Task<TokenResponse> RegisterAsyncV1(UserRegisterationRequest registerRequest, CancellationToken ct)
+    // {
+    //     var existedUser = await _db.ImportedStudents.SingleOrDefaultAsync(u => u.SSN == registerRequest.SSN, ct);
+
+    //     if (existedUser is null)
+    //         throw new InvalidOperationException("This user is not allowed to register.");
+
+    //     if (await _db.Users.AnyAsync(x => x.Email == registerRequest.Email))
+    //         throw new ArgumentException("This Email already exists");
+
+    //     User user;
+
+    //     if (registerRequest.UserType == (int)UserEnum.Student)
+    //     {
+    //         Student student = new();
+    //         CreateUser(student, registerRequest);
+
+    //         var department = await _db.Departments.SingleOrDefaultAsync(x => x.Code == existedUser.Department, ct);
+    //         // Student Data
+    //         student.CollegeId = existedUser.CollegeId!;
+    //         student.GraduationYear = existedUser.GraduationYear!;
+    //         student.GPA = existedUser.GPA!;
+    //         student.OrganizationId = existedUser.OrganizationId;
+    //         student.Department = department;
+
+    //         user = student;
+    //     }
+    //     else if (registerRequest.UserType == (int)UserEnum.Staff)
+    //     {
+    //         Staff staff = new();
+    //         CreateUser(staff, registerRequest);
+
+    //         // Professor Data
+    //         staff.OrganizationId = existedUser.OrganizationId;
+    //         staff.Classification = StaffClassificationsEnum.Professor; //TODO: assign classification from imported user
+
+    //         user = staff;
+    //     }
+    //     else throw new ArgumentException("Invalid user type");
+
+    //     var result = await _userManager.CreateAsync(user, registerRequest.Password);
+
+    //     if (!result.Succeeded)
+    //     {
+    //         var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+    //         throw new Exception(errors);
+    //     }
+
+    //     var role = registerRequest.UserType == (int)UserEnum.Staff ? AppRoles.Professor : AppRoles.Student;
+    //     await _userManager.AddToRoleAsync(user, role);
+
+    //     var tokenResponse = await GenerateJwtTokenAsync(user, ct);
+    //     return tokenResponse;
+    // }
+    #endregion
+
     public async Task<bool> VerifyUserAsync(UserVerificationRequset verificationRequest, CancellationToken ct)
     {
-        var user = await _db.ImportedUsers.SingleOrDefaultAsync(u => u.SSN == verificationRequest.SSN, ct);
+        if (verificationRequest.UserType == (int)UserEnum.Student)
+        {
+            if (!string.IsNullOrEmpty(verificationRequest.CollegeId)) throw new ArgumentException("College Id must has a value");
 
-        Guard.Against.Null(user, nameof(user));
-
-        if (verificationRequest.UserType == (int)UserEnum.Student &&
-            user!.CollegeId != verificationRequest.CollegeId)
-            throw new ArgumentException("User verification failed: User is not associated with the specified college.");
-
-        return true;
+            return await _db.ImportedStudents.AnyAsync(s => s.SSN == verificationRequest.SSN && s.CollegeId == verificationRequest.CollegeId, ct);
+        }
+        else if (verificationRequest.UserType == (int)UserEnum.Staff)
+            return await _db.ImportedStaff.AnyAsync(s => s.SSN == verificationRequest.SSN, ct);
+        else throw new ArgumentException("Invalid user type");
     }
 
     public async Task<TokenResponse> LoginAsync(UserLoginRequest loginRequest, CancellationToken ct)
@@ -136,6 +165,57 @@ public class AuthService : IAuthService
         return token;
     }
 
+    private async Task<User> RegisterStudentAsync(UserRegisterationRequest registerRequest, User user, CancellationToken ct)
+    {
+        var existedStudent = await _db.ImportedStudents.SingleOrDefaultAsync(u => u.SSN == registerRequest.SSN, ct)
+            ?? throw new InvalidOperationException("This user is not allowed to register.");
+
+        if (await _db.Users.AnyAsync(x => x.Email == registerRequest.Email, ct))
+            throw new ArgumentException("This Email already exists");
+
+        Student student = new();
+        CreateUser(student, registerRequest);
+
+        var department = await _db.Departments.SingleOrDefaultAsync(x => x.Code == existedStudent.Department, ct);
+        // Student Data
+        student.CollegeId = existedStudent.CollegeId;
+        student.GraduationYear = existedStudent.GraduationYear;
+        student.GPA = existedStudent.GPA;
+        student.OrganizationId = existedStudent.OrganizationId;
+        student.Department = department;
+
+        user = student;
+
+        return user;
+    }
+
+    private async Task RegisterStaffAsync(UserRegisterationRequest registerRequest, User user, CancellationToken ct)
+    {
+        var existedStudent = await _db.ImportedStaff.SingleOrDefaultAsync(u => u.SSN == registerRequest.SSN, ct)
+            ?? throw new InvalidOperationException("This user is not allowed to register.");
+
+        if (await _db.Users.AnyAsync(x => x.Email == registerRequest.Email))
+            throw new ArgumentException("This Email already exists");
+
+        Staff staff = new();
+        CreateUser(staff, registerRequest);
+
+        // Professor Data
+        staff.OrganizationId = existedStudent.OrganizationId;
+        staff.Classification = StaffClassificationsEnum.Professor; //TODO: assign classification from imported user
+
+        user = staff;
+    }
+
+    private void CreateUser(User user, UserRegisterationRequest registerRequest)
+    {
+        user.FirstName = registerRequest.FirstName;
+        user.LastName = registerRequest.LastName;
+        user.Email = registerRequest.Email;
+        user.UserName = registerRequest.UserName;
+        user.SSN = registerRequest.SSN;
+        user.EmailConfirmed = true;
+    }
 
     private async Task<TokenResponse> GenerateJwtTokenAsync(User user, CancellationToken ct)
     {
@@ -257,16 +337,6 @@ public class AuthService : IAuthService
         await _db.SaveChangesAsync();
 
         return true;
-    }
-
-    private void CreateUser(User user, UserRegisterationRequest registerRequest)
-    {
-        user.FirstName = registerRequest.FirstName;
-        user.LastName = registerRequest.LastName;
-        user.Email = registerRequest.Email;
-        user.UserName = registerRequest.UserName;
-        user.SSN = registerRequest.SSN;
-        user.EmailConfirmed = true;
     }
 
     private string RandomString(int length)
