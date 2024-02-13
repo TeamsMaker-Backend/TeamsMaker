@@ -20,17 +20,6 @@ public class User : IdentityUser, IActivable
     public virtual Organization Organization { get; set; } = null!;
     public virtual ICollection<RefreshToken> RefreshTokens { get; set; } = [];
 
-    // public static User Create(string firstName, string lastName, string email, string userName)
-    // {
-    //     return new User
-    //     {
-    //         FirstName = firstName,
-    //         LastName = lastName,
-    //         Email = email,
-    //         UserName = userName
-    //     };
-    // }
-
 
     // public User WithOrganizationId(int organizationId)
     // {
@@ -45,7 +34,4 @@ public class User : IdentityUser, IActivable
     // }
 
 }
-//TODO: Department, Contacts, Circle, Posts, UserLinks, Tags
-
-
-/// create dpt (class, appDb, )
+//TODO: Contacts, Circle, Posts, UserLinks, Tags
