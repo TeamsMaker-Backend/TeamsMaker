@@ -475,3 +475,6 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+/src/TeamsMaker.Api/Properties/launchSettings.json
+/src/TeamsMaker.Api/appsettings.json
+/.gitignore
