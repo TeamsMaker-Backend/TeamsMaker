@@ -25,5 +25,27 @@ public class DepartmentConfig : IEntityTypeConfiguration<Department>
             .HasMany(x => x.DepartmentStaff)
             .WithOne(y => y.Department)
             .HasForeignKey(y => y.DepartmentId);
+
+        builder.HasData(LoadData());
+    }
+
+    private object[] LoadData()
+    {
+        return [
+            new
+            {
+                Id = 1,
+                Name = "Computer Science",
+                Code = "CS",
+                IsActive = true
+            },
+            new
+            {
+                Id = 2,
+                Name = "Information System",
+                Code = "IS",
+                IsActive = true
+            }
+        ];
     }
 }

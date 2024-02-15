@@ -11,7 +11,6 @@ public static class SeedDB
         var userManager = serviceProvider.GetRequiredService<UserManager<User>>();
         db.Database.EnsureCreated();
 
-        await DefaultOrganization.SeedOrganization(db);
         await DefaultRoles.SeedRoles(db, roleManager);
         await DefaultUsers.SeedAdminUser(db, userManager);
     }

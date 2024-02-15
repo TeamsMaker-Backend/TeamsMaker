@@ -165,7 +165,7 @@ public class AuthService : IAuthService
         return token;
     }
 
-    private async Task<User> RegisterStudentAsync(UserRegisterationRequest registerRequest, User user, CancellationToken ct)
+    private async Task RegisterStudentAsync(UserRegisterationRequest registerRequest, User user, CancellationToken ct)
     {
         var existedStudent = await _db.ImportedStudents.SingleOrDefaultAsync(u => u.SSN == registerRequest.SSN, ct)
             ?? throw new InvalidOperationException("This user is not allowed to register.");
@@ -185,8 +185,6 @@ public class AuthService : IAuthService
         student.Department = department;
 
         user = student;
-
-        return user;
     }
 
     private async Task RegisterStaffAsync(UserRegisterationRequest registerRequest, User user, CancellationToken ct)

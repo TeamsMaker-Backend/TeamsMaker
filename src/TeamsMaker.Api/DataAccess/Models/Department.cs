@@ -5,7 +5,7 @@ namespace TeamsMaker.Api.DataAccess.Models;
 
 public class Department : TrackedEntity<int>, IActivable
 {
-    public required string Code { get; set; }
+    public string Code { get; set; } = null!;
     public string Name { get; set; } = null!;
 
     public bool IsActive { get; set; } = true;

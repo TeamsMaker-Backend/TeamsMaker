@@ -12,11 +12,9 @@ public class OrganizationConfig : IEntityTypeConfiguration<Organization>
 
         builder.HasKey(x => x.Id);
 
-        builder.OwnsOne(x => x.Name, x =>
-        {
-            x.Property(t => t.Eng).HasColumnName("EngName");
-            x.Property(t => t.Loc).HasColumnName("LocName");
-        });
+        builder
+            .OwnsOne(x => x.Name)
+            .HasData(LoadOwned());
 
         builder
             .HasMany(x => x.Users)
@@ -27,5 +25,31 @@ public class OrganizationConfig : IEntityTypeConfiguration<Organization>
             .HasMany(x => x.Roles)
             .WithOne(y => y.Organization)
             .HasForeignKey(y => y.OrganizationId);
+
+        builder.HasData(LoadData());
+    }
+
+    static object[] LoadOwned()
+    {
+        return [
+            new
+            {
+                OrganizationId = 1,
+                Eng = "Computers and Information Systems Kafr-Elsheikh University",
+                Loc = "الحاسبات ونظم المعلومات جامعة كفر الشيخ",
+            }
+        ];
+    }
+
+    static object[] LoadData()
+    {
+        return [
+            new
+            {
+                Id = 1,
+                Address = "Kafr-Elsheikh City",
+                IsActive = true
+            }
+        ];
     }
 }

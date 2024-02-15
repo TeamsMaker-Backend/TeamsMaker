@@ -1,9 +1,10 @@
-using TeamsMaker.Api;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+
+using TeamsMaker.Api;
 using TeamsMaker.Api.Configurations;
 using TeamsMaker.Api.Core.ResultMessages;
 using TeamsMaker.Api.DataAccess.Seeds;
