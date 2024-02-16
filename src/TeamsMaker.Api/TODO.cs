@@ -27,3 +27,33 @@
         * ?  waiting
         
 */
+
+
+/*
+Profile
+0- seeding
+1- Add avatar/header
+2- Add Bio/About
+3- Add links
+4- Add CV
+5- Add Gender/City
+
+Post
+Put
+Get User Profile
+
+
+circle 
+
+
+Admin panel
+Organization -> Get organziaiton info/ Add organization info/ Update organization info
+User -> Get all users/ Add user info/ Update user info "change role"/ deactivate user
+Deprtment -> Get all departments/ Add department info/ Update department info
+*/
+
+/*
+url
+request
+response
+*/
