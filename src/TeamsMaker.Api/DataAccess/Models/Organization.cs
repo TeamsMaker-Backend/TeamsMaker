@@ -17,4 +17,5 @@ public class Organization : TrackedEntity<int>, IActivable
 
     public virtual ICollection<User> Users { get; set; } = [];
     public virtual ICollection<Role> Roles { get; set; } = [];
+    public virtual ICollection<Department> Departments { get; set; } = [];
 }

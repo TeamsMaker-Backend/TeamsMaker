@@ -20,26 +20,6 @@ namespace TeamsMaker.Api.Migrations
                 name: "dbo");
 
             migrationBuilder.CreateTable(
-                name: "Department",
-                schema: "lookups",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Code = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false),
-                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CreationDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    ModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    LastModificationDate = table.Column<DateTime>(type: "datetime2", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Department", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "ImportedStaff",
                 schema: "lookups",
                 columns: table => new
@@ -155,6 +135,34 @@ namespace TeamsMaker.Api.Migrations
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
                     table.ForeignKey(
                         name: "FK_AspNetUsers_Organization_OrganizationId",
+                        column: x => x.OrganizationId,
+                        principalSchema: "dbo",
+                        principalTable: "Organization",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Department",
+                schema: "lookups",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    OrganizationId = table.Column<int>(type: "int", nullable: false),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreationDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    LastModificationDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Department", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Department_Organization_OrganizationId",
                         column: x => x.OrganizationId,
                         principalSchema: "dbo",
                         principalTable: "Organization",
@@ -378,22 +386,12 @@ namespace TeamsMaker.Api.Migrations
 
             migrationBuilder.InsertData(
                 schema: "lookups",
-                table: "Department",
-                columns: new[] { "Id", "Code", "CreatedBy", "CreationDate", "IsActive", "LastModificationDate", "ModifiedBy", "Name" },
-                values: new object[,]
-                {
-                    { 1, "CS", null, null, true, null, null, "Computer Science" },
-                    { 2, "IS", null, null, true, null, null, "Information System" }
-                });
-
-            migrationBuilder.InsertData(
-                schema: "lookups",
                 table: "ImportedStaff",
                 columns: new[] { "Id", "OrganizationId", "SSN" },
                 values: new object[,]
                 {
-                    { new Guid("a02e63fc-54de-41e5-a4e1-31816fb01c56"), 1, "622-45-0646" },
-                    { new Guid("d497031a-84e8-4545-8692-929f309ddca1"), 1, "553-35-8652" }
+                    { new Guid("3e9f4430-2927-41eb-a8a5-099248d1e6ba"), 1, "622-45-0646" },
+                    { new Guid("9266966b-fa8e-461a-bd61-0a1a15d5c234"), 1, "553-35-8652" }
                 });
 
             migrationBuilder.InsertData(
@@ -402,8 +400,8 @@ namespace TeamsMaker.Api.Migrations
                 columns: new[] { "Id", "CollegeId", "Department", "GPA", "GraduationYear", "OrganizationId", "SSN" },
                 values: new object[,]
                 {
-                    { new Guid("2abaa997-3d98-49c8-8fb4-a6fc246c2ab1"), "College-456", "Information System", 3.3f, new DateOnly(2026, 2, 15), 1, "776-11-4808" },
-                    { new Guid("917b4034-ff22-4235-9fe6-46cb9ff568e2"), "College-123", "Computer Science", 3.5f, new DateOnly(2024, 2, 15), 1, "600-68-1014" }
+                    { new Guid("5cba5edb-d6f0-4dee-85df-7f23fcbf86d3"), "College-456", "Information System", 3.3f, new DateOnly(2026, 2, 17), 1, "776-11-4808" },
+                    { new Guid("86281c15-127d-4c91-9dff-dcc24164f79b"), "College-123", "Computer Science", 3.5f, new DateOnly(2024, 2, 17), 1, "600-68-1014" }
                 });
 
             migrationBuilder.InsertData(
@@ -411,6 +409,16 @@ namespace TeamsMaker.Api.Migrations
                 table: "Organization",
                 columns: new[] { "Id", "Name_Eng", "Name_Loc", "Address", "CreatedBy", "CreationDate", "Description", "IsActive", "LastModificationDate", "Logo", "ModifiedBy", "Phone" },
                 values: new object[] { 1, "Computers and Information Systems Kafr-Elsheikh University", "الحاسبات ونظم المعلومات جامعة كفر الشيخ", "Kafr-Elsheikh City", null, null, null, true, null, null, null, null });
+
+            migrationBuilder.InsertData(
+                schema: "lookups",
+                table: "Department",
+                columns: new[] { "Id", "Code", "CreatedBy", "CreationDate", "IsActive", "LastModificationDate", "ModifiedBy", "Name", "OrganizationId" },
+                values: new object[,]
+                {
+                    { 1, "CS", null, null, true, null, null, "Computer Science", 1 },
+                    { 2, "IS", null, null, true, null, null, "Information System", 1 }
+                });
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
@@ -460,6 +468,12 @@ namespace TeamsMaker.Api.Migrations
                 column: "NormalizedUserName",
                 unique: true,
                 filter: "[NormalizedUserName] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Department_OrganizationId",
+                schema: "lookups",
+                table: "Department",
+                column: "OrganizationId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_DepartmentStaff_DepartmentId",

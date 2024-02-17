@@ -5,7 +5,7 @@ using TeamsMaker.Api.Contracts.Requests;
 
 using TeamsMaker.Api.Services.Organizations;
 
-namespace TeamsMaker.Api.Controllers;
+namespace TeamsMaker.Api.Controllers.Organizations;
 
 
 [Authorize]

@@ -159,7 +159,12 @@ namespace TeamsMaker.Api.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("OrganizationId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("OrganizationId");
 
                     b.ToTable("Department", "lookups");
 
@@ -169,14 +174,16 @@ namespace TeamsMaker.Api.Migrations
                             Id = 1,
                             Code = "CS",
                             IsActive = true,
-                            Name = "Computer Science"
+                            Name = "Computer Science",
+                            OrganizationId = 1
                         },
                         new
                         {
                             Id = 2,
                             Code = "IS",
                             IsActive = true,
-                            Name = "Information System"
+                            Name = "Information System",
+                            OrganizationId = 1
                         });
                 });
 
@@ -234,13 +241,13 @@ namespace TeamsMaker.Api.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("d497031a-84e8-4545-8692-929f309ddca1"),
+                            Id = new Guid("9266966b-fa8e-461a-bd61-0a1a15d5c234"),
                             OrganizationId = 1,
                             SSN = "553-35-8652"
                         },
                         new
                         {
-                            Id = new Guid("a02e63fc-54de-41e5-a4e1-31816fb01c56"),
+                            Id = new Guid("3e9f4430-2927-41eb-a8a5-099248d1e6ba"),
                             OrganizationId = 1,
                             SSN = "622-45-0646"
                         });
@@ -280,21 +287,21 @@ namespace TeamsMaker.Api.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("917b4034-ff22-4235-9fe6-46cb9ff568e2"),
+                            Id = new Guid("86281c15-127d-4c91-9dff-dcc24164f79b"),
                             CollegeId = "College-123",
                             Department = "Computer Science",
                             GPA = 3.5f,
-                            GraduationYear = new DateOnly(2024, 2, 15),
+                            GraduationYear = new DateOnly(2024, 2, 17),
                             OrganizationId = 1,
                             SSN = "600-68-1014"
                         },
                         new
                         {
-                            Id = new Guid("2abaa997-3d98-49c8-8fb4-a6fc246c2ab1"),
+                            Id = new Guid("5cba5edb-d6f0-4dee-85df-7f23fcbf86d3"),
                             CollegeId = "College-456",
                             Department = "Information System",
                             GPA = 3.3f,
-                            GraduationYear = new DateOnly(2026, 2, 15),
+                            GraduationYear = new DateOnly(2026, 2, 17),
                             OrganizationId = 1,
                             SSN = "776-11-4808"
                         });
@@ -629,6 +636,17 @@ namespace TeamsMaker.Api.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("TeamsMaker.Api.DataAccess.Models.Department", b =>
+                {
+                    b.HasOne("TeamsMaker.Api.DataAccess.Models.Organization", "Organization")
+                        .WithMany("Departments")
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Organization");
+                });
+
             modelBuilder.Entity("TeamsMaker.Api.DataAccess.Models.DepartmentStaff", b =>
                 {
                     b.HasOne("TeamsMaker.Api.DataAccess.Models.Department", "Department")
@@ -751,6 +769,8 @@ namespace TeamsMaker.Api.Migrations
 
             modelBuilder.Entity("TeamsMaker.Api.DataAccess.Models.Organization", b =>
                 {
+                    b.Navigation("Departments");
+
                     b.Navigation("Roles");
 
                     b.Navigation("Users");

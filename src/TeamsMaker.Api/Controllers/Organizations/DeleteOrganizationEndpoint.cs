@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using TeamsMaker.Api.Services.Organizations;
 using Microsoft.AspNetCore.Mvc;
 
-using TeamsMaker.Api.Services.Organizations;
 
-namespace TeamsMaker.Api.Controllers;
+namespace TeamsMaker.Api.Controllers.Organizations;
 
 [Authorize]
 public class DeleteOrganizationEndpoint : BaseApiController

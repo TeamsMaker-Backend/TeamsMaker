@@ -1,11 +1,9 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
+using System.Net.Mail;
 using System.Security;
 using System.Security.Claims;
-
 using DataAccess.Base.Interfaces;
-
 using Microsoft.IdentityModel.Tokens;
-
 using TeamsMaker.Api.Configurations;
 using TeamsMaker.Api.Contracts.Requests;
 using TeamsMaker.Api.Contracts.Responses;
@@ -210,7 +208,7 @@ public class AuthService : IAuthService
         user.FirstName = registerRequest.FirstName;
         user.LastName = registerRequest.LastName;
         user.Email = registerRequest.Email;
-        user.UserName = registerRequest.UserName;
+        user.UserName = new MailAddress(registerRequest.Email).User;
         user.SSN = registerRequest.SSN;
         user.EmailConfirmed = true;
     }
@@ -261,7 +259,6 @@ public class AuthService : IAuthService
             new Claim("Id", user.Id),
             new Claim(JwtRegisteredClaimNames.Email, user.Email!),
             new Claim("OrganizationId", user.OrganizationId.ToString()),
-            new Claim(JwtRegisteredClaimNames.Sub, user.UserName!),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             new Claim(JwtRegisteredClaimNames.Iat, DateTime.Now.ToUniversalTime().ToString())
         ];
