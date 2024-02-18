@@ -117,7 +117,7 @@ namespace TeamsMaker.Api.Migrations
                     OrganizationId = table.Column<int>(type: "int", nullable: false),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
                     NormalizedEmail = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     EmailConfirmed = table.Column<bool>(type: "bit", nullable: false),
                     PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -390,8 +390,8 @@ namespace TeamsMaker.Api.Migrations
                 columns: new[] { "Id", "OrganizationId", "SSN" },
                 values: new object[,]
                 {
-                    { new Guid("3e9f4430-2927-41eb-a8a5-099248d1e6ba"), 1, "622-45-0646" },
-                    { new Guid("9266966b-fa8e-461a-bd61-0a1a15d5c234"), 1, "553-35-8652" }
+                    { new Guid("3e9f4430-2927-41eb-a8a5-099248d1e6ba"), 1, "553-35-8652" },
+                    { new Guid("9266966b-fa8e-461a-bd61-0a1a15d5c234"), 1, "622-45-0646" }
                 });
 
             migrationBuilder.InsertData(
@@ -400,8 +400,8 @@ namespace TeamsMaker.Api.Migrations
                 columns: new[] { "Id", "CollegeId", "Department", "GPA", "GraduationYear", "OrganizationId", "SSN" },
                 values: new object[,]
                 {
-                    { new Guid("5cba5edb-d6f0-4dee-85df-7f23fcbf86d3"), "College-456", "Information System", 3.3f, new DateOnly(2026, 2, 17), 1, "776-11-4808" },
-                    { new Guid("86281c15-127d-4c91-9dff-dcc24164f79b"), "College-123", "Computer Science", 3.5f, new DateOnly(2024, 2, 17), 1, "600-68-1014" }
+                    { new Guid("5cba5edb-d6f0-4dee-85df-7f23fcbf86d3"), "College-123", "Computer Science", 3.5f, new DateOnly(2026, 2, 17), 1, "600-68-1014" },
+                    { new Guid("86281c15-127d-4c91-9dff-dcc24164f79b"), "College-456", "Information System", 3.3f, new DateOnly(2024, 2, 17), 1, "776-11-4808" }
                 });
 
             migrationBuilder.InsertData(
@@ -456,6 +456,12 @@ namespace TeamsMaker.Api.Migrations
                 name: "EmailIndex",
                 table: "AspNetUsers",
                 column: "NormalizedEmail");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AspNetUsers_Email",
+                table: "AspNetUsers",
+                column: "Email",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetUsers_OrganizationId",

@@ -12,7 +12,7 @@ using TeamsMaker.Api.DataAccess.Context;
 namespace TeamsMaker.Api.Migrations
 {
     [DbContext(typeof(AppDBContext))]
-    [Migration("20240217170150_initial_migration")]
+    [Migration("20240218010734_initial_migration")]
     partial class initial_migration
     {
         /// <inheritdoc />
@@ -244,13 +244,13 @@ namespace TeamsMaker.Api.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("9266966b-fa8e-461a-bd61-0a1a15d5c234"),
+                            Id = new Guid("3e9f4430-2927-41eb-a8a5-099248d1e6ba"),
                             OrganizationId = 1,
                             SSN = "553-35-8652"
                         },
                         new
                         {
-                            Id = new Guid("3e9f4430-2927-41eb-a8a5-099248d1e6ba"),
+                            Id = new Guid("9266966b-fa8e-461a-bd61-0a1a15d5c234"),
                             OrganizationId = 1,
                             SSN = "622-45-0646"
                         });
@@ -290,21 +290,21 @@ namespace TeamsMaker.Api.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("86281c15-127d-4c91-9dff-dcc24164f79b"),
+                            Id = new Guid("5cba5edb-d6f0-4dee-85df-7f23fcbf86d3"),
                             CollegeId = "College-123",
                             Department = "Computer Science",
                             GPA = 3.5f,
-                            GraduationYear = new DateOnly(2024, 2, 17),
+                            GraduationYear = new DateOnly(2026, 2, 17),
                             OrganizationId = 1,
                             SSN = "600-68-1014"
                         },
                         new
                         {
-                            Id = new Guid("5cba5edb-d6f0-4dee-85df-7f23fcbf86d3"),
+                            Id = new Guid("86281c15-127d-4c91-9dff-dcc24164f79b"),
                             CollegeId = "College-456",
                             Department = "Information System",
                             GPA = 3.3f,
-                            GraduationYear = new DateOnly(2026, 2, 17),
+                            GraduationYear = new DateOnly(2024, 2, 17),
                             OrganizationId = 1,
                             SSN = "776-11-4808"
                         });
@@ -464,6 +464,7 @@ namespace TeamsMaker.Api.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
+                        .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
@@ -533,6 +534,9 @@ namespace TeamsMaker.Api.Migrations
                         .HasColumnType("nvarchar(256)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
 
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");

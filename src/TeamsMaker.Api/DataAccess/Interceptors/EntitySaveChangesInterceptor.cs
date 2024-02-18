@@ -74,7 +74,7 @@ public class EntitySaveChangesInterceptor : SaveChangesInterceptor
             var statusEntity = entityEntry.Entity as ILastStatus<IStatus>;
             if (!entityEntry.Property(nameof(statusEntity.LastStatusId)).IsModified) return;
 
-            entityEntry.Property(nameof(statusEntity.LastStatusCreatedBy)).CurrentValue = _userInfo.UserName;
+            entityEntry.Property(nameof(statusEntity.LastStatusCreatedBy)).CurrentValue = _userInfo.Email;
             entityEntry.Property(nameof(statusEntity.LastStatusDateTime)).CurrentValue = _now;
         }
     }
@@ -83,7 +83,7 @@ public class EntitySaveChangesInterceptor : SaveChangesInterceptor
     {
         if (entityEntry.Entity is IModificationInfo modificationInfoEntity)
         {
-            entityEntry.Property(nameof(modificationInfoEntity.ModifiedBy)).CurrentValue = _userInfo.UserName;
+            entityEntry.Property(nameof(modificationInfoEntity.ModifiedBy)).CurrentValue = _userInfo.Email;
             entityEntry.Property(nameof(modificationInfoEntity.LastModificationDate)).CurrentValue = _now;
         }
     }
@@ -93,7 +93,7 @@ public class EntitySaveChangesInterceptor : SaveChangesInterceptor
         if (entityEntry.Entity.GetType().GetInterfaces().Where(i => i.IsGenericType).Any(i => i.GetGenericTypeDefinition() == typeof(ILastStatus<>)))
         {
             var statusEntity = entityEntry.Entity as ILastStatus<IStatus>;
-            entityEntry.Property(nameof(statusEntity.LastStatusCreatedBy)).CurrentValue = _userInfo.UserName;
+            entityEntry.Property(nameof(statusEntity.LastStatusCreatedBy)).CurrentValue = _userInfo.Email;
             entityEntry.Property(nameof(statusEntity.LastStatusDateTime)).CurrentValue = _now;
         }
     }
@@ -102,7 +102,7 @@ public class EntitySaveChangesInterceptor : SaveChangesInterceptor
     {
         if (entityEntry.Entity is not ICreationInfo creationInfoEntity) return;
 
-        entityEntry.Property(nameof(creationInfoEntity.CreatedBy)).CurrentValue = _userInfo.UserName;
+        entityEntry.Property(nameof(creationInfoEntity.CreatedBy)).CurrentValue = _userInfo.Email;
         entityEntry.Property(nameof(creationInfoEntity.CreationDate)).CurrentValue = _now;
     }
 

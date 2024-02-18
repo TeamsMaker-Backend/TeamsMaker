@@ -18,8 +18,15 @@ public class DeleteOrganizationEndpoint : BaseApiController
     [HttpDelete("organizations/{id}")]
     public async Task<IActionResult> UpdateOrganization(int id, CancellationToken ct)
     {
-        await _organizationService.DeleteAsync(id, ct);
+        try
+        {
+            await _organizationService.DeleteAsync(id, ct);
 
-        return NoContent();
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(_response.FailureResponse(ex.Message));
+        }
     }
 }

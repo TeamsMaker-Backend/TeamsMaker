@@ -17,8 +17,15 @@ public class VerifyUserEndpoint : BaseApiController
     [HttpPost("users/verify")]
     public async Task<IActionResult> Verify([FromBody] UserVerificationRequset request, CancellationToken ct)
     {
-        var isVerified = await _authService.VerifyUserAsync(request, ct).ConfigureAwait(false);
+        try
+        {
+            var isVerified = await _authService.VerifyUserAsync(request, ct).ConfigureAwait(false);
 
-        return Ok(_response.SuccessResponse(isVerified));
+            return Ok(_response.SuccessResponse(isVerified));
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(_response.FailureResponse(ex.Message));
+        }
     }
 }

@@ -20,8 +20,15 @@ public class ListOrganizationsEndpoint : BaseApiController
     [HttpGet("organizations")]
     public async Task<IActionResult> ListOrganization([FromQuery] OrganizationsQueryString queryString, CancellationToken ct)
     {
-        var orgs = await _organizationService.GetAsync(queryString, ct).ConfigureAwait(false);
+        try
+        {
+            var orgs = await _organizationService.GetAsync(queryString, ct).ConfigureAwait(false);
 
-        return Ok(_response.SuccessResponseWithPagination(orgs));
+            return Ok(_response.SuccessResponseWithPagination(orgs));
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(_response.FailureResponse(ex.Message));
+        }
     }
 }
