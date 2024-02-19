@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-
 using TeamsMaker.Api;
 using TeamsMaker.Api.Configurations;
 using TeamsMaker.Api.Core.ResultMessages;
@@ -50,6 +49,7 @@ builder.Services.AddAuthorizationBuilder()
         .Build());
 #endregion
 
+// builder.Services.AddExceptionHandler<AppExceptionHandler>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.RegisterBusinessServices();
 builder.Services.RegisterDataServices(builder.Configuration);
@@ -71,7 +71,6 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
         ResultMessage message = new()
         {
             EngMsg = "Validation Error",
-            LocMsg = "خطأ فى البيانات المدخلة",
             Success = false,
             exception = errors,
             ReturnObject = null
@@ -124,6 +123,7 @@ if (app.Environment.IsDevelopment())
 
 await SeedDB.Initialize(app.Services.GetRequiredService<IServiceScopeFactory>().CreateScope().ServiceProvider);
 // app.UseCors();
+// app.UseExceptionHandler(opt => { });
 app.UseHttpsRedirection();
 
 app.UseAuthentication();

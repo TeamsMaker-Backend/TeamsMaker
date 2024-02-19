@@ -1,6 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
+﻿using TeamsMaker.Api.Core.Consts;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-using TeamsMaker.Api.Core.Consts;
 
 namespace TeamsMaker.Api.DataAccess.Config;
 
@@ -15,6 +15,11 @@ public class DepartmentConfig : IEntityTypeConfiguration<Department>
         builder
             .Property(x => x.Code)
             .IsRequired();
+
+        builder
+            .HasOne(x => x.Organization)
+            .WithMany(y => y.Departments)
+            .HasForeignKey(x => x.OrganizationId);
 
         builder
             .HasMany(x => x.Students)
@@ -37,14 +42,16 @@ public class DepartmentConfig : IEntityTypeConfiguration<Department>
                 Id = 1,
                 Name = "Computer Science",
                 Code = "CS",
-                IsActive = true
+                IsActive = true,
+                OrganizationId = 1
             },
             new
             {
                 Id = 2,
                 Name = "Information System",
                 Code = "IS",
-                IsActive = true
+                IsActive = true,
+                OrganizationId = 1
             }
         ];
     }

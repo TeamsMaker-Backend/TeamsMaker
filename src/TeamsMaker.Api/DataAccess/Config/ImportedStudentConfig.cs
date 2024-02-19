@@ -18,21 +18,21 @@ public class ImportedStudentConfig : IEntityTypeConfiguration<ImportedStudent>
         return [
             new ImportedStudent
             {
-                Id = Guid.NewGuid(),
+                Id = Guid.Parse("5cba5edb-d6f0-4dee-85df-7f23fcbf86d3"),
                 SSN = "600-68-1014",
                 CollegeId = "College-123",
                 GPA = 3.5f,
-                GraduationYear = DateOnly.FromDateTime(DateTime.Now),
+                GraduationYear = DateOnly.FromDateTime(new DateTime(2026, 02, 17)),
                 Department = "Computer Science",
                 OrganizationId = 1
             },
             new ImportedStudent
             {
-                Id = Guid.NewGuid(),
+                Id = Guid.Parse("86281c15-127d-4c91-9dff-dcc24164f79b"),
                 SSN = "776-11-4808",
                 CollegeId = "College-456",
                 GPA = 3.3f,
-                GraduationYear = DateOnly.FromDateTime(DateTime.Now.AddYears(2)),
+                GraduationYear = DateOnly.FromDateTime(new DateTime(2024, 02, 17)),
                 Department = "Information System",
                 OrganizationId = 1
             }

@@ -57,3 +57,82 @@ url
 request
 response
 */
+
+/*************************
+[Post] -> api/users/login
+
+body -> 
+{
+    email: string,
+    password: string
+}
+
+return ->
+{
+    token: string,
+    refreshToken: string
+}
+****************************/
+
+/*****************************
+[Post] -> api/users/register
+
+body ->
+{
+    userType: number,
+    firstName: string,
+    lastName: string,
+    userName: string,
+    email: string,
+    password: string,
+    ssn: string
+}
+
+return ->
+{
+    token: string,
+    refreshToken: string
+}
+
+UserTypeEnum
+{
+    Student = 1,
+    Staff = 2   
+}
+********************************/
+
+/*************************
+[Post] -> api/users/verify
+
+body -> 
+{
+    ssn: string,
+    collegeId: string | null,
+    userType: number
+}
+
+return -> true or false
+
+UserTypeEnum
+{
+    Student = 1,
+    Staff = 2   
+}
+****************************/
+
+
+/*****************************
+[Post] -> api/users/refresh_token
+
+body ->
+{
+    token: string,
+    refreshToken: string
+}
+
+return ->
+{
+    token: string,
+    refreshToken: string
+}
+********************************/

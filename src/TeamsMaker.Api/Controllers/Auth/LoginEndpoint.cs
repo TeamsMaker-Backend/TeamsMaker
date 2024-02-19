@@ -16,8 +16,15 @@ public class LoginEndpoint : BaseApiController
     [HttpPost("users/login")]
     public async Task<IActionResult> Login(UserLoginRequest request, CancellationToken ct)
     {
-        var token = await _authService.LoginAsync(request, ct).ConfigureAwait(false);
+        try
+        {
+            var token = await _authService.LoginAsync(request, ct).ConfigureAwait(false);
 
-        return Ok(_response.SuccessResponse(token));
+            return Ok(_response.SuccessResponse(token));
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(_response.FailureResponse(ex.Message));
+        }
     }
 }

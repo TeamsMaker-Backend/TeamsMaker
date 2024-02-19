@@ -9,10 +9,9 @@ public class Response<T> where T : class
     /// </summary>
     /// <param name="successObject">object: object that will be returned into "ReturnObject" field</param>
     /// <param name="engMessage">strig: English message that describe what happened</param>
-    /// <param name="locMessage">string: Arabic message that describe what happened</param>
     /// <returns>ResultMessage Object</returns>
-    public ResultMessage SuccessResponse(object? successObject, string engMessage = "Successful operation", string locMessage = "تم بنجاح")
-        => ResponseObject(successObject, null, true, engMessage, locMessage);
+    public ResultMessage SuccessResponse(object? successObject, string engMessage = "Successful operation")
+        => ResponseObject(successObject, null, true, engMessage);
 
 
     /// <summary>
@@ -20,17 +19,15 @@ public class Response<T> where T : class
     /// </summary>
     /// <param name="exceptionString">string: exception stack or any error message that will be returned into "exception" field</param>
     /// <param name="engMessage">string: English message that describe what happened</param>
-    /// <param name="locMessage">string: Arabic message that describe what happened</param>
     /// <returns>ResultMessage Object</returns>
-    public ResultMessage FailureResponse(string exceptionString, string engMessage = "Failed operation", string locMessage = "فشلت العملية")
-        => ResponseObject(null, exceptionString, false, engMessage, locMessage);
+    public ResultMessage FailureResponse(string exceptionString, string engMessage = "Failed operation")
+        => ResponseObject(null, exceptionString, false, engMessage);
 
     /// <summary>
     ///    Unified response object, Use it in case of returning paginated success response
     /// </summary>
     /// <param name="successObject">object: object that will be returned into "ReturnObject" field</param>
     /// <param name="engMessage">strig: English message that describe what happened</param>
-    /// <param name="locMessage">string: Arabic message that describe what happened</param>
     /// <returns>ResultMessageWithPagination Object</returns>
     public ResultMessageWithPagination SuccessResponseWithPagination(PagedList<T> successObject, string engMessage = "Successful operation", string locMessage = "تم بنجاح")
         => ResponseWithPagination(successObject, null, true, engMessage, locMessage);
@@ -47,14 +44,12 @@ public class Response<T> where T : class
     /// <param name="exceptionString">string: exception stack or any error message that will be returned into "exception" field</param>
     /// <param name="isSuccessed">boolean: represent request is success or not</param>
     /// <param name="engMessage">string: English message that describe what happened</param>
-    /// <param name="locMessage">string: Arabic message that describe what happened</param>
     /// <returns>ResultMessage Object</returns>
-    private ResultMessage ResponseObject(object? successObject, string? exceptionString, bool isSuccessed, string engMessage, string locMessage)
+    private ResultMessage ResponseObject(object? successObject, string? exceptionString, bool isSuccessed, string engMessage)
     {
         return new ResultMessage
         {
             EngMsg = engMessage,
-            LocMsg = locMessage,
             Success = isSuccessed,
             exception = exceptionString,
             ReturnObject = successObject
@@ -70,14 +65,12 @@ public class Response<T> where T : class
     /// <param name="exceptionString">string: exception stack or any error message that will be returned into "exception" field</param>
     /// <param name="isSuccessed">boolean: represent request is success or not</param>
     /// <param name="engMessage">string: English message that describe what happened</param>
-    /// <param name="locMessage">string: Arabic message that describe what happened</param>
     /// <returns>ResultMessageWithPagination Object</returns>
     private ResultMessageWithPagination ResponseWithPagination<TType>(PagedList<TType> successObject, string? exceptionString, bool isSuccessed, string engMessage, string locMessage) where TType : class
     {
         return new ResultMessageWithPagination
         {
             EngMsg = engMessage,
-            LocMsg = locMessage,
             Success = isSuccessed,
             exception = exceptionString,
             ReturnObject = successObject,
@@ -93,3 +86,21 @@ public class Response<T> where T : class
         };
     }
 }
+
+    // private ResultMessage FailureResponseObject(object? successObject,
+    //     string? exceptionString,
+    //     bool isSuccessed,
+    //     string engMessage,
+    //     int? status = null,
+    //     string? instance = null)
+    // {
+    //     return new FailureResultMessage
+    //     {
+    //         EngMsg = engMessage,
+    //         Success = isSuccessed,
+    //         exception = exceptionString,
+    //         ReturnObject = successObject,
+    //         Status = status,
+    //         Instance = instance
+    //     };
+    // }

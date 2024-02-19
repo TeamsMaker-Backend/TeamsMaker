@@ -19,7 +19,7 @@ public static class DefaultUsers
                 LastName = "User",
                 SSN = "230-68-4525-879-82",
                 UserName = "default_user",
-                Email = "default_user123@gmail.com",
+                Email = "default_user@gmail.com",
                 EmailConfirmed = true,
                 Classification = StaffClassificationsEnum.Professor,
                 OrganizationId = organization.Id

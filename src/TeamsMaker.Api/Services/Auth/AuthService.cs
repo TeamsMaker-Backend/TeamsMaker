@@ -1,11 +1,9 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
+using System.Net.Mail;
 using System.Security;
 using System.Security.Claims;
-
 using DataAccess.Base.Interfaces;
-
 using Microsoft.IdentityModel.Tokens;
-
 using TeamsMaker.Api.Configurations;
 using TeamsMaker.Api.Contracts.Requests;
 using TeamsMaker.Api.Contracts.Responses;
@@ -189,7 +187,7 @@ public class AuthService : IAuthService
 
     private async Task RegisterStaffAsync(UserRegisterationRequest registerRequest, User user, CancellationToken ct)
     {
-        var existedStudent = await _db.ImportedStaff.SingleOrDefaultAsync(u => u.SSN == registerRequest.SSN, ct)
+        var existedStaff = await _db.ImportedStaff.SingleOrDefaultAsync(u => u.SSN == registerRequest.SSN, ct)
             ?? throw new InvalidOperationException("This user is not allowed to register.");
 
         if (await _db.Users.AnyAsync(x => x.Email == registerRequest.Email, ct))
@@ -199,7 +197,7 @@ public class AuthService : IAuthService
         CreateUser(staff, registerRequest);
 
         // Professor Data
-        staff.OrganizationId = existedStudent.OrganizationId;
+        staff.OrganizationId = existedStaff.OrganizationId;
         staff.Classification = StaffClassificationsEnum.Professor; //TODO: assign classification from imported user
 
         user = staff;
@@ -210,9 +208,8 @@ public class AuthService : IAuthService
         user.FirstName = registerRequest.FirstName;
         user.LastName = registerRequest.LastName;
         user.Email = registerRequest.Email;
-        user.UserName = registerRequest.UserName;
+        user.UserName = new MailAddress(registerRequest.Email).User;
         user.SSN = registerRequest.SSN;
-        user.EmailConfirmed = true;
     }
 
     private async Task<TokenResponse> GenerateJwtTokenAsync(User user, CancellationToken ct)
@@ -261,7 +258,6 @@ public class AuthService : IAuthService
             new Claim("Id", user.Id),
             new Claim(JwtRegisteredClaimNames.Email, user.Email!),
             new Claim("OrganizationId", user.OrganizationId.ToString()),
-            new Claim(JwtRegisteredClaimNames.Sub, user.Email!),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             new Claim(JwtRegisteredClaimNames.Iat, DateTime.Now.ToUniversalTime().ToString())
         ];

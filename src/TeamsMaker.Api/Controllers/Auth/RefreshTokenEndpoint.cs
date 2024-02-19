@@ -20,8 +20,15 @@ public class RefreshTokenEndpoint : BaseApiController
     [HttpPost("users/refresh_token")]
     public async Task<IActionResult> RefreshToken(TokenRequest request, CancellationToken ct)
     {
-        var refreshToken = await _authService.RefreshTokenAsync(request, ct).ConfigureAwait(false);
+        try
+        {
+            var refreshToken = await _authService.RefreshTokenAsync(request, ct).ConfigureAwait(false);
 
-        return Ok(_response.SuccessResponse(refreshToken));
+            return Ok(_response.SuccessResponse(refreshToken));
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(_response.FailureResponse(ex.Message));
+        }
     }
 }

@@ -15,20 +15,21 @@ namespace TeamsMaker.Api.DataAccess.Config
 
         private ImportedStaff[] LoadData()
         {
-            return [
+            return new ImportedStaff[]
+            {
                 new ImportedStaff
                 {
-                    Id = Guid.NewGuid(),
+                    Id = Guid.Parse("3e9f4430-2927-41eb-a8a5-099248d1e6ba"),
                     SSN = "553-35-8652",
                     OrganizationId = 1
                 },
                 new ImportedStaff
                 {
-                    Id = Guid.NewGuid(),
+                    Id = Guid.Parse("9266966b-fa8e-461a-bd61-0a1a15d5c234"),
                     SSN = "622-45-0646",
                     OrganizationId = 1
                 }
-            ];
+            };
         }
     }
 }

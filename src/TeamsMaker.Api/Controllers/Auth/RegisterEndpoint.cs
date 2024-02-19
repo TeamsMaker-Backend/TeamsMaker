@@ -17,8 +17,15 @@ public class RegisterEndpoint : BaseApiController
     [HttpPost("users/register")] //TODO, As a staff or student
     public async Task<IActionResult> Register(UserRegisterationRequest request, CancellationToken ct)
     {
-        var token = await _authService.RegisterAsync(request, ct).ConfigureAwait(false);
+        try
+        {
+            var token = await _authService.RegisterAsync(request, ct).ConfigureAwait(false);
 
-        return Created("", _response.SuccessResponse(token));
+            return Created("", _response.SuccessResponse(token));
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(_response.FailureResponse(ex.Message));
+        }
     }
 }

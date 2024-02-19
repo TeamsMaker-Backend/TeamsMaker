@@ -5,7 +5,7 @@ using TeamsMaker.Api.Contracts.Requests;
 
 using TeamsMaker.Api.Services.Organizations;
 
-namespace TeamsMaker.Api.Controllers;
+namespace TeamsMaker.Api.Controllers.Organizations;
 
 
 [Authorize]
@@ -21,8 +21,15 @@ public class AddOrganizationEndpoint : BaseApiController
     [HttpPost("organizations")]
     public async Task<IActionResult> AddOrganization(AddOrganizationRequest request, CancellationToken ct)
     {
-        await _organizationService.AddAsync(request, ct);
+        try
+        {
+            await _organizationService.AddAsync(request, ct);
 
-        return Created("", _response.SuccessResponse(null));
+            return Created("", _response.SuccessResponse(null));
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(_response.FailureResponse(ex.Message));
+        }
     }
 }

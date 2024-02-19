@@ -1,4 +1,7 @@
-﻿using TeamsMaker.Api.Contracts.Requests;
+﻿using Core.Generics;
+
+using TeamsMaker.Api.Contracts.QueryStringParameters;
+using TeamsMaker.Api.Contracts.Requests;
 using TeamsMaker.Api.Contracts.Responses;
 using TeamsMaker.Api.Core.Guards;
 using TeamsMaker.Api.DataAccess.Context;
@@ -14,9 +17,9 @@ public class OrganizationService : IOrganizationService
         _db = db;
     }
 
-    public async Task<List<GetOrganizationResponse>> GetAsync(CancellationToken ct)
+    public async Task<PagedList<GetOrganizationResponse>> GetAsync(OrganizationsQueryString queryString, CancellationToken ct)
     {
-        var organizations = await _db.Organizations
+        var query = _db.Organizations
             .Select(org => new GetOrganizationResponse
             {
                 Id = org.Id,
@@ -26,10 +29,12 @@ public class OrganizationService : IOrganizationService
                 Phone = org.Phone,
                 Description = org.Description,
                 Logo = org.Logo
-            })
-            .ToListAsync();
+            });
 
-        return organizations;
+
+        if (queryString.OrganizationId.HasValue) query = query.Where(o => o.Id == queryString.OrganizationId);
+
+        return await PagedList<GetOrganizationResponse>.ToPagedListAsync(query, queryString.PageNumber, queryString.PageSize);
     }
 
     public async Task AddAsync(AddOrganizationRequest organizationRequest, CancellationToken ct)

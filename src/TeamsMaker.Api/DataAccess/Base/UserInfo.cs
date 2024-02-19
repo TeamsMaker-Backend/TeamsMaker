@@ -7,7 +7,6 @@ namespace DataAccess.Base;
 public class UserInfo : IUserInfo
 {
     public string UserId { get; private set; } = string.Empty;
-    public string UserName { get; private set; } = string.Empty;
     public string Email { get; private set; } = string.Empty;
     public int OrganizationId { get; private set; } = 0;
     public IEnumerable<string> Roles { get; private set; } = [];
@@ -29,7 +28,6 @@ public class UserInfo : IUserInfo
         if (user is null) throw new ArgumentNullException("Unknown user");
 
         UserId = user.Id;
-        UserName = user.UserName!;
         Email = user.Email!;
         OrganizationId = user.OrganizationId;
         Roles = GetRoles(db, UserId);

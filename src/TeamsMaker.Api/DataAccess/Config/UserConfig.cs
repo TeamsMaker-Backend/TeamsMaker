@@ -31,6 +31,11 @@ public class UserConfig : IEntityTypeConfiguration<User>
         builder.Property(x => x.City)
             .HasMaxLength(255);
 
+        builder.Property(x => x.Email)
+            .IsRequired();
+
+        builder.HasIndex(x => x.Email).IsUnique();
+
         // Relationships
         builder
             .HasOne(x => x.Organization)
