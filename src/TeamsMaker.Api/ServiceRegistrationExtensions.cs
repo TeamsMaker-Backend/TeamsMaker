@@ -5,6 +5,8 @@ using TeamsMaker.Api.DataAccess.Context;
 using TeamsMaker.Api.DataAccess.Interceptors;
 using TeamsMaker.Api.Services.Auth;
 using TeamsMaker.Api.Services.Organizations;
+using TeamsMaker.Api.Services.ProfileService;
+using TeamsMaker.Api.Services.ProfileService.Interface;
 
 namespace TeamsMaker.Api;
 
@@ -43,6 +45,7 @@ public static class ServiceRegistrationExtensions
         services.AddScoped<IUserInfo, UserInfo>();
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IOrganizationService, OrganizationService>();
+        services.AddScoped<IProfileService, ProfileService>();
 
         return services;
     }

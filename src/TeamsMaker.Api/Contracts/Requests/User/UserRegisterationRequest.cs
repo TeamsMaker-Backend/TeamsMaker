@@ -8,5 +8,5 @@ public class UserRegisterationRequest
     public required string UserName { get; init; }
     [EmailAddress] public required string Email { get; init; }
     public required string Password { get; init; }
-    public required string SSN { get; set; }
+    public required string SSN { get; init; }
 }

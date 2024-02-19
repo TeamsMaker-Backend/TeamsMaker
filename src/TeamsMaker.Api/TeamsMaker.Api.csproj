@@ -21,6 +21,10 @@
     <PackageReference Include="Ulid" Version="1.3.3" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Contracts/Requests/User/" />
+    <Folder Include="wwwroot\Staff\Avatar\" />
+    <Folder Include="wwwroot\Staff\Header\" />
+    <Folder Include="wwwroot\Student\Avatar\" />
+    <Folder Include="wwwroot\Student\Header\" />
+    <Folder Include="wwwroot\Student\CV\" />
   </ItemGroup>
 </Project>

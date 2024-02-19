@@ -154,7 +154,7 @@ public class AuthService : IAuthService
 
         if (!isValidToken) throw new SecurityTokenValidationException("Invalid token");
 
-        var storedToken = await _db.RefreshTokens.FirstOrDefaultAsync(t => t.Token == tokenRequest.RefreshToken);
+        var storedToken = await _db.RefreshTokens.FirstOrDefaultAsync(t => t.Token == tokenRequest.RefreshToken, ct);
 
         var user = await _userManager.FindByIdAsync(storedToken!.UserId);
 
@@ -192,7 +192,7 @@ public class AuthService : IAuthService
         var existedStudent = await _db.ImportedStaff.SingleOrDefaultAsync(u => u.SSN == registerRequest.SSN, ct)
             ?? throw new InvalidOperationException("This user is not allowed to register.");
 
-        if (await _db.Users.AnyAsync(x => x.Email == registerRequest.Email))
+        if (await _db.Users.AnyAsync(x => x.Email == registerRequest.Email, ct))
             throw new ArgumentException("This Email already exists");
 
         Staff staff = new();
@@ -205,7 +205,7 @@ public class AuthService : IAuthService
         user = staff;
     }
 
-    private void CreateUser(User user, UserRegisterationRequest registerRequest)
+    private static void CreateUser(User user, UserRegisterationRequest registerRequest)
     {
         user.FirstName = registerRequest.FirstName;
         user.LastName = registerRequest.LastName;
@@ -244,8 +244,8 @@ public class AuthService : IAuthService
             IsInvoked = false,
         };
 
-        await _db.RefreshTokens.AddAsync(refreshToken);
-        await _db.SaveChangesAsync();
+        await _db.RefreshTokens.AddAsync(refreshToken, ct);
+        await _db.SaveChangesAsync(ct);
 
         return new TokenResponse
         {
@@ -312,7 +312,7 @@ public class AuthService : IAuthService
         if (expiryDate > DateTime.UtcNow) return false;
 
         // step 4: validate token exists or not
-        var storedToken = await _db.RefreshTokens.FirstOrDefaultAsync(t => t.Token == tokenRequest.RefreshToken);
+        var storedToken = await _db.RefreshTokens.FirstOrDefaultAsync(t => t.Token == tokenRequest.RefreshToken, ct);
 
         if (storedToken == null) return false;
 
@@ -332,12 +332,12 @@ public class AuthService : IAuthService
         // update current token
         storedToken.IsUsed = true;
         _db.RefreshTokens.Update(storedToken);
-        await _db.SaveChangesAsync();
+        await _db.SaveChangesAsync(ct);
 
         return true;
     }
 
-    private string RandomString(int length)
+    private static string RandomString(int length)
     {
         Random random = new();
 
