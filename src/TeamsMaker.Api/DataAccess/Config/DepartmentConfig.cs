@@ -1,5 +1,6 @@
-﻿using TeamsMaker.Api.Core.Consts;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
+﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+using TeamsMaker.Api.Core.Consts;
 
 
 namespace TeamsMaker.Api.DataAccess.Config;

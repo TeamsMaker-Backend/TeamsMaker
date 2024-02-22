@@ -289,7 +289,7 @@ namespace TeamsMaker.Api.Migrations
                         {
                             Id = new Guid("5cba5edb-d6f0-4dee-85df-7f23fcbf86d3"),
                             CollegeId = "College-123",
-                            Department = "Computer Science",
+                            Department = "CS",
                             GPA = 3.5f,
                             GraduationYear = new DateOnly(2026, 2, 17),
                             OrganizationId = 1,
@@ -299,7 +299,7 @@ namespace TeamsMaker.Api.Migrations
                         {
                             Id = new Guid("86281c15-127d-4c91-9dff-dcc24164f79b"),
                             CollegeId = "College-456",
-                            Department = "Information System",
+                            Department = "IS",
                             GPA = 3.3f,
                             GraduationYear = new DateOnly(2024, 2, 17),
                             OrganizationId = 1,

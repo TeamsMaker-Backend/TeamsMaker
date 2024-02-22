@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-
-using TeamsMaker.Core.Enums;
+﻿using TeamsMaker.Core.Enums;
 
 namespace TeamsMaker.Api.Contracts.Responses.Profile;
 
@@ -17,12 +15,11 @@ public class ProfileResponse
     public bool EmailConfirmed { get; set; } = false;
     public string? Phone { get; set; }
 
+    public string? Avatar { get; set; }
+    public string? Header { get; set; }
+
     public StudentInfo? StudentInfo { get; set; }
     public StaffInfo? StaffInfo { get; set; }
-
-    public FileContentResult? Avatar { get; set; }
-    public FileContentResult? Header { get; set; }
-    public FileContentResult? CV { get; set; }
 }
 
 public class StudentInfo
@@ -32,6 +29,8 @@ public class StudentInfo
     public DateOnly? GraduationYear { get; set; }
     public int Level { get; set; } = 4;
     public string? DepartmentName { get; set; }
+
+    public string? CV { get; set; }
 }
 
 public class StaffInfo

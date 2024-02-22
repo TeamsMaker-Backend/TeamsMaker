@@ -3,16 +3,11 @@
 using TeamsMaker.Api.Contracts.Requests.Profile;
 using TeamsMaker.Api.Services.ProfileService.Interface;
 
-namespace TeamsMaker.Api.Controllers.Profile
+namespace TeamsMaker.Api.Controllers.Profiles
 {
-    public class UpdateProfileEndpoint : BaseApiController
+    public class UpdateProfileEndpoint(IProfileService profileService) : BaseApiController
     {
-        private readonly IProfileService _profileService;
-
-        public UpdateProfileEndpoint(IProfileService profileService)
-        {
-            _profileService = profileService;
-        }
+        private readonly IProfileService _profileService = profileService;
 
         [HttpPut("profiles/{id}")]
         public async Task<IActionResult> Profile(Guid id, [FromForm] UpdateProfileRequest request, CancellationToken ct)

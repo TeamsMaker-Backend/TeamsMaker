@@ -5,5 +5,5 @@ namespace TeamsMaker.Api.Controllers.Departments;
 [Authorize]
 public class AddDepartmentEndpoint : BaseApiController
 {
-    
+
 }

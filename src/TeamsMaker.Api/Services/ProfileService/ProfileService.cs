@@ -1,85 +1,140 @@
-﻿using TeamsMaker.Api.Contracts.Requests.Profile;
+﻿using Microsoft.AspNetCore.Mvc;
+
+using TeamsMaker.Api.Contracts.Requests.Profile;
 using TeamsMaker.Api.Contracts.Responses.Profile;
 using TeamsMaker.Api.Core.Consts;
 using TeamsMaker.Api.DataAccess.Context;
 using TeamsMaker.Api.Services.ProfileService.Interface;
+using TeamsMaker.Api.Services.ProfileService.Utilities;
 
 namespace TeamsMaker.Api.Services.ProfileService;
 
-public class ProfileService : IProfileService
+public class ProfileService(AppDBContext db, IWebHostEnvironment hostEnvironment) : IProfileService
 {
-    private readonly AppDBContext _db;
-    private readonly IWebHostEnvironment _hostEnvironment;
+    private readonly AppDBContext _db = db;
+    private readonly IWebHostEnvironment _host = hostEnvironment;
 
-    public ProfileService(AppDBContext db, IWebHostEnvironment hostEnvironment)
-    {
-        _db = db;
-        _hostEnvironment = hostEnvironment;
-    }
-
-    public async Task<ProfileResponse> GetProfileAsync(string email, CancellationToken ct)
+    public async Task<ProfileResponse> GetProfileAsync(Guid id, CancellationToken ct)
     {
         ProfileResponse response = new();
 
-        if (await _db.Students.AnyAsync(x => x.Email == email, ct))
+        if (await _db.Students.AnyAsync(x => x.Id == id.ToString(), ct))
         {
-            var student = await _db.Students.SingleAsync(x => x.Email == email, ct);
+            var student =
+                await _db.Students.SingleOrDefaultAsync(x => x.Id == id.ToString(), ct) ??
+                throw new ArgumentException("Invalid ID!");
 
-            GetStudentData(student, response);
-            Utilities.GetUserData(student, response);
+            ProfileUtilities.GetStudentData(student, response);
+            ProfileUtilities.GetUserData(student, response);
         }
-        else if (await _db.Staff.AnyAsync(x => x.Email == email, ct))
+        else if (await _db.Staff.AnyAsync(x => x.Id == id.ToString(), ct))
         {
-            var staff = await _db.Staff.SingleAsync(x => x.Email == email, ct);
+            var staff =
+                await _db.Staff.SingleOrDefaultAsync(x => x.Id == id.ToString(), ct) ??
+                throw new ArgumentException("Invalid ID!");
 
-            GetStaffData(staff, response);
-            Utilities.GetUserData(staff, response);
+            ProfileUtilities.GetStaffData(staff, response);
+            ProfileUtilities.GetUserData(staff, response);
         }
         else
-            throw new ArgumentException("Invalid Data");
+            throw new ArgumentException("Invalid Data!");
 
         return response;
+    }
+
+    public async Task<FileContentResult?> GetAvatarAsync(Guid id, CancellationToken ct)
+    {
+        FileContentResult? result;
+        if (await _db.Students.AnyAsync(x => x.Id == id.ToString(), ct))
+        {
+            var student =
+                await _db.Students.SingleOrDefaultAsync(x => x.Id == id.ToString(), ct) ??
+                throw new ArgumentException("Invalid ID!");
+
+            result =
+                await FileUtilities.GetFileAsync(Path.Combine(_host.WebRootPath, BaseFolders.Student, FileTypes.Avatar), student.Avatar, ct);
+        }
+        else if (await _db.Staff.AnyAsync(x => x.Id == id.ToString(), ct))
+        {
+            var staff =
+                await _db.Staff.SingleOrDefaultAsync(x => x.Id == id.ToString(), ct) ??
+                throw new ArgumentException("Invalid ID!");
+
+            result =
+                await FileUtilities.GetFileAsync(Path.Combine(_host.WebRootPath, BaseFolders.Staff, FileTypes.Avatar), staff.Avatar, ct);
+        }
+        else
+            throw new ArgumentException("Invalid Data!");
+
+        return result;
+    }
+
+    public async Task<FileContentResult?> GetHeaderAsync(Guid id, CancellationToken ct)
+    {
+        FileContentResult? result;
+        if (await _db.Students.AnyAsync(x => x.Id == id.ToString(), ct))
+        {
+            var student =
+                await _db.Students.SingleOrDefaultAsync(x => x.Id == id.ToString(), ct) ??
+                throw new ArgumentException("Invalid ID!");
+
+            result =
+                await FileUtilities.GetFileAsync(Path.Combine(_host.WebRootPath, BaseFolders.Student, FileTypes.Header), student.Header, ct);
+        }
+        else if (await _db.Staff.AnyAsync(x => x.Id == id.ToString(), ct))
+        {
+            var staff =
+                await _db.Staff.SingleOrDefaultAsync(x => x.Id == id.ToString(), ct) ??
+                throw new ArgumentException("Invalid ID!");
+
+            result =
+                await FileUtilities.GetFileAsync(Path.Combine(_host.WebRootPath, BaseFolders.Staff, FileTypes.Header), staff.Header, ct);
+        }
+        else
+            throw new ArgumentException("Invalid Data!");
+
+        return result;
+    }
+
+    public async Task<FileContentResult?> GetCVAsync(Guid id, CancellationToken ct)
+    {
+        FileContentResult? result;
+        if (await _db.Students.AnyAsync(x => x.Id == id.ToString(), ct))
+        {
+            var student =
+                await _db.Students.SingleOrDefaultAsync(x => x.Id == id.ToString(), ct) ??
+                throw new ArgumentException("Invalid ID!");
+
+            result =
+                await FileUtilities.GetFileAsync(Path.Combine(_host.WebRootPath, BaseFolders.Student, FileTypes.CV), student.CV, ct);
+        }
+        else
+            throw new ArgumentException("Invalid Data!");
+
+        return result;
     }
 
     public async Task UpdateProfileAsync(Guid id, UpdateProfileRequest profileRequest, CancellationToken ct)
     {
         if (await _db.Students.AnyAsync(x => x.Id == id.ToString(), ct))
         {
-            var student = await _db.Students.SingleAsync(x => x.Id == id.ToString(), ct);
+            var student =
+                await _db.Students.SingleOrDefaultAsync(x => x.Id == id.ToString(), ct) ??
+                throw new ArgumentException("Invalid ID!");
 
-            Utilities.UpdateUserDataAsync(student, profileRequest, Path.Combine(_hostEnvironment.WebRootPath, FilesPath.StudentFolder), ct);
+            ProfileUtilities.UpdateUserDataAsync(student, profileRequest, Path.Combine(_host.WebRootPath, BaseFolders.Student), ct);
         }
         else if (await _db.Staff.AnyAsync(x => x.Id == id.ToString(), ct))
         {
-            var staff = await _db.Staff.SingleAsync(x => x.Id == id.ToString(), ct);
+            var staff =
+                await _db.Staff.SingleOrDefaultAsync(x => x.Id == id.ToString(), ct) ??
+                throw new ArgumentException("Invalid ID!");
 
-            Utilities.UpdateUserDataAsync(staff, profileRequest, Path.Combine(_hostEnvironment.WebRootPath, FilesPath.StaffFolder), ct);
+            ProfileUtilities.UpdateUserDataAsync(staff, profileRequest, Path.Combine(_host.WebRootPath, BaseFolders.Staff), ct);
         }
         else
-            throw new ArgumentException("Invalid Data");
+            throw new ArgumentException("Invalid Data!");
 
         await _db.SaveChangesAsync(ct);
-    }
-
-    private static void GetStudentData(Student student, ProfileResponse response)
-    {
-        StudentInfo studentInfo = new()
-        {
-            CollegeId = student.CollegeId,
-            GPA = student.GPA,
-            GraduationYear = student.GraduationYear,
-            Level = student.Level,
-            DepartmentName = student.Department?.Name
-        };
-        response.StudentInfo = studentInfo;
-    }
-
-    private static void GetStaffData(Staff staff, ProfileResponse response)
-    {
-        StaffInfo staffInfo = new()
-        {
-            Classification = (int)staff.Classification
-        };
-        response.StaffInfo = staffInfo;
     }
 }

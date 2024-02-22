@@ -23,7 +23,7 @@ public class ImportedStudentConfig : IEntityTypeConfiguration<ImportedStudent>
                 CollegeId = "College-123",
                 GPA = 3.5f,
                 GraduationYear = DateOnly.FromDateTime(new DateTime(2026, 02, 17)),
-                Department = "Computer Science",
+                Department = "CS",
                 OrganizationId = 1
             },
             new ImportedStudent
@@ -33,7 +33,7 @@ public class ImportedStudentConfig : IEntityTypeConfiguration<ImportedStudent>
                 CollegeId = "College-456",
                 GPA = 3.3f,
                 GraduationYear = DateOnly.FromDateTime(new DateTime(2024, 02, 17)),
-                Department = "Information System",
+                Department = "IS",
                 OrganizationId = 1
             }
         ];
