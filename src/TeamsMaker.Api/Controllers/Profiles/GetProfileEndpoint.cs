@@ -19,19 +19,22 @@ public class GetProfileEndpoint(IProfileService profileService, IUserInfo userIn
         ProfileResponse response;
         try
         {
-            response = await _profileService.GetProfileAsync(id, ct);
-
-            response.Avatar = Url.Action(nameof(GetAvatarEndpoint.Avatar), nameof(GetAvatarEndpoint), new { id }, Request.Scheme);
-            response.Header = Url.Action(nameof(GetHeaderEndpoint.Header), nameof(GetHeaderEndpoint), new { id }, Request.Scheme);
-
-            if (response.StudentInfo != null)
-                response.StudentInfo!.CV =
-                    Url.Action(nameof(GetCVEndpoint.CV), nameof(GetCVEndpoint), new { id }, Request.Scheme);
+            response = await _profileService.GetProfileAsync(ct);
+            LoadFiles(id, response);
         }
         catch (ArgumentException)
         {
             return NotFound(_response.FailureResponse("Invalid Data!"));
         }
         return Ok(_response.SuccessResponse(response));
+    }
+
+    private void LoadFiles(Guid id, ProfileResponse response)
+    {
+        response.Avatar = Url.Action(nameof(GetAvatarEndpoint.Avatar), nameof(GetAvatarEndpoint), new { id }, Request.Scheme);
+        response.Header = Url.Action(nameof(GetHeaderEndpoint.Header), nameof(GetHeaderEndpoint), new { id }, Request.Scheme);
+
+        if (response.StudentInfo != null)
+            response.StudentInfo!.CV = Url.Action(nameof(GetCVEndpoint.CV), nameof(GetCVEndpoint), new { id }, Request.Scheme);
     }
 }

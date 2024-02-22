@@ -5,9 +5,9 @@ using TeamsMaker.Core.Enums;
 
 namespace TeamsMaker.Api.Services.ProfileService.Utilities;
 
-internal static class ProfileUtilities
+public static class ProfileUtilities
 {
-    internal static void GetUserData(User user, ProfileResponse response)
+    public static void GetUserData(User user, ProfileResponse response)
     {
         response.FirstName = user.FirstName;
         response.LastName = user.LastName;
@@ -21,7 +21,7 @@ internal static class ProfileUtilities
         response.Phone = user.PhoneNumber;
     }
 
-    internal static void GetStudentData(Student student, ProfileResponse response)
+    public static void GetStudentData(Student student, ProfileResponse response)
     {
         StudentInfo studentInfo = new()
         {
@@ -34,7 +34,7 @@ internal static class ProfileUtilities
         response.StudentInfo = studentInfo;
     }
 
-    internal static void GetStaffData(Staff staff, ProfileResponse response)
+    public static void GetStaffData(Staff staff, ProfileResponse response)
     {
         StaffInfo staffInfo = new()
         {
@@ -43,7 +43,7 @@ internal static class ProfileUtilities
         response.StaffInfo = staffInfo;
     }
 
-    internal static async void UpdateUserDataAsync(User user, UpdateProfileRequest request, string folder, CancellationToken ct)
+    public static async void UpdateUserDataAsync(User user, UpdateProfileRequest request, string folder, CancellationToken ct)
     {
         user.FirstName = request.FirstName;
         user.LastName = request.LastName;

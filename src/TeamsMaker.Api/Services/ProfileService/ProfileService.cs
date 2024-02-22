@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using DataAccess.Base.Interfaces;
+
+using Microsoft.AspNetCore.Mvc;
 
 using TeamsMaker.Api.Contracts.Requests.Profile;
 using TeamsMaker.Api.Contracts.Responses.Profile;
@@ -9,35 +11,34 @@ using TeamsMaker.Api.Services.ProfileService.Utilities;
 
 namespace TeamsMaker.Api.Services.ProfileService;
 
-public class ProfileService(AppDBContext db, IWebHostEnvironment hostEnvironment) : IProfileService
+public class ProfileService(AppDBContext db, IWebHostEnvironment hostEnvironment, IUserInfo userInfo) : IProfileService
 {
     private readonly AppDBContext _db = db;
     private readonly IWebHostEnvironment _host = hostEnvironment;
+    private readonly IUserInfo _user = userInfo;
 
-    public async Task<ProfileResponse> GetProfileAsync(Guid id, CancellationToken ct)
+    public async Task<ProfileResponse> GetProfileAsync(CancellationToken ct)
     {
         ProfileResponse response = new();
 
-        if (await _db.Students.AnyAsync(x => x.Id == id.ToString(), ct))
+        if (_user.Roles.Contains(AppRoles.Student))
         {
             var student =
-                await _db.Students.SingleOrDefaultAsync(x => x.Id == id.ToString(), ct) ??
+                await _db.Students.SingleOrDefaultAsync(x => x.Id == _user.UserId, ct) ??
                 throw new ArgumentException("Invalid ID!");
 
             ProfileUtilities.GetStudentData(student, response);
             ProfileUtilities.GetUserData(student, response);
         }
-        else if (await _db.Staff.AnyAsync(x => x.Id == id.ToString(), ct))
+        else
         {
             var staff =
-                await _db.Staff.SingleOrDefaultAsync(x => x.Id == id.ToString(), ct) ??
+                await _db.Staff.SingleOrDefaultAsync(x => x.Id == _user.UserId, ct) ??
                 throw new ArgumentException("Invalid ID!");
 
             ProfileUtilities.GetStaffData(staff, response);
             ProfileUtilities.GetUserData(staff, response);
         }
-        else
-            throw new ArgumentException("Invalid Data!");
 
         return response;
     }
@@ -116,24 +117,22 @@ public class ProfileService(AppDBContext db, IWebHostEnvironment hostEnvironment
 
     public async Task UpdateProfileAsync(Guid id, UpdateProfileRequest profileRequest, CancellationToken ct)
     {
-        if (await _db.Students.AnyAsync(x => x.Id == id.ToString(), ct))
+        if (_user.Roles.Contains(AppRoles.Student))
         {
             var student =
-                await _db.Students.SingleOrDefaultAsync(x => x.Id == id.ToString(), ct) ??
+                await _db.Students.SingleOrDefaultAsync(x => x.Id == _user.UserId, ct) ??
                 throw new ArgumentException("Invalid ID!");
 
             ProfileUtilities.UpdateUserDataAsync(student, profileRequest, Path.Combine(_host.WebRootPath, BaseFolders.Student), ct);
         }
-        else if (await _db.Staff.AnyAsync(x => x.Id == id.ToString(), ct))
+        else
         {
             var staff =
-                await _db.Staff.SingleOrDefaultAsync(x => x.Id == id.ToString(), ct) ??
+                await _db.Staff.SingleOrDefaultAsync(x => x.Id == _user.UserId, ct) ??
                 throw new ArgumentException("Invalid ID!");
 
             ProfileUtilities.UpdateUserDataAsync(staff, profileRequest, Path.Combine(_host.WebRootPath, BaseFolders.Staff), ct);
         }
-        else
-            throw new ArgumentException("Invalid Data!");
 
         await _db.SaveChangesAsync(ct);
     }

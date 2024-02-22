@@ -4,7 +4,7 @@ namespace TeamsMaker.Api.Services.ProfileService.Utilities;
 
 public static class FileUtilities
 {
-    internal static async Task<FileContentResult?> GetFileAsync(string folder, string? file, CancellationToken ct)
+    public static async Task<FileContentResult?> GetFileAsync(string folder, string? file, CancellationToken ct)
     {
         if (file == null)
             return null;
@@ -18,7 +18,7 @@ public static class FileUtilities
         return contentResult;
     }
 
-    internal static async Task<string?> UpdateFileAsync(string? oldFile, IFormFile? newFile, string? newFileName, string folder, CancellationToken ct)
+    public static async Task<string?> UpdateFileAsync(string? oldFile, IFormFile? newFile, string? newFileName, string folder, CancellationToken ct)
     {
         if (oldFile != null && File.Exists(Path.Combine(folder, oldFile)))
             File.Delete(Path.Combine(folder, oldFile));
@@ -55,6 +55,6 @@ public static class FileUtilities
         };
     }
 
-    internal static string? CreateName(string id, string? file)
+    public static string? CreateName(string id, string? file)
         => $"{id}{Path.GetExtension(file) ?? "NA"}";
 }
