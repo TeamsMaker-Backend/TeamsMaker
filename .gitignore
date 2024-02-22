@@ -475,3 +475,6 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+/src/TeamsMaker.Api/wwwroot/Student/Header/c61c37ce-3c9c-456b-8a96-05b831c0a60c.jpg
+/src/TeamsMaker.Api/wwwroot/Student/Avatar/c61c37ce-3c9c-456b-8a96-05b831c0a60c.jpg
+/src/TeamsMaker.Api/wwwroot/Student/CV/c61c37ce-3c9c-456b-8a96-05b831c0a60c.pdf
