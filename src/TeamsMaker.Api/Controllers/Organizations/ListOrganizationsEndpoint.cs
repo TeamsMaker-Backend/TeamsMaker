@@ -1,7 +1,8 @@
-using TeamsMaker.Api.Contracts.QueryStringParameters;
-using TeamsMaker.Api.Services.Organizations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+
+using TeamsMaker.Api.Contracts.QueryStringParameters;
+using TeamsMaker.Api.Services.Organizations;
 
 namespace TeamsMaker.Api.Controllers.Organizations;
 

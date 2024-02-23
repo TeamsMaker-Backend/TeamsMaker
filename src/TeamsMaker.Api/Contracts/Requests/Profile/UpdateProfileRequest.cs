@@ -6,7 +6,7 @@ public class UpdateProfileRequest
     public required string LastName { get; init; }
     public string? Bio { get; init; }
     public string? About { get; init; }
-    public int Gender { get; init; }
+    public int? Gender { get; init; }
     public string? City { get; init; }
     public string? Phone { get; init; }
 

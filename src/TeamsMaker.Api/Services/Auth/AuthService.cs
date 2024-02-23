@@ -2,8 +2,11 @@
 using System.Net.Mail;
 using System.Security;
 using System.Security.Claims;
+
 using DataAccess.Base.Interfaces;
+
 using Microsoft.IdentityModel.Tokens;
+
 using TeamsMaker.Api.Configurations;
 using TeamsMaker.Api.Contracts.Requests;
 using TeamsMaker.Api.Contracts.Responses;
@@ -40,10 +43,10 @@ public class AuthService : IAuthService
 
     public async Task<TokenResponse> RegisterAsync(UserRegisterationRequest registerRequest, CancellationToken ct)
     {
-        User user = new();
+        User user;
 
-        if (registerRequest.UserType == (int)UserEnum.Student) await RegisterStudentAsync(registerRequest, user, ct);
-        else if (registerRequest.UserType == (int)UserEnum.Staff) await RegisterStaffAsync(registerRequest, user, ct);
+        if (registerRequest.UserType == (int)UserEnum.Student) user = await RegisterStudentAsync(registerRequest, ct);
+        else if (registerRequest.UserType == (int)UserEnum.Staff) user = await RegisterStaffAsync(registerRequest, ct);
         else throw new ArgumentException("Invalid user type");
 
         var result = await _userManager.CreateAsync(user, registerRequest.Password);
@@ -163,7 +166,7 @@ public class AuthService : IAuthService
         return token;
     }
 
-    private async Task RegisterStudentAsync(UserRegisterationRequest registerRequest, User user, CancellationToken ct)
+    private async Task<Student> RegisterStudentAsync(UserRegisterationRequest registerRequest, CancellationToken ct)
     {
         var existedStudent = await _db.ImportedStudents.SingleOrDefaultAsync(u => u.SSN == registerRequest.SSN, ct)
             ?? throw new InvalidOperationException("This user is not allowed to register.");
@@ -182,10 +185,10 @@ public class AuthService : IAuthService
         student.OrganizationId = existedStudent.OrganizationId;
         student.Department = department;
 
-        user = student;
+        return student;
     }
 
-    private async Task RegisterStaffAsync(UserRegisterationRequest registerRequest, User user, CancellationToken ct)
+    private async Task<Staff> RegisterStaffAsync(UserRegisterationRequest registerRequest, CancellationToken ct)
     {
         var existedStaff = await _db.ImportedStaff.SingleOrDefaultAsync(u => u.SSN == registerRequest.SSN, ct)
             ?? throw new InvalidOperationException("This user is not allowed to register.");
@@ -200,10 +203,10 @@ public class AuthService : IAuthService
         staff.OrganizationId = existedStaff.OrganizationId;
         staff.Classification = StaffClassificationsEnum.Professor; //TODO: assign classification from imported user
 
-        user = staff;
+        return staff;
     }
 
-    private static void CreateUser(User user, UserRegisterationRequest registerRequest)
+    private void CreateUser(User user, UserRegisterationRequest registerRequest)
     {
         user.FirstName = registerRequest.FirstName;
         user.LastName = registerRequest.LastName;

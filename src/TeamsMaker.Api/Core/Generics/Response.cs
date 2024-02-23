@@ -51,7 +51,7 @@ public class Response<T> where T : class
         {
             EngMsg = engMessage,
             Success = isSuccessed,
-            exception = exceptionString,
+            Exception = exceptionString,
             ReturnObject = successObject
         };
     }
@@ -72,7 +72,7 @@ public class Response<T> where T : class
         {
             EngMsg = engMessage,
             Success = isSuccessed,
-            exception = exceptionString,
+            Exception = exceptionString,
             ReturnObject = successObject,
             pagination = new PaginationData
             {
@@ -87,20 +87,20 @@ public class Response<T> where T : class
     }
 }
 
-    // private ResultMessage FailureResponseObject(object? successObject,
-    //     string? exceptionString,
-    //     bool isSuccessed,
-    //     string engMessage,
-    //     int? status = null,
-    //     string? instance = null)
-    // {
-    //     return new FailureResultMessage
-    //     {
-    //         EngMsg = engMessage,
-    //         Success = isSuccessed,
-    //         exception = exceptionString,
-    //         ReturnObject = successObject,
-    //         Status = status,
-    //         Instance = instance
-    //     };
-    // }
+// private ResultMessage FailureResponseObject(object? successObject,
+//     string? exceptionString,
+//     bool isSuccessed,
+//     string engMessage,
+//     int? status = null,
+//     string? instance = null)
+// {
+//     return new FailureResultMessage
+//     {
+//         EngMsg = engMessage,
+//         Success = isSuccessed,
+//         exception = exceptionString,
+//         ReturnObject = successObject,
+//         Status = status,
+//         Instance = instance
+//     };
+// }

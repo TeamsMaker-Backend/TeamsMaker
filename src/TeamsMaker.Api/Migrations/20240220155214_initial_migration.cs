@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -400,8 +399,8 @@ namespace TeamsMaker.Api.Migrations
                 columns: new[] { "Id", "CollegeId", "Department", "GPA", "GraduationYear", "OrganizationId", "SSN" },
                 values: new object[,]
                 {
-                    { new Guid("5cba5edb-d6f0-4dee-85df-7f23fcbf86d3"), "College-123", "Computer Science", 3.5f, new DateOnly(2026, 2, 17), 1, "600-68-1014" },
-                    { new Guid("86281c15-127d-4c91-9dff-dcc24164f79b"), "College-456", "Information System", 3.3f, new DateOnly(2024, 2, 17), 1, "776-11-4808" }
+                    { new Guid("5cba5edb-d6f0-4dee-85df-7f23fcbf86d3"), "College-123", "CS", 3.5f, new DateOnly(2026, 2, 17), 1, "600-68-1014" },
+                    { new Guid("86281c15-127d-4c91-9dff-dcc24164f79b"), "College-456", "IS", 3.3f, new DateOnly(2024, 2, 17), 1, "776-11-4808" }
                 });
 
             migrationBuilder.InsertData(
