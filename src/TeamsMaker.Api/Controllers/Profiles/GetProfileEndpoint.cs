@@ -1,5 +1,7 @@
 ﻿using DataAccess.Base.Interfaces;
 
+using Microsoft.AspNetCore.Authorization;
+
 using Microsoft.AspNetCore.Mvc;
 
 using TeamsMaker.Api.Contracts.Responses.Profile;
@@ -8,6 +10,7 @@ using TeamsMaker.Api.Services.ProfileService.Interface;
 
 namespace TeamsMaker.Api.Controllers.Profiles;
 
+[Authorize]
 public class GetProfileEndpoint(IProfileService profileService, IUserInfo userInfo) : BaseApiController
 {
     private readonly IProfileService _profileService = profileService;
