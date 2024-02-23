@@ -9,7 +9,7 @@ public class Student : User
     public string? CV { get; set; }
     public int DepartmentId { get; set; }
     public virtual Department? Department { get; set; }
-
+    public virtual ICollection<Link> Links { get; set; } = [];
     //public static Student Create(string firstName, string lastName, string email, string userName)
     //{
     //    return new Student

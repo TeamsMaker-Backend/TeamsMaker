@@ -29,7 +29,8 @@ public static class ProfileUtilities
             GPA = student.GPA,
             GraduationYear = student.GraduationYear,
             Level = student.Level,
-            DepartmentName = student.Department?.Name
+            DepartmentName = student.Department?.Name,
+            Urls = student.Links,
         };
         response.StudentInfo = studentInfo;
     }
@@ -60,7 +61,11 @@ public static class ProfileUtilities
             Path.Combine(folder, FileTypes.Header), ct);
 
         if (user is Student student)
-            student.CV = await FileUtilities.UpdateFileAsync(student.CV, request.CV, FileUtilities.CreateName(student.Id, request.CV?.FileName),
+        {
+            student.CV = await FileUtilities.UpdateFileAsync(student.CV, request.StudentUpdateInfo.CV, FileUtilities.CreateName(student.Id, request.StudentUpdateInfo.CV?.FileName),
                 Path.Combine(folder, FileTypes.CV), ct);
+            student.Links = request.StudentUpdateInfo.Urls;
+        }
+            
     }
 }

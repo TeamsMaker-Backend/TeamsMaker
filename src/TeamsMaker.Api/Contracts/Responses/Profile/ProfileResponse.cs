@@ -29,8 +29,8 @@ public class StudentInfo
     public DateOnly? GraduationYear { get; set; }
     public int Level { get; set; } = 4;
     public string? DepartmentName { get; set; }
-
     public string? CV { get; set; }
+    public ICollection<Link> Urls { get; set; }
 }
 
 public class StaffInfo

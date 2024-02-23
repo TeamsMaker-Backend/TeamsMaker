@@ -9,12 +9,12 @@ namespace TeamsMaker.Api.Controllers.Profiles
     {
         private readonly IProfileService _profileService = profileService;
 
-        [HttpPut("profiles/{id}")]
-        public async Task<IActionResult> Profile(Guid id, [FromForm] UpdateProfileRequest request, CancellationToken ct)
+        [HttpPut("profiles")]
+        public async Task<IActionResult> Profile([FromForm] UpdateProfileRequest request, CancellationToken ct)
         {
             try
             {
-                await _profileService.UpdateProfileAsync(id, request, ct);
+                await _profileService.UpdateProfileAsync(request, ct);
             }
             catch (ArgumentException)
             {

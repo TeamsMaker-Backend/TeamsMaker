@@ -13,14 +13,14 @@ public class GetProfileEndpoint(IProfileService profileService, IUserInfo userIn
     private readonly IProfileService _profileService = profileService;
     private readonly IUserInfo _userInfo = userInfo;
 
-    [HttpGet("profiles/{id}")]
-    public async Task<IActionResult> Profile(Guid id, CancellationToken ct)
+    [HttpGet("profiles")]
+    public async Task<IActionResult> Profile(CancellationToken ct)
     {
         ProfileResponse response;
         try
         {
             response = await _profileService.GetProfileAsync(ct);
-            LoadFiles(id, response);
+            LoadFiles(_userInfo.UserId, response);
         }
         catch (ArgumentException)
         {
@@ -29,7 +29,7 @@ public class GetProfileEndpoint(IProfileService profileService, IUserInfo userIn
         return Ok(_response.SuccessResponse(response));
     }
 
-    private void LoadFiles(Guid id, ProfileResponse response)
+    private void LoadFiles(string id, ProfileResponse response)
     {
         response.Avatar = Url.Action(nameof(GetAvatarEndpoint.Avatar), nameof(GetAvatarEndpoint), new { id }, Request.Scheme);
         response.Header = Url.Action(nameof(GetHeaderEndpoint.Header), nameof(GetHeaderEndpoint), new { id }, Request.Scheme);

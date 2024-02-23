@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -383,6 +384,29 @@ namespace TeamsMaker.Api.Migrations
                         onDelete: ReferentialAction.Restrict);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "Link",
+                schema: "dbo",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Title = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false),
+                    Url = table.Column<string>(type: "nvarchar(2083)", maxLength: 2083, nullable: false),
+                    StudentId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Link", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Link_Student_StudentId",
+                        column: x => x.StudentId,
+                        principalSchema: "dbo",
+                        principalTable: "Student",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
             migrationBuilder.InsertData(
                 schema: "lookups",
                 table: "ImportedStaff",
@@ -493,6 +517,12 @@ namespace TeamsMaker.Api.Migrations
                 column: "StaffId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Link_StudentId",
+                schema: "dbo",
+                table: "Link",
+                column: "StudentId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_RefreshToken_UserId",
                 schema: "dbo",
                 table: "RefreshToken",
@@ -536,11 +566,11 @@ namespace TeamsMaker.Api.Migrations
                 schema: "lookups");
 
             migrationBuilder.DropTable(
-                name: "RefreshToken",
+                name: "Link",
                 schema: "dbo");
 
             migrationBuilder.DropTable(
-                name: "Student",
+                name: "RefreshToken",
                 schema: "dbo");
 
             migrationBuilder.DropTable(
@@ -551,11 +581,15 @@ namespace TeamsMaker.Api.Migrations
                 schema: "dbo");
 
             migrationBuilder.DropTable(
-                name: "Department",
-                schema: "lookups");
+                name: "Student",
+                schema: "dbo");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
+
+            migrationBuilder.DropTable(
+                name: "Department",
+                schema: "lookups");
 
             migrationBuilder.DropTable(
                 name: "Organization",

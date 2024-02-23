@@ -12,5 +12,12 @@ public class UpdateProfileRequest
 
     public IFormFile? Avatar { get; set; }
     public IFormFile? Header { get; set; }
+    public StudentUpdateInfo? StudentUpdateInfo { get; set; }
+
+}
+
+public class StudentUpdateInfo
+{
     public IFormFile? CV { get; set; }
+    public ICollection<Link> Urls { get; set; }
 }

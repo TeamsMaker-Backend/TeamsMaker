@@ -12,7 +12,7 @@ using TeamsMaker.Api.DataAccess.Context;
 namespace TeamsMaker.Api.Migrations
 {
     [DbContext(typeof(AppDBContext))]
-    [Migration("20240220155214_initial_migration")]
+    [Migration("20240223183933_initial_migration")]
     partial class initial_migration
     {
         /// <inheritdoc />
@@ -308,6 +308,35 @@ namespace TeamsMaker.Api.Migrations
                             OrganizationId = 1,
                             SSN = "776-11-4808"
                         });
+                });
+
+            modelBuilder.Entity("TeamsMaker.Api.DataAccess.Models.Link", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("StudentId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<string>("Url")
+                        .IsRequired()
+                        .HasMaxLength(2083)
+                        .HasColumnType("nvarchar(2083)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("StudentId");
+
+                    b.ToTable("Link", "dbo");
                 });
 
             modelBuilder.Entity("TeamsMaker.Api.DataAccess.Models.Organization", b =>
@@ -673,6 +702,17 @@ namespace TeamsMaker.Api.Migrations
                     b.Navigation("Staff");
                 });
 
+            modelBuilder.Entity("TeamsMaker.Api.DataAccess.Models.Link", b =>
+                {
+                    b.HasOne("TeamsMaker.Api.DataAccess.Models.Student", "Student")
+                        .WithMany("Links")
+                        .HasForeignKey("StudentId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Student");
+                });
+
             modelBuilder.Entity("TeamsMaker.Api.DataAccess.Models.Organization", b =>
                 {
                     b.OwnsOne("Core.ValueObjects.TranslatableString", "Name", b1 =>
@@ -791,6 +831,11 @@ namespace TeamsMaker.Api.Migrations
             modelBuilder.Entity("TeamsMaker.Api.DataAccess.Models.Staff", b =>
                 {
                     b.Navigation("DepartmentStaff");
+                });
+
+            modelBuilder.Entity("TeamsMaker.Api.DataAccess.Models.Student", b =>
+                {
+                    b.Navigation("Links");
                 });
 #pragma warning restore 612, 618
         }
