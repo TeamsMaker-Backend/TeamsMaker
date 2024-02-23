@@ -115,7 +115,7 @@ public class ProfileService(AppDBContext db, IWebHostEnvironment hostEnvironment
         return result;
     }
 
-    public async Task UpdateProfileAsync(Guid id, UpdateProfileRequest profileRequest, CancellationToken ct)
+    public async Task UpdateProfileAsync(UpdateProfileRequest profileRequest, CancellationToken ct)
     {
         if (_user.Roles.Contains(AppRoles.Student))
         {

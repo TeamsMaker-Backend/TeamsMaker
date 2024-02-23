@@ -11,5 +11,5 @@ public interface IProfileService
     Task<FileContentResult?> GetAvatarAsync(Guid id, CancellationToken ct);
     Task<FileContentResult?> GetHeaderAsync(Guid id, CancellationToken ct);
     Task<FileContentResult?> GetCVAsync(Guid id, CancellationToken ct);
-    Task UpdateProfileAsync(Guid id, UpdateProfileRequest profileRequest, CancellationToken ct);
+    Task UpdateProfileAsync(UpdateProfileRequest profileRequest, CancellationToken ct);
 }
