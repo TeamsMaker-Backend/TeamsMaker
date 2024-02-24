@@ -67,5 +67,6 @@ public static class ProfileUtilities
             student.Links = request.StudentUpdateInfo.Links;
         }
 
+        //TODO: if (user is Staff staff)
     }
 }
