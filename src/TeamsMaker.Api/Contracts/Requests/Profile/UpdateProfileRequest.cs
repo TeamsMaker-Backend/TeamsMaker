@@ -9,15 +9,9 @@ public class UpdateProfileRequest
     public int? Gender { get; init; }
     public string? City { get; init; }
     public string? Phone { get; init; }
+    public ICollection<string>? Links { get; init; }
 
     public IFormFile? Avatar { get; set; }
     public IFormFile? Header { get; set; }
-    public StudentUpdateInfo? StudentUpdateInfo { get; init; }
-
-}
-
-public class StudentUpdateInfo
-{
     public IFormFile? CV { get; init; }
-    public ICollection<Link>? Links { get; init; }
 }

@@ -19,7 +19,7 @@ public class GetProfileEndpoint(IProfileService profileService, IUserInfo userIn
     [HttpGet("profiles")]
     public async Task<IActionResult> Profile(CancellationToken ct)
     {
-        ProfileResponse response;
+        GetProfileResponse response;
         try
         {
             response = await _profileService.GetProfileAsync(ct);
@@ -32,7 +32,7 @@ public class GetProfileEndpoint(IProfileService profileService, IUserInfo userIn
         return Ok(_response.SuccessResponse(response));
     }
 
-    private void LoadFiles(string id, ProfileResponse response)
+    private void LoadFiles(string id, GetProfileResponse response)
     {
         response.Avatar = Url.Action(nameof(GetAvatarEndpoint.Avatar), nameof(GetAvatarEndpoint), new { id }, Request.Scheme);
         response.Header = Url.Action(nameof(GetHeaderEndpoint.Header), nameof(GetHeaderEndpoint), new { id }, Request.Scheme);

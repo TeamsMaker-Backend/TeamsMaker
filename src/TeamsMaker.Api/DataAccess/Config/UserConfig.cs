@@ -42,6 +42,11 @@ public class UserConfig : IEntityTypeConfiguration<User>
             .WithMany(y => y.Users)
             .HasForeignKey(x => x.OrganizationId);
 
+        builder.HasMany(x => x.Links)
+            .WithOne(x => x.User)
+            .HasForeignKey(x => x.UserId)
+            .IsRequired();
+
         // Enums
         builder.Property(x => x.Gender)
             .HasConversion<int>(); // Update the conversion method

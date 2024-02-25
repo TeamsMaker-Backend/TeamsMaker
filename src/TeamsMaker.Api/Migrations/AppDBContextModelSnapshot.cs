@@ -315,23 +315,18 @@ namespace TeamsMaker.Api.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("StudentId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar(100)");
-
                     b.Property<string>("Url")
                         .IsRequired()
                         .HasMaxLength(2083)
                         .HasColumnType("nvarchar(2083)");
 
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("StudentId");
+                    b.HasIndex("UserId");
 
                     b.ToTable("Link", "dbo");
                 });
@@ -701,13 +696,13 @@ namespace TeamsMaker.Api.Migrations
 
             modelBuilder.Entity("TeamsMaker.Api.DataAccess.Models.Link", b =>
                 {
-                    b.HasOne("TeamsMaker.Api.DataAccess.Models.Student", "Student")
+                    b.HasOne("TeamsMaker.Api.DataAccess.Models.User", "User")
                         .WithMany("Links")
-                        .HasForeignKey("StudentId")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("Student");
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("TeamsMaker.Api.DataAccess.Models.Organization", b =>
@@ -822,17 +817,14 @@ namespace TeamsMaker.Api.Migrations
 
             modelBuilder.Entity("TeamsMaker.Api.DataAccess.Models.User", b =>
                 {
+                    b.Navigation("Links");
+
                     b.Navigation("RefreshTokens");
                 });
 
             modelBuilder.Entity("TeamsMaker.Api.DataAccess.Models.Staff", b =>
                 {
                     b.Navigation("DepartmentStaff");
-                });
-
-            modelBuilder.Entity("TeamsMaker.Api.DataAccess.Models.Student", b =>
-                {
-                    b.Navigation("Links");
                 });
 #pragma warning restore 612, 618
         }

@@ -7,7 +7,7 @@ namespace TeamsMaker.Api.Services.ProfileService.Utilities;
 
 public static class ProfileUtilities
 {
-    public static void GetUserData(User user, ProfileResponse response)
+    public static void GetUserData(User user, GetProfileResponse response)
     {
         response.FirstName = user.FirstName;
         response.LastName = user.LastName;
@@ -19,9 +19,11 @@ public static class ProfileUtilities
         response.City = user.City;
         response.EmailConfirmed = user.EmailConfirmed;
         response.Phone = user.PhoneNumber;
+        foreach (var link in user.Links)
+            response.Links.Add(link.Url);
     }
 
-    public static void GetStudentData(Student student, ProfileResponse response)
+    public static void GetStudentData(Student student, GetProfileResponse response)
     {
         StudentInfo studentInfo = new()
         {
@@ -29,13 +31,12 @@ public static class ProfileUtilities
             GPA = student.GPA,
             GraduationYear = student.GraduationYear,
             Level = student.Level,
-            DepartmentName = student.Department?.Name,
-            Links = student.Links,
+            DepartmentName = student.Department?.Name
         };
         response.StudentInfo = studentInfo;
     }
 
-    public static void GetStaffData(Staff staff, ProfileResponse response)
+    public static void GetStaffData(Staff staff, GetProfileResponse response)
     {
         StaffInfo staffInfo = new()
         {
@@ -54,6 +55,9 @@ public static class ProfileUtilities
         user.City = request.City;
         user.PhoneNumber = request.Phone;
 
+        foreach (var link in request.Links ?? [])
+            user.Links.Add(new Link { UserId = user.Id, Url = link });
+
         user.Avatar = await FileUtilities.UpdateFileAsync(user.Avatar, request.Avatar, FileUtilities.CreateName(user.Id, request.Avatar?.FileName),
             Path.Combine(folder, FileTypes.Avatar), ct);
 
@@ -62,9 +66,8 @@ public static class ProfileUtilities
 
         if (user is Student student)
         {
-            student.CV = await FileUtilities.UpdateFileAsync(student.CV, request.StudentUpdateInfo!.CV, FileUtilities.CreateName(student.Id, request.StudentUpdateInfo.CV?.FileName),
+            student.CV = await FileUtilities.UpdateFileAsync(student.CV, request.CV, FileUtilities.CreateName(student.Id, request.CV?.FileName),
                 Path.Combine(folder, FileTypes.CV), ct);
-            student.Links = request.StudentUpdateInfo.Links;
         }
 
         //TODO: if (user is Staff staff)

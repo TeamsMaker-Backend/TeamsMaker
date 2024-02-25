@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace TeamsMaker.Api.Migrations
 {
     /// <inheritdoc />
-    public partial class initial_migration : Migration
+    public partial class update_link : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -277,6 +277,27 @@ namespace TeamsMaker.Api.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Link",
+                schema: "dbo",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Url = table.Column<string>(type: "nvarchar(2083)", maxLength: 2083, nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Link", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Link_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "RefreshToken",
                 schema: "dbo",
                 columns: table => new
@@ -380,29 +401,6 @@ namespace TeamsMaker.Api.Migrations
                         column: x => x.StaffId,
                         principalSchema: "dbo",
                         principalTable: "Staff",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Link",
-                schema: "dbo",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Title = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false),
-                    Url = table.Column<string>(type: "nvarchar(2083)", maxLength: 2083, nullable: false),
-                    StudentId = table.Column<string>(type: "nvarchar(450)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Link", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Link_Student_StudentId",
-                        column: x => x.StudentId,
-                        principalSchema: "dbo",
-                        principalTable: "Student",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -517,10 +515,10 @@ namespace TeamsMaker.Api.Migrations
                 column: "StaffId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Link_StudentId",
+                name: "IX_Link_UserId",
                 schema: "dbo",
                 table: "Link",
-                column: "StudentId");
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_RefreshToken_UserId",
@@ -574,6 +572,10 @@ namespace TeamsMaker.Api.Migrations
                 schema: "dbo");
 
             migrationBuilder.DropTable(
+                name: "Student",
+                schema: "dbo");
+
+            migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
@@ -581,15 +583,11 @@ namespace TeamsMaker.Api.Migrations
                 schema: "dbo");
 
             migrationBuilder.DropTable(
-                name: "Student",
-                schema: "dbo");
+                name: "Department",
+                schema: "lookups");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
-
-            migrationBuilder.DropTable(
-                name: "Department",
-                schema: "lookups");
 
             migrationBuilder.DropTable(
                 name: "Organization",
