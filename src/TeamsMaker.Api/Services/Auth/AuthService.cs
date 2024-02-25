@@ -45,8 +45,8 @@ public class AuthService : IAuthService
     {
         User user;
 
-        if (registerRequest.UserType == (int)UserEnum.Student) user = await RegisterStudentAsync(registerRequest, ct);
-        else if (registerRequest.UserType == (int)UserEnum.Staff) user = await RegisterStaffAsync(registerRequest, ct);
+        if (registerRequest.UserType == UserEnum.Student) user = await RegisterStudentAsync(registerRequest, ct);
+        else if (registerRequest.UserType == UserEnum.Staff) user = await RegisterStaffAsync(registerRequest, ct);
         else throw new ArgumentException("Invalid user type");
 
         var result = await _userManager.CreateAsync(user, registerRequest.Password);
@@ -57,7 +57,7 @@ public class AuthService : IAuthService
             throw new Exception(errors);
         }
 
-        var role = registerRequest.UserType == (int)UserEnum.Staff ? AppRoles.Professor : AppRoles.Student;
+        var role = registerRequest.UserType == UserEnum.Staff ? AppRoles.Professor : AppRoles.Student;
         await _userManager.AddToRoleAsync(user, role);
 
         var tokenResponse = await GenerateJwtTokenAsync(user, ct);
@@ -123,13 +123,13 @@ public class AuthService : IAuthService
 
     public async Task<bool> VerifyUserAsync(UserVerificationRequset verificationRequest, CancellationToken ct)
     {
-        if (verificationRequest.UserType == (int)UserEnum.Student)
+        if (verificationRequest.UserType == UserEnum.Student)
         {
             if (!string.IsNullOrEmpty(verificationRequest.CollegeId)) throw new ArgumentException("College Id must has a value");
 
             return await _db.ImportedStudents.AnyAsync(s => s.SSN == verificationRequest.SSN && s.CollegeId == verificationRequest.CollegeId, ct);
         }
-        else if (verificationRequest.UserType == (int)UserEnum.Staff)
+        else if (verificationRequest.UserType == UserEnum.Staff)
             return await _db.ImportedStaff.AnyAsync(s => s.SSN == verificationRequest.SSN, ct);
         else throw new ArgumentException("Invalid user type");
     }

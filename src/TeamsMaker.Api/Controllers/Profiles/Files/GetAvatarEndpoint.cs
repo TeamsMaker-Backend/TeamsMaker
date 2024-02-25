@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-using TeamsMaker.Api.Services.ProfileService.Interface;
+using TeamsMaker.Api.Services.Profiles.Interfaces;
 
 namespace TeamsMaker.Api.Controllers.Profiles.Files;
 

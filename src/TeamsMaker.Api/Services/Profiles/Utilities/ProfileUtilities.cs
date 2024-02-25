@@ -3,7 +3,7 @@ using TeamsMaker.Api.Contracts.Responses.Profile;
 using TeamsMaker.Api.Core.Consts;
 using TeamsMaker.Core.Enums;
 
-namespace TeamsMaker.Api.Services.ProfileService.Utilities;
+namespace TeamsMaker.Api.Services.Profiles.Utilities;
 
 public static class ProfileUtilities
 {
@@ -15,7 +15,7 @@ public static class ProfileUtilities
         response.Email = user.Email!;
         response.Bio = user.Bio;
         response.About = user.About;
-        response.Gender = (int)user.Gender;
+        response.Gender = user.Gender;
         response.City = user.City;
         response.EmailConfirmed = user.EmailConfirmed;
         response.Phone = user.PhoneNumber;
@@ -40,7 +40,7 @@ public static class ProfileUtilities
     {
         StaffInfo staffInfo = new()
         {
-            Classification = (int)staff.Classification
+            Classification = staff.Classification
         };
         response.StaffInfo = staffInfo;
     }
@@ -51,7 +51,7 @@ public static class ProfileUtilities
         user.LastName = request.LastName;
         user.Bio = request.Bio;
         user.About = request.About;
-        user.Gender = (GenderEnum)(request.Gender ?? (int)GenderEnum.Unknown);
+        user.Gender = request.Gender ?? GenderEnum.Unknown;
         user.City = request.City;
         user.PhoneNumber = request.Phone;
 

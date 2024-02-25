@@ -10,7 +10,7 @@ public class GetProfileResponse
     public string Email { get; set; } = null!;
     public string? Bio { get; set; }
     public string? About { get; set; }
-    public int Gender { get; set; } = (int)GenderEnum.Unknown;
+    public GenderEnum Gender { get; set; } = GenderEnum.Unknown;
     public string? City { get; set; }
     public bool EmailConfirmed { get; set; } = false;
     public string? Phone { get; set; }
@@ -36,5 +36,5 @@ public class StudentInfo
 
 public class StaffInfo
 {
-    public int Classification { get; set; }
+    public StaffClassificationsEnum Classification { get; set; }
 }

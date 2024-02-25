@@ -2,7 +2,7 @@
 
 using Microsoft.AspNetCore.Mvc;
 
-namespace TeamsMaker.Api.Services.ProfileService.Utilities;
+namespace TeamsMaker.Api.Services.Profiles.Utilities;
 
 public static class FileUtilities
 {
@@ -20,7 +20,7 @@ public static class FileUtilities
         return contentResult;
     }
 
-    public static async Task<FileData?> UpdateFileAsync(string? oldFile, IFormFile? newFile, string? newFileName, string folder, CancellationToken ct)
+    public static async Task<FileData?> UpdateFileAsync(string? oldFile, IFormFile? newFile, string newFileName, string folder, CancellationToken ct)
     {
         if (oldFile != null && File.Exists(Path.Combine(folder, oldFile)))
             File.Delete(Path.Combine(folder, oldFile));
@@ -30,7 +30,7 @@ public static class FileUtilities
 
         var newFilePath = Path.Combine(folder, newFileName!);
 
-        FileData file = new(newFileName!, newFile.ContentType);
+        FileData file = new(newFileName, newFile.ContentType);
 
 
         using (var stream = new FileStream(newFilePath, FileMode.Create))
@@ -41,6 +41,6 @@ public static class FileUtilities
         return file;
     }
 
-    public static string? CreateName(string id, string? file)
+    public static string CreateName(string id, string? file)
         => $"{id}{Path.GetExtension(file)}";
 }
