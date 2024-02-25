@@ -17,27 +17,27 @@ public class ProfileService(AppDBContext db, IWebHostEnvironment hostEnvironment
     private readonly IWebHostEnvironment _host = hostEnvironment;
     private readonly IUserInfo _user = userInfo;
 
-    public async Task<ProfileResponse> GetProfileAsync(CancellationToken ct)
+    public async Task<GetProfileResponse> GetProfileAsync(CancellationToken ct)
     {
-        ProfileResponse response = new();
+        GetProfileResponse response = new();
 
         if (_user.Roles.Contains(AppRoles.Student))
         {
             var student =
-                await _db.Students.SingleOrDefaultAsync(x => x.Id == _user.UserId, ct) ??
+                await _db.Students.Include(x => x.Links).SingleOrDefaultAsync(x => x.Id == _user.UserId, ct) ??
                 throw new ArgumentException("Invalid ID!");
 
-            ProfileUtilities.GetStudentData(student, response);
             ProfileUtilities.GetUserData(student, response);
+            ProfileUtilities.GetStudentData(student, response);
         }
         else
         {
             var staff =
-                await _db.Staff.SingleOrDefaultAsync(x => x.Id == _user.UserId, ct) ??
+                await _db.Staff.Include(x => x.Links).SingleOrDefaultAsync(x => x.Id == _user.UserId, ct) ??
                 throw new ArgumentException("Invalid ID!");
 
-            ProfileUtilities.GetStaffData(staff, response);
             ProfileUtilities.GetUserData(staff, response);
+            ProfileUtilities.GetStaffData(staff, response);
         }
 
         return response;
@@ -49,8 +49,9 @@ public class ProfileService(AppDBContext db, IWebHostEnvironment hostEnvironment
         if (await _db.Students.AnyAsync(x => x.Id == id.ToString(), ct))
         {
             var student =
-                await _db.Students.SingleOrDefaultAsync(x => x.Id == id.ToString(), ct) ??
-                throw new ArgumentException("Invalid ID!");
+                await _db.Students.FindAsync([id.ToString()], ct);
+
+            if (student == null) throw new ArgumentException("Invalid ID!");
 
             result =
                 await FileUtilities.GetFileAsync(Path.Combine(_host.WebRootPath, BaseFolders.Student, FileTypes.Avatar), student.Avatar, ct);
@@ -58,7 +59,7 @@ public class ProfileService(AppDBContext db, IWebHostEnvironment hostEnvironment
         else if (await _db.Staff.AnyAsync(x => x.Id == id.ToString(), ct))
         {
             var staff =
-                await _db.Staff.SingleOrDefaultAsync(x => x.Id == id.ToString(), ct) ??
+                await _db.Staff.FindAsync([_user.UserId], ct) ??
                 throw new ArgumentException("Invalid ID!");
 
             result =
@@ -76,7 +77,7 @@ public class ProfileService(AppDBContext db, IWebHostEnvironment hostEnvironment
         if (await _db.Students.AnyAsync(x => x.Id == id.ToString(), ct))
         {
             var student =
-                await _db.Students.SingleOrDefaultAsync(x => x.Id == id.ToString(), ct) ??
+                await _db.Students.FindAsync([id.ToString()], ct) ??
                 throw new ArgumentException("Invalid ID!");
 
             result =
@@ -85,7 +86,7 @@ public class ProfileService(AppDBContext db, IWebHostEnvironment hostEnvironment
         else if (await _db.Staff.AnyAsync(x => x.Id == id.ToString(), ct))
         {
             var staff =
-                await _db.Staff.SingleOrDefaultAsync(x => x.Id == id.ToString(), ct) ??
+                await _db.Staff.FindAsync([_user.UserId], ct) ??
                 throw new ArgumentException("Invalid ID!");
 
             result =
@@ -103,7 +104,7 @@ public class ProfileService(AppDBContext db, IWebHostEnvironment hostEnvironment
         if (await _db.Students.AnyAsync(x => x.Id == id.ToString(), ct))
         {
             var student =
-                await _db.Students.SingleOrDefaultAsync(x => x.Id == id.ToString(), ct) ??
+                await _db.Students.FindAsync([id.ToString()], ct) ??
                 throw new ArgumentException("Invalid ID!");
 
             result =
@@ -117,10 +118,13 @@ public class ProfileService(AppDBContext db, IWebHostEnvironment hostEnvironment
 
     public async Task UpdateProfileAsync(UpdateProfileRequest profileRequest, CancellationToken ct)
     {
+        var links = _db.Links.Where(x => x.UserId == _user.UserId);
+        _db.Links.RemoveRange(links);
+
         if (_user.Roles.Contains(AppRoles.Student))
         {
             var student =
-                await _db.Students.SingleOrDefaultAsync(x => x.Id == _user.UserId, ct) ??
+                await _db.Students.Include(x => x.Links).SingleOrDefaultAsync(x => x.Id == _user.UserId, ct) ??
                 throw new ArgumentException("Invalid ID!");
 
             ProfileUtilities.UpdateUserDataAsync(student, profileRequest, Path.Combine(_host.WebRootPath, BaseFolders.Student), ct);
@@ -128,7 +132,7 @@ public class ProfileService(AppDBContext db, IWebHostEnvironment hostEnvironment
         else
         {
             var staff =
-                await _db.Staff.SingleOrDefaultAsync(x => x.Id == _user.UserId, ct) ??
+                await _db.Staff.Include(x => x.Links).SingleOrDefaultAsync(x => x.Id == _user.UserId, ct) ??
                 throw new ArgumentException("Invalid ID!");
 
             ProfileUtilities.UpdateUserDataAsync(staff, profileRequest, Path.Combine(_host.WebRootPath, BaseFolders.Staff), ct);

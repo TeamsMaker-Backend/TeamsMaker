@@ -307,6 +307,30 @@ namespace TeamsMaker.Api.Migrations
                         });
                 });
 
+            modelBuilder.Entity("TeamsMaker.Api.DataAccess.Models.Link", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Url")
+                        .IsRequired()
+                        .HasMaxLength(2083)
+                        .HasColumnType("nvarchar(2083)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Link", "dbo");
+                });
+
             modelBuilder.Entity("TeamsMaker.Api.DataAccess.Models.Organization", b =>
                 {
                     b.Property<int>("Id")
@@ -670,6 +694,17 @@ namespace TeamsMaker.Api.Migrations
                     b.Navigation("Staff");
                 });
 
+            modelBuilder.Entity("TeamsMaker.Api.DataAccess.Models.Link", b =>
+                {
+                    b.HasOne("TeamsMaker.Api.DataAccess.Models.User", "User")
+                        .WithMany("Links")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("TeamsMaker.Api.DataAccess.Models.Organization", b =>
                 {
                     b.OwnsOne("Core.ValueObjects.TranslatableString", "Name", b1 =>
@@ -782,6 +817,8 @@ namespace TeamsMaker.Api.Migrations
 
             modelBuilder.Entity("TeamsMaker.Api.DataAccess.Models.User", b =>
                 {
+                    b.Navigation("Links");
+
                     b.Navigation("RefreshTokens");
                 });
 

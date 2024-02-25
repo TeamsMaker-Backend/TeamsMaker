@@ -31,6 +31,7 @@ public class AppDBContext : IdentityDbContext<User, Role, string>
     public DbSet<RefreshToken> RefreshTokens { get; set; }
     public DbSet<Organization> Organizations { get; set; }
     public DbSet<Department> Departments { get; set; }
+    public DbSet<Link> Links { get; set; }
     #endregion
 
 

@@ -2,7 +2,7 @@
 
 namespace TeamsMaker.Api.Contracts.Responses.Profile;
 
-public class ProfileResponse
+public class GetProfileResponse
 {
     public string FirstName { get; set; } = null!;
     public string LastName { get; set; } = null!;
@@ -14,6 +14,7 @@ public class ProfileResponse
     public string? City { get; set; }
     public bool EmailConfirmed { get; set; } = false;
     public string? Phone { get; set; }
+    public ICollection<string> Links { get; set; } = [];
 
     public string? Avatar { get; set; }
     public string? Header { get; set; }

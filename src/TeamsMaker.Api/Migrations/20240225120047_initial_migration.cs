@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -276,6 +277,27 @@ namespace TeamsMaker.Api.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Link",
+                schema: "dbo",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Url = table.Column<string>(type: "nvarchar(2083)", maxLength: 2083, nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Link", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Link_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "RefreshToken",
                 schema: "dbo",
                 columns: table => new
@@ -493,6 +515,12 @@ namespace TeamsMaker.Api.Migrations
                 column: "StaffId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Link_UserId",
+                schema: "dbo",
+                table: "Link",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_RefreshToken_UserId",
                 schema: "dbo",
                 table: "RefreshToken",
@@ -534,6 +562,10 @@ namespace TeamsMaker.Api.Migrations
             migrationBuilder.DropTable(
                 name: "ImportedStudent",
                 schema: "lookups");
+
+            migrationBuilder.DropTable(
+                name: "Link",
+                schema: "dbo");
 
             migrationBuilder.DropTable(
                 name: "RefreshToken",
