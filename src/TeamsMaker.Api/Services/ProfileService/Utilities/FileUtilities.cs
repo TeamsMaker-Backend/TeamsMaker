@@ -28,10 +28,12 @@ public static class FileUtilities
         if (newFile == null || newFile.Length == 0)
             return null;
 
-        FileData file = new(Path.Combine(folder, newFileName!), newFile.ContentType);
+        var newFilePath = Path.Combine(folder, newFileName!);
+
+        FileData file = new(newFileName!, newFile.ContentType);
 
 
-        using (var stream = new FileStream(file.Name, FileMode.Create))
+        using (var stream = new FileStream(newFilePath, FileMode.Create))
         {
             await newFile.CopyToAsync(stream, ct);
         }
