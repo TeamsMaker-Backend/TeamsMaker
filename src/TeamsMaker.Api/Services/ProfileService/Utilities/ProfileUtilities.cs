@@ -58,15 +58,15 @@ public static class ProfileUtilities
         foreach (var link in request.Links ?? [])
             user.Links.Add(new Link { UserId = user.Id, Url = link });
 
-        user.Avatar = await FileUtilities.UpdateFileAsync(user.Avatar, request.Avatar, FileUtilities.CreateName(user.Id, request.Avatar?.FileName),
+        user.Avatar = await FileUtilities.UpdateFileAsync(user.Avatar?.Name, request.Avatar, FileUtilities.CreateName(user.Id, request.Avatar?.FileName),
             Path.Combine(folder, FileTypes.Avatar), ct);
 
-        user.Header = await FileUtilities.UpdateFileAsync(user.Header, request.Header, FileUtilities.CreateName(user.Id, request.Header?.FileName),
+        user.Header = await FileUtilities.UpdateFileAsync(user.Header?.Name, request.Header, FileUtilities.CreateName(user.Id, request.Header?.FileName),
             Path.Combine(folder, FileTypes.Header), ct);
 
         if (user is Student student)
         {
-            student.CV = await FileUtilities.UpdateFileAsync(student.CV, request.CV, FileUtilities.CreateName(student.Id, request.CV?.FileName),
+            student.CV = await FileUtilities.UpdateFileAsync(student.CV?.Name, request.CV, FileUtilities.CreateName(student.Id, request.CV?.FileName),
                 Path.Combine(folder, FileTypes.CV), ct);
         }
 

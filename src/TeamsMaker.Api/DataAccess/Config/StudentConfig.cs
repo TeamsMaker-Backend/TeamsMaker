@@ -15,6 +15,9 @@ public class StudentConfig : IEntityTypeConfiguration<Student>
             .HasMaxLength(50);
 
         builder
+            .OwnsOne(x => x.CV);
+
+        builder
             .HasOne(x => x.Department)
             .WithMany(y => y.Students)
             .HasForeignKey(x => x.DepartmentId);
