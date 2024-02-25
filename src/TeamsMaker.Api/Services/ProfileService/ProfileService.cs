@@ -49,8 +49,9 @@ public class ProfileService(AppDBContext db, IWebHostEnvironment hostEnvironment
         if (await _db.Students.AnyAsync(x => x.Id == id.ToString(), ct))
         {
             var student =
-                await _db.Students.FindAsync([_user.UserId], ct) ??
-                throw new ArgumentException("Invalid ID!");
+                await _db.Students.FindAsync([id.ToString()], ct);
+
+            if (student == null) throw new ArgumentException("Invalid ID!");
 
             result =
                 await FileUtilities.GetFileAsync(Path.Combine(_host.WebRootPath, BaseFolders.Student, FileTypes.Avatar), student.Avatar, ct);
@@ -76,7 +77,7 @@ public class ProfileService(AppDBContext db, IWebHostEnvironment hostEnvironment
         if (await _db.Students.AnyAsync(x => x.Id == id.ToString(), ct))
         {
             var student =
-                await _db.Students.FindAsync([_user.UserId], ct) ??
+                await _db.Students.FindAsync([id.ToString()], ct) ??
                 throw new ArgumentException("Invalid ID!");
 
             result =
@@ -103,7 +104,7 @@ public class ProfileService(AppDBContext db, IWebHostEnvironment hostEnvironment
         if (await _db.Students.AnyAsync(x => x.Id == id.ToString(), ct))
         {
             var student =
-                await _db.Students.FindAsync([_user.UserId], ct) ??
+                await _db.Students.FindAsync([id.ToString()], ct) ??
                 throw new ArgumentException("Invalid ID!");
 
             result =

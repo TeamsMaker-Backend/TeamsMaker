@@ -11,7 +11,7 @@ public class UpdateProfileRequest
     public string? Phone { get; init; }
     public ICollection<string>? Links { get; init; }
 
-    public IFormFile? Avatar { get; set; }
-    public IFormFile? Header { get; set; }
+    public IFormFile? Avatar { get; init; }
+    public IFormFile? Header { get; init; }
     public IFormFile? CV { get; init; }
 }
