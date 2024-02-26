@@ -15,14 +15,11 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllers();
 
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("CorsPolicy",
+builder.Services.AddCors(options => options.AddPolicy("CorsPolicy",
         builder => builder.WithOrigins("http://localhost:5173")
                         .AllowCredentials()
                         .AllowAnyMethod()
-                        .WithHeaders("Content-Type", "Authorization"));
-});
+                        .WithHeaders("Content-Type", "Authorization")));
 
 #region JWT & Authorization;
 builder.Services.AddSingleton(builder.Configuration.GetSection("JwtConfig").Get<JwtConfig>()!);
