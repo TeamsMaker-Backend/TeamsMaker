@@ -17,12 +17,11 @@ builder.Services.AddControllers();
 
 builder.Services.AddCors(options =>
 {
-    options.AddDefaultPolicy(
-        builder => builder.AllowAnyOrigin()
-                        // .AllowCredentials()
+    options.AddPolicy("CorsPolicy",
+        builder => builder.WithOrigins("http://localhost:5173")
+                        .AllowCredentials()
                         .AllowAnyMethod()
-                        //.WithHeaders("Content-Type", "Authorization"));
-                        .AllowAnyHeader());
+                        .WithHeaders("Content-Type", "Authorization"));
 });
 
 #region JWT & Authorization;
@@ -136,11 +135,9 @@ await SeedDB.Initialize(app.Services.GetRequiredService<IServiceScopeFactory>().
 
 // app.UseExceptionHandler(opt => { });
 
-// app.UseRouting();
+app.UseCors("CorsPolicy");
 
-app.UseCors();
-
-// app.UseHttpsRedirection();
+app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
