@@ -5,8 +5,8 @@ using TeamsMaker.Api.DataAccess.Context;
 using TeamsMaker.Api.DataAccess.Interceptors;
 using TeamsMaker.Api.Services.Auth;
 using TeamsMaker.Api.Services.Organizations;
-using TeamsMaker.Api.Services.ProfileService;
-using TeamsMaker.Api.Services.ProfileService.Interface;
+using TeamsMaker.Api.Services.Profiles;
+using TeamsMaker.Api.Services.Profiles.Interfaces;
 
 namespace TeamsMaker.Api;
 

@@ -6,10 +6,10 @@ using TeamsMaker.Api.Contracts.Requests.Profile;
 using TeamsMaker.Api.Contracts.Responses.Profile;
 using TeamsMaker.Api.Core.Consts;
 using TeamsMaker.Api.DataAccess.Context;
-using TeamsMaker.Api.Services.ProfileService.Interface;
-using TeamsMaker.Api.Services.ProfileService.Utilities;
+using TeamsMaker.Api.Services.Profiles.Interfaces;
+using TeamsMaker.Api.Services.Profiles.Utilities;
 
-namespace TeamsMaker.Api.Services.ProfileService;
+namespace TeamsMaker.Api.Services.Profiles;
 
 public class ProfileService(AppDBContext db, IWebHostEnvironment hostEnvironment, IUserInfo userInfo) : IProfileService
 {
@@ -49,9 +49,8 @@ public class ProfileService(AppDBContext db, IWebHostEnvironment hostEnvironment
         if (await _db.Students.AnyAsync(x => x.Id == id.ToString(), ct))
         {
             var student =
-                await _db.Students.FindAsync([id.ToString()], ct);
-
-            if (student == null) throw new ArgumentException("Invalid ID!");
+                await _db.Students.FindAsync([id.ToString()], ct) ??
+                throw new ArgumentException("Invalid ID!");
 
             result =
                 await FileUtilities.GetFileAsync(Path.Combine(_host.WebRootPath, BaseFolders.Student, FileTypes.Avatar), student.Avatar, ct);

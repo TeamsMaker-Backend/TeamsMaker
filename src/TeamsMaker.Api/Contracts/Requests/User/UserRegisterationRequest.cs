@@ -1,8 +1,10 @@
-﻿namespace TeamsMaker.Api.Contracts.Requests;
+﻿using TeamsMaker.Core.Enums;
+
+namespace TeamsMaker.Api.Contracts.Requests;
 
 public class UserRegisterationRequest
 {
-    public int UserType { get; init; }
+    public UserEnum UserType { get; init; }
     public required string FirstName { get; init; }
     public required string LastName { get; init; }
     [EmailAddress] public required string Email { get; init; }

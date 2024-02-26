@@ -3,7 +3,7 @@ using TeamsMaker.Api.Contracts.Responses.Profile;
 using TeamsMaker.Api.Core.Consts;
 using TeamsMaker.Core.Enums;
 
-namespace TeamsMaker.Api.Services.ProfileService.Utilities;
+namespace TeamsMaker.Api.Services.Profiles.Utilities;
 
 public static class ProfileUtilities
 {
@@ -15,7 +15,7 @@ public static class ProfileUtilities
         response.Email = user.Email!;
         response.Bio = user.Bio;
         response.About = user.About;
-        response.Gender = (int)user.Gender;
+        response.Gender = user.Gender;
         response.City = user.City;
         response.EmailConfirmed = user.EmailConfirmed;
         response.Phone = user.PhoneNumber;
@@ -40,7 +40,7 @@ public static class ProfileUtilities
     {
         StaffInfo staffInfo = new()
         {
-            Classification = (int)staff.Classification
+            Classification = staff.Classification
         };
         response.StaffInfo = staffInfo;
     }
@@ -51,22 +51,22 @@ public static class ProfileUtilities
         user.LastName = request.LastName;
         user.Bio = request.Bio;
         user.About = request.About;
-        user.Gender = (GenderEnum)(request.Gender ?? (int)GenderEnum.Unknown);
+        user.Gender = request.Gender ?? GenderEnum.Unknown;
         user.City = request.City;
         user.PhoneNumber = request.Phone;
 
         foreach (var link in request.Links ?? [])
             user.Links.Add(new Link { UserId = user.Id, Url = link });
 
-        user.Avatar = await FileUtilities.UpdateFileAsync(user.Avatar, request.Avatar, FileUtilities.CreateName(user.Id, request.Avatar?.FileName),
+        user.Avatar = await FileUtilities.UpdateFileAsync(user.Avatar?.Name, request.Avatar, FileUtilities.CreateName(user.Id, request.Avatar?.FileName),
             Path.Combine(folder, FileTypes.Avatar), ct);
 
-        user.Header = await FileUtilities.UpdateFileAsync(user.Header, request.Header, FileUtilities.CreateName(user.Id, request.Header?.FileName),
+        user.Header = await FileUtilities.UpdateFileAsync(user.Header?.Name, request.Header, FileUtilities.CreateName(user.Id, request.Header?.FileName),
             Path.Combine(folder, FileTypes.Header), ct);
 
         if (user is Student student)
         {
-            student.CV = await FileUtilities.UpdateFileAsync(student.CV, request.CV, FileUtilities.CreateName(student.Id, request.CV?.FileName),
+            student.CV = await FileUtilities.UpdateFileAsync(student.CV?.Name, request.CV, FileUtilities.CreateName(student.Id, request.CV?.FileName),
                 Path.Combine(folder, FileTypes.CV), ct);
         }
 

@@ -34,6 +34,12 @@ public class UserConfig : IEntityTypeConfiguration<User>
         builder.Property(x => x.Email)
             .IsRequired();
 
+        builder
+            .OwnsOne(x => x.Avatar);
+
+        builder
+            .OwnsOne(x => x.Header);
+
         builder.HasIndex(x => x.Email).IsUnique();
 
         // Relationships

@@ -1,3 +1,5 @@
+using Core.ValueObjects;
+
 using TeamsMaker.Api.DataAccess.Base.Interfaces;
 using TeamsMaker.Core.Enums;
 
@@ -9,8 +11,8 @@ public class User : IdentityUser, IActivable
     public string FirstName { get; set; } = null!;
     public string LastName { get; set; } = null!;
     public string SSN { get; set; } = null!;
-    public string? Avatar { get; set; }
-    public string? Header { get; set; }
+    public FileData? Avatar { get; set; }
+    public FileData? Header { get; set; }
     public string? Bio { get; set; }
     public string? About { get; set; }
     public GenderEnum Gender { get; set; } = GenderEnum.Unknown;
