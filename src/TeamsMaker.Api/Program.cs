@@ -15,6 +15,16 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllers();
 
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(
+        builder => builder.AllowAnyOrigin()
+                        // .AllowCredentials()
+                        .AllowAnyMethod()
+                        //.WithHeaders("Content-Type", "Authorization"));
+                        .AllowAnyHeader());
+});
+
 #region JWT & Authorization;
 builder.Services.AddSingleton(builder.Configuration.GetSection("JwtConfig").Get<JwtConfig>()!);
 var key = Encoding.ASCII.GetBytes(builder.Configuration["JwtConfig:Secret"]!);
@@ -123,9 +133,14 @@ if (app.Environment.IsDevelopment())
 }
 
 await SeedDB.Initialize(app.Services.GetRequiredService<IServiceScopeFactory>().CreateScope().ServiceProvider);
-// app.UseCors();
+
 // app.UseExceptionHandler(opt => { });
-app.UseHttpsRedirection();
+
+// app.UseRouting();
+
+app.UseCors();
+
+// app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
