@@ -211,7 +211,7 @@ public class AuthService : IAuthService
         user.FirstName = registerRequest.FirstName;
         user.LastName = registerRequest.LastName;
         user.Email = registerRequest.Email;
-        user.UserName = new MailAddress(registerRequest.Email).User;
+        user.UserName = registerRequest.Email;
         user.SSN = registerRequest.SSN;
     }
 
