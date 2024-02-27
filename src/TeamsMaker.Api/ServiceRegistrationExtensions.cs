@@ -7,6 +7,7 @@ using TeamsMaker.Api.Services.Auth;
 using TeamsMaker.Api.Services.Organizations;
 using TeamsMaker.Api.Services.Profiles;
 using TeamsMaker.Api.Services.Profiles.Interfaces;
+using TeamsMaker.Core.Enums;
 
 namespace TeamsMaker.Api;
 
@@ -45,7 +46,8 @@ public static class ServiceRegistrationExtensions
         services.AddScoped<IUserInfo, UserInfo>();
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IOrganizationService, OrganizationService>();
-        services.AddScoped<IProfileService, ProfileService>();
+        services.AddKeyedScoped<IProfileService, StudentProfileService>(UserEnum.Student);
+        services.AddKeyedScoped<IProfileService, StaffProfileService>(UserEnum.Staff);
 
         return services;
     }

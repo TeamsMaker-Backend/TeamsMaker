@@ -8,8 +8,6 @@ namespace TeamsMaker.Api.Services.Profiles.Interfaces;
 public interface IProfileService
 {
     Task<GetProfileResponse> GetProfileAsync(CancellationToken ct);
-    Task<FileContentResult?> GetAvatarAsync(Guid id, CancellationToken ct);
-    Task<FileContentResult?> GetHeaderAsync(Guid id, CancellationToken ct);
-    Task<FileContentResult?> GetCVAsync(Guid id, CancellationToken ct);
+    Task<FileContentResult?> GetFileContentAsync(Guid id, string fileType, CancellationToken ct);
     Task UpdateProfileAsync(UpdateProfileRequest profileRequest, CancellationToken ct);
 }
