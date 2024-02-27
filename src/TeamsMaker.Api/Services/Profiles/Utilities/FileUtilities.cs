@@ -6,7 +6,7 @@ namespace TeamsMaker.Api.Services.Profiles.Utilities;
 
 public static class FileUtilities
 {
-    public static async Task<FileContentResult?> GetFileAsync(string folder, FileData? file, CancellationToken ct)
+    public static async Task<FileContentResult?> LoadFileAsync(string folder, FileData? file, CancellationToken ct)
     {
         if (file == null)
             return null;
@@ -28,10 +28,11 @@ public static class FileUtilities
         if (newFile == null || newFile.Length == 0)
             return null;
 
+        Directory.CreateDirectory(folder);
+
         var newFilePath = Path.Combine(folder, newFileName!);
 
         FileData file = new(newFileName, newFile.ContentType);
-
 
         using (var stream = new FileStream(newFilePath, FileMode.Create))
         {
