@@ -18,7 +18,8 @@ public class GetProfileEndpoint(IServiceProvider serviceProvider, IUserInfo user
     private readonly IUserInfo _userInfo = userInfo;
     private IProfileService? _profileService;
 
-    [HttpGet("profiles")]
+
+    [HttpGet("profiles/me")]
     public async Task<IActionResult> Profile(CancellationToken ct)
     {
         _profileService = _serviceProvider.GetRequiredKeyedService<IProfileService>(GetKey());

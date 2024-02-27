@@ -17,7 +17,7 @@ public class StaffProfileService(AppDBContext db, IWebHostEnvironment hostEnviro
 {
     private readonly AppDBContext _db = db;
     private readonly IWebHostEnvironment _host = hostEnvironment;
-    private readonly IUserInfo _user = userInfo;
+    private readonly IUserInfo _userInfo = userInfo;
     private readonly string _folder = BaseFolders.Staff;
 
     public async Task<GetProfileResponse> GetProfileAsync(CancellationToken ct)
@@ -25,7 +25,7 @@ public class StaffProfileService(AppDBContext db, IWebHostEnvironment hostEnviro
         GetProfileResponse response = new();
 
         var staff =
-            await _db.Staff.Include(x => x.Links).SingleOrDefaultAsync(x => x.Id == _user.UserId, ct) ??
+            await _db.Staff.Include(x => x.Links).SingleOrDefaultAsync(x => x.Id == _userInfo.UserId, ct) ??
             throw new ArgumentException("Invalid ID!");
 
         ProfileUtilities.GetUserData(staff, response);
@@ -36,11 +36,11 @@ public class StaffProfileService(AppDBContext db, IWebHostEnvironment hostEnviro
 
     public async Task UpdateProfileAsync(UpdateProfileRequest profileRequest, CancellationToken ct)
     {
-        var links = _db.Links.Where(x => x.UserId == _user.UserId);
+        var links = _db.Links.Where(x => x.UserId == _userInfo.UserId);
         _db.Links.RemoveRange(links);
 
         var staff =
-                await _db.Staff.Include(x => x.Links).SingleOrDefaultAsync(x => x.Id == _user.UserId, ct) ??
+                await _db.Staff.Include(x => x.Links).SingleOrDefaultAsync(x => x.Id == _userInfo.UserId, ct) ??
                 throw new ArgumentException("Invalid ID!");
 
         ProfileUtilities.UpdateUserDataAsync(staff, profileRequest, Path.Combine(_host.WebRootPath, BaseFolders.Staff), ct);
