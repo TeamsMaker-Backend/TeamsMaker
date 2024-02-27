@@ -40,13 +40,17 @@ public class GetProfileEndpoint(IServiceProvider serviceProvider, IUserInfo user
 
     private void LoadFiles(string id, UserEnum userEnum, GetProfileResponse response)
     {
-        response.Avatar = Url.Action(nameof(GetFileEndpoint.File), nameof(GetFileEndpoint), new { id, userEnum, fileType = FileTypes.Avatar }, Request.Scheme);
-        response.Header = Url.Action(nameof(GetFileEndpoint.File), nameof(GetFileEndpoint), new { id, userEnum, fileType = FileTypes.Header }, Request.Scheme);
+        response.Avatar = Url.Action(nameof(GetFileEndpoint.File), nameof(GetFileEndpoint), new { userEnum, id, fileType = FileTypes.Avatar }, Request.Scheme);
+        response.Header = Url.Action(nameof(GetFileEndpoint.File), nameof(GetFileEndpoint), new { userEnum, id, fileType = FileTypes.Header }, Request.Scheme);
 
         if (response.StudentInfo != null)
-            response.StudentInfo!.CV = Url.Action(nameof(GetFileEndpoint.File), nameof(GetFileEndpoint), new { id, userEnum, fileType = FileTypes.CV }, Request.Scheme);
+            response.StudentInfo!.CV = Url.Action(nameof(GetFileEndpoint.File), nameof(GetFileEndpoint), new { userEnum, id, fileType = FileTypes.CV }, Request.Scheme);
     }
 
     private UserEnum GetKey() // Refactor
         => _userInfo.Roles.Contains(AppRoles.Student) ? UserEnum.Student : UserEnum.Staff;
 }
+/*
+get profile => ?? userId -> profiles/{userId}/{userE}
+
+*/

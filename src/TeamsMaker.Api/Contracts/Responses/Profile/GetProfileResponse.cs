@@ -14,10 +14,11 @@ public class GetProfileResponse
     public string? City { get; set; }
     public bool EmailConfirmed { get; set; } = false;
     public string? Phone { get; set; }
-    public ICollection<string> Links { get; set; } = [];
-
     public string? Avatar { get; set; }
     public string? Header { get; set; }
+    public ICollection<string> Links { get; set; } = [];
+    //TODO: Add Roles Collection
+    // TODO: Org id
 
     public StudentInfo? StudentInfo { get; set; }
     public StaffInfo? StaffInfo { get; set; }
