@@ -21,6 +21,7 @@ public class UpdateProfileEndpoint(IServiceProvider serviceProvider, IUserInfo u
     public async Task<IActionResult> Profile([FromForm] UpdateProfileRequest request, CancellationToken ct)
     {
         _profileService = _serviceProvider.GetRequiredKeyedService<IProfileService>(GetKey());
+
         try
         {
             await _profileService.UpdateProfileAsync(request, ct);
@@ -29,6 +30,7 @@ public class UpdateProfileEndpoint(IServiceProvider serviceProvider, IUserInfo u
         {
             return NotFound(_response.FailureResponse("Invalid Data"));
         }
+
         return Ok(_response.SuccessResponse(null));
     }
 

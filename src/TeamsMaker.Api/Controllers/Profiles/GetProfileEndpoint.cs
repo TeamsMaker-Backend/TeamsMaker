@@ -33,6 +33,7 @@ public class GetProfileEndpoint(IServiceProvider serviceProvider, IUserInfo user
         {
             return NotFound(_response.FailureResponse("Invalid Data!"));
         }
+
         return Ok(_response.SuccessResponse(response));
     }
 
