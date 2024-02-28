@@ -1,22 +1,21 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-using TeamsMaker.Api.Contracts.Requests.Profile;
 using TeamsMaker.Api.Services.Profiles.Interfaces;
 
-namespace TeamsMaker.Api.Controllers.Profiles;
+namespace TeamsMaker.Api.Controllers.Profiles.Experiences;
 
 [Authorize]
-public class DeleteExperienceEndpoint(IStudentProfileService studentProfileService) : BaseApiController
+public class DeleteExperienceEndpoint(IExperienceService experienceService) : BaseApiController
 {
-    private readonly IStudentProfileService _studentProfileService = studentProfileService;
+    private readonly IExperienceService _experienceService = experienceService;
 
     [HttpDelete("profiles/experiences/{id}")]
     public async Task<IActionResult> Experience(int id, CancellationToken ct)
     {
         try
         {
-            await _studentProfileService.DeleteExperienceAsync(id, ct);
+            await _experienceService.DeleteExperienceAsync(id, ct);
         }
         catch (ArgumentException)
         {

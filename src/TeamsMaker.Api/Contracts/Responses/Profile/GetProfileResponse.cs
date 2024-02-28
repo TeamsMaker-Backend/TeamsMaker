@@ -1,6 +1,4 @@
-﻿using Microsoft.CodeAnalysis;
-
-using TeamsMaker.Core.Enums;
+﻿using TeamsMaker.Core.Enums;
 
 namespace TeamsMaker.Api.Contracts.Responses.Profile;
 
@@ -16,7 +14,7 @@ public class GetProfileResponse
     public string? City { get; set; }
     public bool EmailConfirmed { get; set; } = false;
     public string? Phone { get; set; }
-    public ICollection<string> Links { get; set; } = [];
+    public ICollection<string>? Links { get; set; } = [];
 
     public string? Avatar { get; set; }
     public string? Header { get; set; }
@@ -35,8 +33,8 @@ public class StudentInfo
 
     public string? CV { get; set; }
 
-    public ICollection<ExperienceInfo>? Experiences { get; set; }
-    public ICollection<ProjectInfo>? Projects { get; set; }
+    public ICollection<ExperienceInfo>? Experiences { get; set; } = [];
+    public ICollection<ProjectInfo>? Projects { get; set; } = [];
 }
 
 public class ProjectInfo
@@ -45,7 +43,7 @@ public class ProjectInfo
     public string Name { get; set; } = null!;
     public string Url { get; set; } = null!;
     public string? Description { get; set; }
-    public ICollection<string>? Tags { get; set; } = [];
+    public ICollection<string>? Skills { get; set; } = [];
 }
 
 public class ExperienceInfo

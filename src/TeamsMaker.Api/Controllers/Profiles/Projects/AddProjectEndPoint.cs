@@ -1,6 +1,4 @@
-﻿using DataAccess.Base.Interfaces;
-
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 using TeamsMaker.Api.Contracts.Requests.Profile;
@@ -9,9 +7,9 @@ using TeamsMaker.Api.Services.Profiles.Interfaces;
 namespace TeamsMaker.Api.Controllers.Profiles;
 
 [Authorize]
-public class AddProjectEndpoint(IStudentProfileService studenrProfileService) : BaseApiController
+public class AddProjectEndpoint(IProjectService projectService) : BaseApiController
 {
-    private readonly IStudentProfileService _studentProfileService = studenrProfileService;
+    private readonly IProjectService _studentProfileService = projectService;
 
     [HttpPost("profiles/projects")]
     public async Task<IActionResult> Project(ProjectRequest request, CancellationToken ct)

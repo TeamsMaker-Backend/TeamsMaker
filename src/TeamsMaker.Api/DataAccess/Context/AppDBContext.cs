@@ -34,6 +34,7 @@ public class AppDBContext : IdentityDbContext<User, Role, string>
     public DbSet<Link> Links { get; set; }
     public DbSet<Experience> Experiences { get; set; }
     public DbSet<Project> Projects { get; set; }
+    public DbSet<Skill> Skills { get; set; }
     #endregion
 
 

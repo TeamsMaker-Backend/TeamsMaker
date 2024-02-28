@@ -21,20 +21,6 @@ public class User : IdentityUser, IActivable
     public int OrganizationId { get; set; }
     public virtual Organization Organization { get; set; } = null!;
     public virtual ICollection<RefreshToken> RefreshTokens { get; set; } = [];
-    public virtual ICollection<Link> Links { get; set; } = [];
-
-
-    // public User WithOrganizationId(int organizationId)
-    // {
-    //     OrganizationId = organizationId;
-
-    //     return this;
-    // }
-
-    // public static implicit operator User(bool v)
-    // {
-    //     throw new NotImplementedException();
-    // }
-
+    public virtual ICollection<Link>? Links { get; set; } = [];
 }
 //TODO: Contacts, Circle, Posts, UserLinks, Tags

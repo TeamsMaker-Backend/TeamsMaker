@@ -1,24 +1,22 @@
-﻿using DataAccess.Base.Interfaces;
-
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 using TeamsMaker.Api.Contracts.Requests.Profile;
 using TeamsMaker.Api.Services.Profiles.Interfaces;
 
-namespace TeamsMaker.Api.Controllers.Profiles;
+namespace TeamsMaker.Api.Controllers.Profiles.Experiences;
 
 [Authorize]
-public class AddExperiencEndpoint(IStudentProfileService studentProfileService) : BaseApiController
+public class AddExperiencEndpoint(IExperienceService experienceService) : BaseApiController
 {
-    private readonly IStudentProfileService _studentProfileService = studentProfileService;
+    private readonly IExperienceService _experienceService = experienceService;
 
     [HttpPost("profiles/experiences")]
     public async Task<IActionResult> Experience(ExperienceRequest request, CancellationToken ct)
     {
         try
         {
-            await _studentProfileService.AddExperienceAsync(request, ct);
+            await _experienceService.AddExperienceAsync(request, ct);
         }
         catch (ArgumentException)
         {

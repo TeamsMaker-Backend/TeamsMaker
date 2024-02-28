@@ -25,11 +25,13 @@ public class StudentConfig : IEntityTypeConfiguration<Student>
         builder
            .HasMany(x => x.Experiences)
            .WithOne(x => x.Student)
-           .HasForeignKey(x => x.StudentId);
+           .HasForeignKey(x => x.StudentId)
+           .IsRequired();
 
         builder
             .HasMany(x => x.Projects)
             .WithOne(x => x.Student)
-            .HasForeignKey(x => x.StudentId);
+            .HasForeignKey(x => x.StudentId)
+            .IsRequired();
     }
 }

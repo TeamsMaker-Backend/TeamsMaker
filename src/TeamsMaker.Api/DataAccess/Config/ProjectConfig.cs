@@ -19,6 +19,12 @@ public class ProjectConfig : IEntityTypeConfiguration<Project>
         builder
             .HasOne(x => x.Student)
             .WithMany(x => x.Projects)
-            .HasForeignKey(x => x.StudentId);
+            .HasForeignKey(x => x.StudentId)
+            .IsRequired();
+
+        builder.HasMany(x => x.Skills)
+            .WithOne(x => x.Project)
+            .HasForeignKey(x => x.ProjectId)
+            .IsRequired();
     }
 }

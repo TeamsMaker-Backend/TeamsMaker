@@ -19,6 +19,7 @@ public class ExperienceConfig : IEntityTypeConfiguration<Experience>
         builder
             .HasOne(x => x.Student)
             .WithMany(x => x.Experiences)
-            .HasForeignKey(x => x.StudentId);
+            .HasForeignKey(x => x.StudentId)
+            .IsRequired();
     }
 }

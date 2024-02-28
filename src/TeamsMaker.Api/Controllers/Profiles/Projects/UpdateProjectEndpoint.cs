@@ -4,19 +4,19 @@ using Microsoft.AspNetCore.Mvc;
 using TeamsMaker.Api.Contracts.Requests.Profile;
 using TeamsMaker.Api.Services.Profiles.Interfaces;
 
-namespace TeamsMaker.Api.Controllers.Profiles;
+namespace TeamsMaker.Api.Controllers.Profiles.Projects;
 
 [Authorize]
-public class UpdateProjectEndpoint(IStudentProfileService studentProfileService) : BaseApiController
+public class UpdateProjectEndpoint(IProjectService projectService) : BaseApiController
 {
-    private readonly IStudentProfileService _studentProfileService = studentProfileService;
+    private readonly IProjectService _projectService = projectService;
 
     [HttpPut("profiles/projects/{id}")]
     public async Task<IActionResult> Project(int id, ProjectRequest request, CancellationToken ct)
     {
         try
         {
-            await _studentProfileService.UpdateProjectAsync(id, request, ct);
+            await _projectService.UpdateProjectAsync(id, request, ct);
         }
         catch (ArgumentException)
         {

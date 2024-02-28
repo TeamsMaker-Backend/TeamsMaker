@@ -4,19 +4,19 @@ using Microsoft.AspNetCore.Mvc;
 using TeamsMaker.Api.Contracts.Requests.Profile;
 using TeamsMaker.Api.Services.Profiles.Interfaces;
 
-namespace TeamsMaker.Api.Controllers.Profiles;
+namespace TeamsMaker.Api.Controllers.Profiles.Experiences;
 
 [Authorize]
-public class UpdateExperienceEndpoint(IStudentProfileService studentProfileService) : BaseApiController
+public class UpdateExperienceEndpoint(IExperienceService experienceService) : BaseApiController
 {
-    private readonly IStudentProfileService _studentProfileService = studentProfileService;
+    private readonly IExperienceService _experienceService = experienceService;
 
     [HttpPut("profiles/experiences/{id}")]
     public async Task<IActionResult> Experience(int id, ExperienceRequest request, CancellationToken ct)
     {
         try
         {
-            await _studentProfileService.UpdateExperienceAsync(id, request, ct);
+            await _experienceService.UpdateExperienceAsync(id, request, ct);
         }
         catch (ArgumentException)
         {

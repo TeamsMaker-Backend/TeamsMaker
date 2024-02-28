@@ -12,19 +12,6 @@ public class Student : User
     public int DepartmentId { get; set; }
     public virtual Department? Department { get; set; }
 
-    public ICollection<Experience> Experiences { get; set; } = [];
-    public ICollection<Project> Projects { get; set; } = [];
-
-    //public static Student Create(string firstName, string lastName, string email, string userName)
-    //{
-    //    return new Student
-    //    {
-    //        FirstName = firstName,
-    //        LastName = lastName,
-    //        Email = email,
-    //        UserName = userName
-    //    };
-    //}
-
-    // public Student WithCollegeId()
+    public ICollection<Experience>? Experiences { get; set; } = [];
+    public ICollection<Project>? Projects { get; set; } = [];
 }
