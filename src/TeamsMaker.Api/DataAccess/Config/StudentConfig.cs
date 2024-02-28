@@ -21,5 +21,15 @@ public class StudentConfig : IEntityTypeConfiguration<Student>
             .HasOne(x => x.Department)
             .WithMany(y => y.Students)
             .HasForeignKey(x => x.DepartmentId);
+
+        builder
+           .HasMany(x => x.Experiences)
+           .WithOne(x => x.Student)
+           .HasForeignKey(x => x.StudentId);
+
+        builder
+            .HasMany(x => x.Projects)
+            .WithOne(x => x.Student)
+            .HasForeignKey(x => x.StudentId);
     }
 }

@@ -10,8 +10,8 @@ public class GetFileEndpoint(IServiceProvider serviceProvider) : BaseApiControll
     private readonly IServiceProvider _serviceProvider = serviceProvider;
     private IProfileService? _profileService;
 
-    [HttpGet("profiles/{userEnum}/{id}/files/{fileType}")]
-    public async Task<IActionResult> File(UserEnum userEnum, Guid id, string fileType, CancellationToken ct)
+    [HttpGet("profiles/{id}/{userEnum}/files/{fileType}")]
+    public async Task<IActionResult> File(Guid id, UserEnum userEnum, string fileType, CancellationToken ct)
     {
         _profileService = _serviceProvider.GetRequiredKeyedService<IProfileService>(userEnum);
         FileContentResult? result;

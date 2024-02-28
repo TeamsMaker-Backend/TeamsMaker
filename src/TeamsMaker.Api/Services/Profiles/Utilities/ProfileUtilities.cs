@@ -33,6 +33,35 @@ public static class ProfileUtilities
             Level = student.Level,
             DepartmentName = student.Department?.Name
         };
+
+        if (student.Experiences != null)
+        {
+            studentInfo.Experiences = [];
+
+            foreach (var experience in student.Experiences)
+                studentInfo.Experiences.Add(new ExperienceInfo()
+                {
+                    Organization = experience.Organization,
+                    Role = experience.Role,
+                    StartDate = experience.StartDate,
+                    EndDate = experience.EndDate,
+                    Description = experience.Description
+                });
+        }
+        if (student.Projects != null)
+        {
+            studentInfo.Projects = [];
+
+            foreach (var project in student.Projects)
+                studentInfo.Projects.Add(new ProjectInfo()
+                {
+                    Name = project.Name,
+                    Url = project.Url,
+                    Description = project.Description,
+                    Tags = project.Tags
+                });
+        }
+
         response.StudentInfo = studentInfo;
     }
 

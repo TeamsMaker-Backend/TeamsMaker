@@ -64,6 +64,63 @@ public class AuthService : IAuthService
         return tokenResponse;
     }
 
+    #region 
+    // public async Task<TokenResponse> RegisterAsyncV1(UserRegisterationRequest registerRequest, CancellationToken ct)
+    // {
+    //     var existedUser = await _db.ImportedStudents.SingleOrDefaultAsync(u => u.SSN == registerRequest.SSN, ct);
+
+    //     if (existedUser is null)
+    //         throw new InvalidOperationException("This user is not allowed to register.");
+
+    //     if (await _db.Users.AnyAsync(x => x.Email == registerRequest.Email))
+    //         throw new ArgumentException("This Email already exists");
+
+    //     User user;
+
+    //     if (registerRequest.UserType == (int)UserEnum.Student)
+    //     {
+    //         Student student = new();
+    //         CreateUser(student, registerRequest);
+
+    //         var department = await _db.Departments.SingleOrDefaultAsync(x => x.Code == existedUser.Department, ct);
+    //         // Student Data
+    //         student.CollegeId = existedUser.CollegeId!;
+    //         student.GraduationYear = existedUser.GraduationYear!;
+    //         student.GPA = existedUser.GPA!;
+    //         student.OrganizationId = existedUser.OrganizationId;
+    //         student.Department = department;
+
+    //         user = student;
+    //     }
+    //     else if (registerRequest.UserType == (int)UserEnum.Staff)
+    //     {
+    //         Staff staff = new();
+    //         CreateUser(staff, registerRequest);
+
+    //         // Professor Data
+    //         staff.OrganizationId = existedUser.OrganizationId;
+    //         staff.Classification = StaffClassificationsEnum.Professor; //TODO: assign classification from imported user
+
+    //         user = staff;
+    //     }
+    //     else throw new ArgumentException("Invalid user type");
+
+    //     var result = await _userManager.CreateAsync(user, registerRequest.Password);
+
+    //     if (!result.Succeeded)
+    //     {
+    //         var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+    //         throw new Exception(errors);
+    //     }
+
+    //     var role = registerRequest.UserType == (int)UserEnum.Staff ? AppRoles.Professor : AppRoles.Student;
+    //     await _userManager.AddToRoleAsync(user, role);
+
+    //     var tokenResponse = await GenerateJwtTokenAsync(user, ct);
+    //     return tokenResponse;
+    // }
+    #endregion
+
     public async Task<bool> VerifyUserAsync(UserVerificationRequset verificationRequest, CancellationToken ct)
     {
         if (verificationRequest.UserType == UserEnum.Student)

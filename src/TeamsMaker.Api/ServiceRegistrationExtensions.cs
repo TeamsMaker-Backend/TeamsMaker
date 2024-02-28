@@ -48,6 +48,7 @@ public static class ServiceRegistrationExtensions
         services.AddScoped<IOrganizationService, OrganizationService>();
         services.AddKeyedScoped<IProfileService, StudentProfileService>(UserEnum.Student);
         services.AddKeyedScoped<IProfileService, StaffProfileService>(UserEnum.Staff);
+        services.AddScoped<IStudentProfileService, StudentProfileService>();
 
         return services;
     }
