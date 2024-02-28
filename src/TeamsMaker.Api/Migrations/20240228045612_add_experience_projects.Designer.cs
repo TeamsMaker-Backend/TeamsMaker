@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TeamsMaker.Api.DataAccess.Context;
 
@@ -11,9 +12,11 @@ using TeamsMaker.Api.DataAccess.Context;
 namespace TeamsMaker.Api.Migrations
 {
     [DbContext(typeof(AppDBContext))]
-    partial class AppDBContextModelSnapshot : ModelSnapshot
+    [Migration("20240228045612_add_experience_projects")]
+    partial class add_experience_projects
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -435,6 +438,9 @@ namespace TeamsMaker.Api.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<string>("Tags")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Url")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -521,28 +527,6 @@ namespace TeamsMaker.Api.Migrations
                     b.HasIndex("OrganizationId");
 
                     b.ToTable("AspNetRoles", (string)null);
-                });
-
-            modelBuilder.Entity("TeamsMaker.Api.DataAccess.Models.Skill", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("ProjectId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProjectId");
-
-                    b.ToTable("Skill", "dbo");
                 });
 
             modelBuilder.Entity("TeamsMaker.Api.DataAccess.Models.User", b =>
@@ -863,17 +847,6 @@ namespace TeamsMaker.Api.Migrations
                     b.Navigation("Organization");
                 });
 
-            modelBuilder.Entity("TeamsMaker.Api.DataAccess.Models.Skill", b =>
-                {
-                    b.HasOne("TeamsMaker.Api.DataAccess.Models.Project", "Project")
-                        .WithMany("Skills")
-                        .HasForeignKey("ProjectId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Project");
-                });
-
             modelBuilder.Entity("TeamsMaker.Api.DataAccess.Models.User", b =>
                 {
                     b.HasOne("TeamsMaker.Api.DataAccess.Models.Organization", "Organization")
@@ -994,11 +967,6 @@ namespace TeamsMaker.Api.Migrations
                     b.Navigation("Roles");
 
                     b.Navigation("Users");
-                });
-
-            modelBuilder.Entity("TeamsMaker.Api.DataAccess.Models.Project", b =>
-                {
-                    b.Navigation("Skills");
                 });
 
             modelBuilder.Entity("TeamsMaker.Api.DataAccess.Models.User", b =>

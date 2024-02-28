@@ -19,8 +19,7 @@ public static class ProfileUtilities
         response.City = user.City;
         response.EmailConfirmed = user.EmailConfirmed;
         response.Phone = user.PhoneNumber;
-        foreach (var link in user.Links)
-            response.Links.Add(link.Url);
+        response.Links = user.Links?.Select(x => x.Url).ToList();
     }
 
     public static void GetStudentData(Student student, GetProfileResponse response)
@@ -31,8 +30,30 @@ public static class ProfileUtilities
             GPA = student.GPA,
             GraduationYear = student.GraduationYear,
             Level = student.Level,
-            DepartmentName = student.Department?.Name
+            DepartmentName = student.Department?.Name,
+
+            Experiences =
+                student?.Experiences?.Select(x => new ExperienceInfo()
+                {
+                    Id = x.Id,
+                    Organization = x.Organization,
+                    Role = x.Role,
+                    StartDate = x.StartDate,
+                    EndDate = x.EndDate,
+                    Description = x.Description
+                }).ToList(),
+
+            Projects =
+                student?.Projects?.Select(x => new ProjectInfo()
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    Url = x.Url,
+                    Description = x.Description,
+                    Skills = x.Skills?.Select(s => s.Name).ToList()
+                }).ToList()
         };
+
         response.StudentInfo = studentInfo;
     }
 
@@ -54,9 +75,7 @@ public static class ProfileUtilities
         user.Gender = request.Gender ?? GenderEnum.Unknown;
         user.City = request.City;
         user.PhoneNumber = request.Phone;
-
-        foreach (var link in request.Links ?? [])
-            user.Links.Add(new Link { UserId = user.Id, Url = link });
+        user.Links = request.Links?.Select(x => new Link { UserId = user.Id, Url = x }).ToList();
 
         user.Avatar = await FileUtilities.UpdateFileAsync(user.Avatar?.Name, request.Avatar, FileUtilities.CreateName(user.Id, request.Avatar?.FileName),
             Path.Combine(folder, FileTypes.Avatar), ct);

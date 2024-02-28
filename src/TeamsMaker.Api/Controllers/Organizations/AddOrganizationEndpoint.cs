@@ -18,6 +18,7 @@ public class AddOrganizationEndpoint : BaseApiController
         _organizationService = organizationService;
     }
 
+    [Tags("Organizations")]
     [HttpPost("organizations")]
     public async Task<IActionResult> AddOrganization(AddOrganizationRequest request, CancellationToken ct)
     {

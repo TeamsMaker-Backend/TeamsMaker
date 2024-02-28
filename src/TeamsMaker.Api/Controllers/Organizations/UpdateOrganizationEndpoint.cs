@@ -17,6 +17,7 @@ public class UpdateOrganizationEndpoint : BaseApiController
         _organizationService = organizationService;
     }
 
+    [Tags("Organizations")]
     [HttpPut("organizations/{id}")]
     public async Task<IActionResult> UpdateOrganization(int id, UpdateOrganizationRequest request, CancellationToken ct)
     {

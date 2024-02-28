@@ -14,11 +14,10 @@ public class GetProfileResponse
     public string? City { get; set; }
     public bool EmailConfirmed { get; set; } = false;
     public string? Phone { get; set; }
+    public ICollection<string>? Links { get; set; } = [];
+
     public string? Avatar { get; set; }
     public string? Header { get; set; }
-    public ICollection<string> Links { get; set; } = [];
-    //TODO: Add Roles Collection
-    // TODO: Org id
 
     public StudentInfo? StudentInfo { get; set; }
     public StaffInfo? StaffInfo { get; set; }
@@ -33,6 +32,28 @@ public class StudentInfo
     public string? DepartmentName { get; set; }
 
     public string? CV { get; set; }
+
+    public ICollection<ExperienceInfo>? Experiences { get; set; } = [];
+    public ICollection<ProjectInfo>? Projects { get; set; } = [];
+}
+
+public class ProjectInfo
+{
+    public int Id { get; set; }
+    public string Name { get; set; } = null!;
+    public string Url { get; set; } = null!;
+    public string? Description { get; set; }
+    public ICollection<string>? Skills { get; set; } = [];
+}
+
+public class ExperienceInfo
+{
+    public int Id { get; set; }
+    public string Organization { get; set; } = null!;
+    public string Role { get; set; } = null!;
+    public DateOnly? StartDate { get; set; }
+    public DateOnly? EndDate { get; set; }
+    public string? Description { get; set; }
 }
 
 public class StaffInfo

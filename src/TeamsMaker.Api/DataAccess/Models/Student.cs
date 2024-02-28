@@ -11,4 +11,7 @@ public class Student : User
     public FileData? CV { get; set; }
     public int DepartmentId { get; set; }
     public virtual Department? Department { get; set; }
+
+    public ICollection<Experience>? Experiences { get; set; } = [];
+    public ICollection<Project>? Projects { get; set; } = [];
 }

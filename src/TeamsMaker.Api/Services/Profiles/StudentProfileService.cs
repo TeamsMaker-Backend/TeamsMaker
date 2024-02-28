@@ -25,7 +25,11 @@ public class StudentProfileService(AppDBContext db, IWebHostEnvironment hostEnvi
         GetProfileResponse response = new();
 
         var student =
-            await _db.Students.Include(x => x.Links).SingleOrDefaultAsync(x => x.Id == _userInfo.UserId, ct) ??
+            await _db.Students
+            .Include(x => x.Links)
+            .Include(x => x.Projects)
+            .Include(x => x.Experiences)
+            .SingleOrDefaultAsync(x => x.Id == _userInfo.UserId, ct) ??
             throw new ArgumentException("Invalid ID!");
 
         ProfileUtilities.GetUserData(student, response);
@@ -36,11 +40,13 @@ public class StudentProfileService(AppDBContext db, IWebHostEnvironment hostEnvi
 
     public async Task UpdateProfileAsync(UpdateProfileRequest profileRequest, CancellationToken ct)
     {
-        var links = _db.Links.Where(x => x.UserId == _userInfo.UserId);
-        _db.Links.RemoveRange(links);
+        var skills = _db.Links.Where(x => x.UserId == _userInfo.UserId);
+        _db.RemoveRange(skills);
 
         var student =
-                await _db.Students.Include(x => x.Links).SingleOrDefaultAsync(x => x.Id == _userInfo.UserId, ct) ??
+                await _db.Students
+                .Include(x => x.Links)
+                .SingleOrDefaultAsync(x => x.Id == _userInfo.UserId, ct) ??
                 throw new ArgumentException("Invalid ID!");
 
         ProfileUtilities.UpdateUserDataAsync(student, profileRequest, Path.Combine(_host.WebRootPath, BaseFolders.Student), ct);

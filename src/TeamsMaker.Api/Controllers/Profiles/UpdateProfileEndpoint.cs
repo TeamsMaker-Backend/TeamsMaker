@@ -17,6 +17,7 @@ public class UpdateProfileEndpoint(IServiceProvider serviceProvider, IUserInfo u
     private readonly IUserInfo _userInfo = userInfo;
     private IProfileService? _profileService;
 
+    [Tags("profiles")]
     [HttpPut("profiles")]
     public async Task<IActionResult> Profile([FromForm] UpdateProfileRequest request, CancellationToken ct)
     {

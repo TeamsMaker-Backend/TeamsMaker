@@ -1,5 +1,4 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
-using System.Net.Mail;
 using System.Security;
 using System.Security.Claims;
 

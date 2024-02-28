@@ -18,7 +18,7 @@ public class GetProfileEndpoint(IServiceProvider serviceProvider, IUserInfo user
     private readonly IUserInfo _userInfo = userInfo;
     private IProfileService? _profileService;
 
-
+    [Tags("profiles")]
     [HttpGet("profiles/me")]
     public async Task<IActionResult> Profile(CancellationToken ct)
     {
@@ -50,7 +50,3 @@ public class GetProfileEndpoint(IServiceProvider serviceProvider, IUserInfo user
     private UserEnum GetKey() // Refactor
         => _userInfo.Roles.Contains(AppRoles.Student) ? UserEnum.Student : UserEnum.Staff;
 }
-/*
-get profile => ?? userId -> profiles/{userId}/{userE}
-
-*/

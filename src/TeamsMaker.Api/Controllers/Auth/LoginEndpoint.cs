@@ -13,6 +13,7 @@ public class LoginEndpoint : BaseApiController
         _authService = authService;
     }
 
+    [Tags("Auth")]
     [HttpPost("users/login")]
     public async Task<IActionResult> Login(UserLoginRequest request, CancellationToken ct)
     {

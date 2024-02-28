@@ -14,6 +14,7 @@ public class RegisterEndpoint : BaseApiController
         _authService = authService;
     }
 
+    [Tags("Auth")]
     [HttpPost("users/register")]
     public async Task<IActionResult> Register(UserRegisterationRequest request, CancellationToken ct)
     {

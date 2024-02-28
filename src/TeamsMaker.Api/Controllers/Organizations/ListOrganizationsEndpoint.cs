@@ -17,7 +17,7 @@ public class ListOrganizationsEndpoint : BaseApiController
         _organizationService = organizationService;
     }
 
-
+    [Tags("Organizations")]
     [HttpGet("organizations")]
     public async Task<IActionResult> ListOrganization([FromQuery] OrganizationsQueryString queryString, CancellationToken ct)
     {
