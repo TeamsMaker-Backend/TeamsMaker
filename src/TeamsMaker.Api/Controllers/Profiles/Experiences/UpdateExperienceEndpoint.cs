@@ -11,6 +11,7 @@ public class UpdateExperienceEndpoint(IExperienceService experienceService) : Ba
 {
     private readonly IExperienceService _experienceService = experienceService;
 
+    [Tags("profiles/experiences")]
     [HttpPut("profiles/experiences/{id}")]
     public async Task<IActionResult> Experience(int id, ExperienceRequest request, CancellationToken ct)
     {

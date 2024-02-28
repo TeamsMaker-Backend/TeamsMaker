@@ -11,6 +11,7 @@ public class AddProjectEndpoint(IProjectService projectService) : BaseApiControl
 {
     private readonly IProjectService _studentProfileService = projectService;
 
+    [Tags("profiles/Projects")]
     [HttpPost("profiles/projects")]
     public async Task<IActionResult> Project(ProjectRequest request, CancellationToken ct)
     {

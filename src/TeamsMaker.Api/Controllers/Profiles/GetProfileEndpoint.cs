@@ -18,6 +18,7 @@ public class GetProfileEndpoint(IServiceProvider serviceProvider, IUserInfo user
     private readonly IUserInfo _userInfo = userInfo;
     private IProfileService? _profileService;
 
+    [Tags("profiles")]
     [HttpGet("profiles/me")]
     public async Task<IActionResult> Profile(CancellationToken ct)
     {

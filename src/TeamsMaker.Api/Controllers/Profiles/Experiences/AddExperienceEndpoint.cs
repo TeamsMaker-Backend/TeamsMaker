@@ -11,6 +11,7 @@ public class AddExperiencEndpoint(IExperienceService experienceService) : BaseAp
 {
     private readonly IExperienceService _experienceService = experienceService;
 
+    [Tags("profiles/experiences")]
     [HttpPost("profiles/experiences")]
     public async Task<IActionResult> Experience(ExperienceRequest request, CancellationToken ct)
     {

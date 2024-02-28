@@ -10,6 +10,7 @@ public class DeleteExperienceEndpoint(IExperienceService experienceService) : Ba
 {
     private readonly IExperienceService _experienceService = experienceService;
 
+    [Tags("profiles/experiences")]
     [HttpDelete("profiles/experiences/{id}")]
     public async Task<IActionResult> Experience(int id, CancellationToken ct)
     {
