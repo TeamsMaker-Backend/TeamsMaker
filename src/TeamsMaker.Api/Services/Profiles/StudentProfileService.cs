@@ -37,6 +37,23 @@ public class StudentProfileService(AppDBContext db, IWebHostEnvironment hostEnvi
 
         return response;
     }
+    public async Task<GetOtherProfileResponse> GetOtherProfileAsync(string id,CancellationToken ct)
+    {
+        var response = new GetOtherProfileResponse { Roles = _userInfo.Roles.ToList() };
+
+        var student =
+            await _db.Students
+            .Include(x => x.Links)
+            .Include(x => x.Experiences)
+            .Include(x => x.Projects).ThenInclude(p => p.Skills)
+            .SingleOrDefaultAsync(x => x.Id == id, ct) ??
+            throw new ArgumentException("Invalid ID!");
+
+        ProfileUtilities.GetOtherUserData(student, response);
+        ProfileUtilities.GetOtherStudentData(student, response);
+
+        return response;
+    }
 
     public async Task UpdateProfileAsync(UpdateProfileRequest profileRequest, CancellationToken ct)
     {
