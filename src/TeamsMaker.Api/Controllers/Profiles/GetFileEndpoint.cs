@@ -8,18 +8,17 @@ namespace TeamsMaker.Api.Controllers.Profiles;
 public class GetFileEndpoint(IServiceProvider serviceProvider) : BaseApiController
 {
     private readonly IServiceProvider _serviceProvider = serviceProvider;
-    private IProfileService? _profileService;
 
     [Tags("profiles")]
     [HttpGet("profiles/{userEnum}/{id}/files/{fileType}")]
     public async Task<IActionResult> File(UserEnum userEnum, Guid id, string fileType, CancellationToken ct)
     {
-        _profileService = _serviceProvider.GetRequiredKeyedService<IProfileService>(userEnum);
+        var profileService = _serviceProvider.GetRequiredKeyedService<IProfileService>(userEnum);
         FileContentResult? result;
 
         try
         {
-            result = await _profileService.GetFileContentAsync(id, fileType, ct);
+            result = await profileService.GetFileContentAsync(id, fileType, ct);
         }
         catch (ArgumentException)
         {

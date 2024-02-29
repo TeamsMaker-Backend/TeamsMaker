@@ -16,18 +16,17 @@ public class GetProfileEndpoint(IServiceProvider serviceProvider, IUserInfo user
 {
     private readonly IServiceProvider _serviceProvider = serviceProvider;
     private readonly IUserInfo _userInfo = userInfo;
-    private IProfileService? _profileService;
 
     [Tags("profiles")]
     [HttpGet("profiles/me")]
     public async Task<IActionResult> Profile(CancellationToken ct)
     {
-        _profileService = _serviceProvider.GetRequiredKeyedService<IProfileService>(GetKey());
+        var profileService = _serviceProvider.GetRequiredKeyedService<IProfileService>(GetKey());
         GetProfileResponse response;
 
         try
         {
-            response = await _profileService.GetProfileAsync(ct);
+            response = await profileService.GetProfileAsync(ct);
             LoadFiles(_userInfo.UserId, GetKey(), response);
         }
         catch (ArgumentException)

@@ -15,17 +15,16 @@ public class UpdateProfileEndpoint(IServiceProvider serviceProvider, IUserInfo u
 {
     private readonly IServiceProvider _serviceProvider = serviceProvider;
     private readonly IUserInfo _userInfo = userInfo;
-    private IProfileService? _profileService;
 
     [Tags("profiles")]
     [HttpPut("profiles")]
     public async Task<IActionResult> Profile([FromForm] UpdateProfileRequest request, CancellationToken ct)
     {
-        _profileService = _serviceProvider.GetRequiredKeyedService<IProfileService>(GetKey());
+        var profileService = _serviceProvider.GetRequiredKeyedService<IProfileService>(GetKey());
 
         try
         {
-            await _profileService.UpdateProfileAsync(request, ct);
+            await profileService.UpdateProfileAsync(request, ct);
         }
         catch (ArgumentException)
         {
