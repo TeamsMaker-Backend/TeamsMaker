@@ -22,7 +22,7 @@ public class StaffProfileService(AppDBContext db, IWebHostEnvironment hostEnviro
 
     public async Task<GetProfileResponse> GetProfileAsync(CancellationToken ct)
     {
-        GetProfileResponse response = new();
+        var response = new GetProfileResponse { Roles = _userInfo.Roles.ToList() };
 
         var staff =
             await _db.Staff.Include(x => x.Links).SingleOrDefaultAsync(x => x.Id == _userInfo.UserId, ct) ??
@@ -40,10 +40,14 @@ public class StaffProfileService(AppDBContext db, IWebHostEnvironment hostEnviro
         _db.Links.RemoveRange(links);
 
         var staff =
-                await _db.Staff.Include(x => x.Links).SingleOrDefaultAsync(x => x.Id == _userInfo.UserId, ct) ??
+                await _db.Staff
+                .Include(x => x.Links)
+                .SingleOrDefaultAsync(x => x.Id == _userInfo.UserId, ct) ??
                 throw new ArgumentException("Invalid ID!");
 
         ProfileUtilities.UpdateUserDataAsync(staff, profileRequest, Path.Combine(_host.WebRootPath, BaseFolders.Staff), ct);
+
+        await _db.SaveChangesAsync(ct);
     }
 
     public async Task<FileContentResult?> GetFileContentAsync(Guid id, string fileType, CancellationToken ct)

@@ -19,6 +19,7 @@ public static class ProfileUtilities
         response.City = user.City;
         response.EmailConfirmed = user.EmailConfirmed;
         response.Phone = user.PhoneNumber;
+        response.OrganizationId = user.OrganizationId;
         response.Links = user.Links?.Select(x => x.Url).ToList();
     }
 
@@ -33,7 +34,7 @@ public static class ProfileUtilities
             DepartmentName = student.Department?.Name,
 
             Experiences =
-                student?.Experiences?.Select(x => new ExperienceInfo()
+                student?.Experiences?.Select(x => new ExperienceInfo
                 {
                     Id = x.Id,
                     Organization = x.Organization,
@@ -44,7 +45,7 @@ public static class ProfileUtilities
                 }).ToList(),
 
             Projects =
-                student?.Projects?.Select(x => new ProjectInfo()
+                student?.Projects?.Select(x => new ProjectInfo
                 {
                     Id = x.Id,
                     Name = x.Name,
@@ -88,7 +89,5 @@ public static class ProfileUtilities
             student.CV = await FileUtilities.UpdateFileAsync(student.CV?.Name, request.CV, FileUtilities.CreateName(student.Id, request.CV?.FileName),
                 Path.Combine(folder, FileTypes.CV), ct);
         }
-
-        //TODO: if (user is Staff staff)
     }
 }

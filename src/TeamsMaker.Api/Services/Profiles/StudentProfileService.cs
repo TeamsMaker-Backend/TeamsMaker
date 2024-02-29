@@ -22,7 +22,7 @@ public class StudentProfileService(AppDBContext db, IWebHostEnvironment hostEnvi
 
     public async Task<GetProfileResponse> GetProfileAsync(CancellationToken ct)
     {
-        GetProfileResponse response = new();
+        var response = new GetProfileResponse { Roles = _userInfo.Roles.ToList() };
 
         var student =
             await _db.Students
@@ -40,8 +40,8 @@ public class StudentProfileService(AppDBContext db, IWebHostEnvironment hostEnvi
 
     public async Task UpdateProfileAsync(UpdateProfileRequest profileRequest, CancellationToken ct)
     {
-        var skills = _db.Links.Where(x => x.UserId == _userInfo.UserId);
-        _db.RemoveRange(skills);
+        var links = _db.Links.Where(x => x.UserId == _userInfo.UserId);
+        _db.RemoveRange(links);
 
         var student =
                 await _db.Students

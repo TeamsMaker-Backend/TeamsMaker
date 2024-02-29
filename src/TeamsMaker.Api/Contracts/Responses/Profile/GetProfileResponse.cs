@@ -14,6 +14,8 @@ public class GetProfileResponse
     public string? City { get; set; }
     public bool EmailConfirmed { get; set; } = false;
     public string? Phone { get; set; }
+    public int OrganizationId { get; set; }
+    public ICollection<string> Roles { get; set; } = [];
     public ICollection<string>? Links { get; set; } = [];
 
     public string? Avatar { get; set; }

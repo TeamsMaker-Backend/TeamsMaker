@@ -13,7 +13,7 @@ namespace TeamsMaker.Api.Services.Profiles
 
         public async Task AddProjectAsync(ProjectRequest projectRequest, CancellationToken ct)
         {
-            Project project = new()
+            var project = new Project
             {
                 StudentId = _userInfo.UserId,
                 Name = projectRequest.Name,
@@ -50,7 +50,7 @@ namespace TeamsMaker.Api.Services.Profiles
         {
             var project =
                 await _db.Projects.SingleOrDefaultAsync(x => x.Id == projectId, ct) ??
-                    throw new ArgumentException("Invalid ID!");
+                throw new ArgumentException("Invalid ID!");
 
             project.Name = projectRequest.Name;
             project.Url = projectRequest.Url;
