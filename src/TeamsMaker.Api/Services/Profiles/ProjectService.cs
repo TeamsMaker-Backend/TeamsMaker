@@ -19,7 +19,7 @@ namespace TeamsMaker.Api.Services.Profiles
                 Name = projectRequest.Name,
                 Url = projectRequest.Url,
                 Description = projectRequest.Description,
-                Skills = projectRequest.Skills?.Select(x => new Skill { Name = x }).ToList()
+                Skills = projectRequest.Skills?.Select(x => new Skill { Name = x }).ToList() ?? []
             };
 
             await _db.Projects.AddAsync(project, ct);
@@ -38,24 +38,28 @@ namespace TeamsMaker.Api.Services.Profiles
             await _db.SaveChangesAsync(ct);
         }
 
-        private async Task DeleteSkillsAsync(int projectId, CancellationToken ct)
-        {
-            var skills = _db.Skills.Where(x => x.ProjectId == projectId);
-            _db.RemoveRange(skills);
-
-            await _db.SaveChangesAsync(ct);
-        }
-
         public async Task UpdateProjectAsync(int projectId, ProjectRequest projectRequest, CancellationToken ct)
         {
+            await DeleteSkillsAsync(projectId, ct);
+
             var project =
-                await _db.Projects.SingleOrDefaultAsync(x => x.Id == projectId, ct) ??
+                await _db.Projects
+                .Include(x => x.Skills)
+                .SingleOrDefaultAsync(x => x.Id == projectId, ct) ??
                 throw new ArgumentException("Invalid ID!");
 
             project.Name = projectRequest.Name;
             project.Url = projectRequest.Url;
             project.Description = projectRequest.Description;
-            project.Skills = projectRequest.Skills?.Select(x => new Skill { Name = x }).ToList();
+            project.Skills = projectRequest.Skills?.Select(x => new Skill { Name = x }).ToList() ?? [];
+
+            await _db.SaveChangesAsync(ct);
+        }
+
+        private async Task DeleteSkillsAsync(int projectId, CancellationToken ct)
+        {
+            var skills = _db.Skills.Where(x => x.ProjectId == projectId);
+            _db.RemoveRange(skills);
 
             await _db.SaveChangesAsync(ct);
         }

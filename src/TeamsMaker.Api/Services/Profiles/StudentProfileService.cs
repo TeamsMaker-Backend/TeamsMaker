@@ -27,8 +27,8 @@ public class StudentProfileService(AppDBContext db, IWebHostEnvironment hostEnvi
         var student =
             await _db.Students
             .Include(x => x.Links)
-            .Include(x => x.Projects)
             .Include(x => x.Experiences)
+            .Include(x => x.Projects).ThenInclude(p => p.Skills)
             .SingleOrDefaultAsync(x => x.Id == _userInfo.UserId, ct) ??
             throw new ArgumentException("Invalid ID!");
 
