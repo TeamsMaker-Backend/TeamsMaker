@@ -59,7 +59,7 @@ namespace TeamsMaker.Api.Services.Profiles
         private async Task DeleteSkillsAsync(int projectId, CancellationToken ct)
         {
             var skills = _db.Skills.Where(x => x.ProjectId == projectId);
-            _db.RemoveRange(skills);
+            _db.Skills.RemoveRange(skills);
 
             await _db.SaveChangesAsync(ct);
         }

@@ -76,7 +76,7 @@ public static class ProfileUtilities
         user.Gender = request.Gender ?? GenderEnum.Unknown;
         user.City = request.City;
         user.PhoneNumber = request.Phone;
-        user.Links = request.Links?.Select(x => new Link { UserId = user.Id, Url = x }).ToList();
+        user.Links = request.Links?.Select(x => new Link { UserId = user.Id, Url = x }).ToList() ?? [];
 
         user.Avatar = await FileUtilities.UpdateFileAsync(user.Avatar?.Name, request.Avatar, FileUtilities.CreateName(user.Id, request.Avatar?.FileName),
             Path.Combine(folder, FileTypes.Avatar), ct);

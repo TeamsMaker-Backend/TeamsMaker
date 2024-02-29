@@ -41,7 +41,7 @@ public class StudentProfileService(AppDBContext db, IWebHostEnvironment hostEnvi
     public async Task UpdateProfileAsync(UpdateProfileRequest profileRequest, CancellationToken ct)
     {
         var links = _db.Links.Where(x => x.UserId == _userInfo.UserId);
-        _db.RemoveRange(links);
+        _db.Links.RemoveRange(links);
 
         var student =
                 await _db.Students
