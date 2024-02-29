@@ -20,7 +20,7 @@ public static class ProfileUtilities
         response.EmailConfirmed = user.EmailConfirmed;
         response.Phone = user.PhoneNumber;
         response.OrganizationId = user.OrganizationId;
-        response.Links = user.Links?.Select(x => x.Url).ToList();
+        response.Links = user.Links?.Select(l => l.Url).ToList();
     }
 
     public static void GetStudentData(Student student, GetProfileResponse response)
@@ -34,24 +34,24 @@ public static class ProfileUtilities
             DepartmentName = student.Department?.Name,
 
             Experiences =
-                student?.Experiences?.Select(x => new ExperienceInfo
+                student?.Experiences?.Select(ex => new ExperienceInfo
                 {
-                    Id = x.Id,
-                    Organization = x.Organization,
-                    Role = x.Role,
-                    StartDate = x.StartDate,
-                    EndDate = x.EndDate,
-                    Description = x.Description
+                    Id = ex.Id,
+                    Organization = ex.Organization,
+                    Role = ex.Role,
+                    StartDate = ex.StartDate,
+                    EndDate = ex.EndDate,
+                    Description = ex.Description
                 }).ToList(),
 
             Projects =
-                student?.Projects?.Select(x => new ProjectInfo
+                student?.Projects?.Select(prj => new ProjectInfo
                 {
-                    Id = x.Id,
-                    Name = x.Name,
-                    Url = x.Url,
-                    Description = x.Description,
-                    Skills = x.Skills?.Select(s => s.Name).ToList()
+                    Id = prj.Id,
+                    Name = prj.Name,
+                    Url = prj.Url,
+                    Description = prj.Description,
+                    Skills = prj.Skills?.Select(s => s.Name).ToList()
                 }).ToList()
         };
 
@@ -76,7 +76,7 @@ public static class ProfileUtilities
         user.Gender = request.Gender ?? GenderEnum.Unknown;
         user.City = request.City;
         user.PhoneNumber = request.Phone;
-        user.Links = request.Links?.Select(x => new Link { UserId = user.Id, Url = x }).ToList() ?? [];
+        user.Links = request.Links?.Select(l => new Link { UserId = user.Id, Url = l }).ToList() ?? [];
 
         user.Avatar = await FileUtilities.UpdateFileAsync(user.Avatar?.Name, request.Avatar, FileUtilities.CreateName(user.Id, request.Avatar?.FileName),
             Path.Combine(folder, FileTypes.Avatar), ct);

@@ -19,7 +19,7 @@ namespace TeamsMaker.Api.Services.Profiles
                 Name = projectRequest.Name,
                 Url = projectRequest.Url,
                 Description = projectRequest.Description,
-                Skills = projectRequest.Skills?.Select(x => new Skill { Name = x }).ToList() ?? []
+                Skills = projectRequest.Skills?.Select(s => new Skill { Name = s }).ToList() ?? []
             };
 
             await _db.Projects.AddAsync(project, ct);
@@ -44,21 +44,21 @@ namespace TeamsMaker.Api.Services.Profiles
 
             var project =
                 await _db.Projects
-                .Include(x => x.Skills)
-                .SingleOrDefaultAsync(x => x.Id == projectId, ct) ??
+                .Include(prj => prj.Skills)
+                .SingleOrDefaultAsync(prj => prj.Id == projectId, ct) ??
                 throw new ArgumentException("Invalid ID!");
 
             project.Name = projectRequest.Name;
             project.Url = projectRequest.Url;
             project.Description = projectRequest.Description;
-            project.Skills = projectRequest.Skills?.Select(x => new Skill { Name = x }).ToList() ?? [];
+            project.Skills = projectRequest.Skills?.Select(s => new Skill { Name = s }).ToList() ?? [];
 
             await _db.SaveChangesAsync(ct);
         }
 
         private async Task DeleteSkillsAsync(int projectId, CancellationToken ct)
         {
-            var skills = _db.Skills.Where(x => x.ProjectId == projectId);
+            var skills = _db.Skills.Where(s => s.ProjectId == projectId);
             _db.Skills.RemoveRange(skills);
 
             await _db.SaveChangesAsync(ct);

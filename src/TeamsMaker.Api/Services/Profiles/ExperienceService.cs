@@ -40,7 +40,7 @@ namespace TeamsMaker.Api.Services.Profiles
         public async Task UpdateExperienceAsync(int experienceId, ExperienceRequest experienceRequest, CancellationToken ct)
         {
             var experience =
-                await _db.Experiences.SingleOrDefaultAsync(x => x.Id == experienceId, ct) ??
+                await _db.Experiences.SingleOrDefaultAsync(ex => ex.Id == experienceId, ct) ??
                 throw new ArgumentException("Invalid ID!");
 
             experience.Organization = experienceRequest.Organization;
