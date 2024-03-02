@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 using TeamsMaker.Api.Contracts.Responses.Profile;
+using TeamsMaker.Api.Controllers.Files;
 using TeamsMaker.Api.Core.Consts;
 using TeamsMaker.Api.Services.Profiles.Interfaces;
 using TeamsMaker.Core.Enums;
@@ -27,7 +28,7 @@ public class GetProfileEndpoint(IServiceProvider serviceProvider, IUserInfo user
         try
         {
             response = await profileService.GetProfileAsync(ct);
-            LoadFiles(_userInfo.UserId, GetKey(), response);
+            LoadFiles(_userInfo.UserId, GetBaseType(GetKey()), response);
         }
         catch (ArgumentException)
         {
@@ -37,15 +38,23 @@ public class GetProfileEndpoint(IServiceProvider serviceProvider, IUserInfo user
         return Ok(_response.SuccessResponse(response));
     }
 
-    private void LoadFiles(string id, UserEnum userEnum, GetProfileResponse response)
+    private void LoadFiles(string id, string baseType, GetProfileResponse response)
     {
-        response.Avatar = Url.Action(nameof(GetFileEndpoint.File), nameof(GetFileEndpoint), new { userEnum, id, fileType = FileTypes.Avatar }, Request.Scheme);
-        response.Header = Url.Action(nameof(GetFileEndpoint.File), nameof(GetFileEndpoint), new { userEnum, id, fileType = FileTypes.Header }, Request.Scheme);
+        response.Avatar = Url.Action(nameof(GetFileEndpoint.File), nameof(GetFileEndpoint), new { baseType, id, fileType = FileTypes.Avatar }, Request.Scheme);
+        response.Header = Url.Action(nameof(GetFileEndpoint.File), nameof(GetFileEndpoint), new { baseType, id, fileType = FileTypes.Header }, Request.Scheme);
 
         if (response.StudentInfo != null)
-            response.StudentInfo!.CV = Url.Action(nameof(GetFileEndpoint.File), nameof(GetFileEndpoint), new { userEnum, id, fileType = FileTypes.CV }, Request.Scheme);
+            response.StudentInfo.CV = Url.Action(nameof(GetFileEndpoint.File), nameof(GetFileEndpoint), new { baseType, id, fileType = FileTypes.CV }, Request.Scheme);
     }
 
-    private UserEnum GetKey() // Refactor
+    private UserEnum GetKey()
         => _userInfo.Roles.Contains(AppRoles.Student) ? UserEnum.Student : UserEnum.Staff;
+
+    private static string GetBaseType(UserEnum userEnum)
+        => userEnum switch
+        {
+            UserEnum.Student => BaseTypes.Student,
+            UserEnum.Staff => BaseTypes.Staff,
+            _ => string.Empty,
+        };
 }

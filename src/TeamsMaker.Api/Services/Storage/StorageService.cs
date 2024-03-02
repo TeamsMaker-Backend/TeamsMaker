@@ -2,13 +2,15 @@
 
 using Microsoft.AspNetCore.Mvc;
 
-namespace TeamsMaker.Api.Services.Profiles.Utilities;
+using TeamsMaker.Api.Services.Storage.Interfacecs;
 
-public static class FileUtilities
+namespace TeamsMaker.Api.Services.Storage;
+
+public class StorageService : IStorageService
 {
-    public static async Task<FileContentResult?> LoadFileAsync(string folder, FileData? file, CancellationToken ct)
+    public async Task<FileContentResult?> LoadFileAsync(string folder, FileData? file, CancellationToken ct)
     {
-        if (file == null)
+        if (file == null || File.Exists(Path.Combine(folder, file.Name)) == false)
             return null;
 
         var path = Path.Combine(folder, file.Name);
@@ -20,7 +22,7 @@ public static class FileUtilities
         return contentResult;
     }
 
-    public static async Task<FileData?> UpdateFileAsync(string? oldFile, IFormFile? newFile, string newFileName, string folder, CancellationToken ct)
+    public async Task<FileData?> UpdateFileAsync(string? oldFile, IFormFile? newFile, string newFileName, string folder, CancellationToken ct)
     {
         if (oldFile != null && File.Exists(Path.Combine(folder, oldFile)))
             File.Delete(Path.Combine(folder, oldFile));
@@ -30,18 +32,13 @@ public static class FileUtilities
 
         Directory.CreateDirectory(folder);
 
-        var newFilePath = Path.Combine(folder, newFileName!);
-
-        FileData file = new(newFileName, newFile.ContentType);
+        var newFilePath = Path.Combine(folder, newFileName);
 
         using (var stream = new FileStream(newFilePath, FileMode.Create))
         {
             await newFile.CopyToAsync(stream, ct);
         }
 
-        return file;
+        return new FileData { Name = newFileName, ContentType = newFile.ContentType };
     }
-
-    public static string CreateName(string id, string? file)
-        => $"{id}{Path.GetExtension(file)}";
 }

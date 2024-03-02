@@ -1,24 +1,20 @@
-﻿using Core.ValueObjects;
-
-using DataAccess.Base.Interfaces;
-
-using Microsoft.AspNetCore.Mvc;
+﻿using DataAccess.Base.Interfaces;
 
 using TeamsMaker.Api.Contracts.Requests.Profile;
 using TeamsMaker.Api.Contracts.Responses.Profile;
 using TeamsMaker.Api.Core.Consts;
 using TeamsMaker.Api.DataAccess.Context;
 using TeamsMaker.Api.Services.Profiles.Interfaces;
-using TeamsMaker.Api.Services.Profiles.Utilities;
 
 namespace TeamsMaker.Api.Services.Profiles;
 
-public class StudentProfileService(AppDBContext db, IWebHostEnvironment hostEnvironment, IUserInfo userInfo) : IProfileService
+public class StudentProfileService
+    (AppDBContext db, IWebHostEnvironment host, IUserInfo userInfo, ProfileUtilities profileUtilities) : IProfileService
 {
     private readonly AppDBContext _db = db;
-    private readonly IWebHostEnvironment _host = hostEnvironment;
+    private readonly IWebHostEnvironment _host = host;
     private readonly IUserInfo _userInfo = userInfo;
-    private readonly string _folder = BaseFolders.Student;
+    private readonly ProfileUtilities _profileUtilities = profileUtilities;
 
     public async Task<GetProfileResponse> GetProfileAsync(CancellationToken ct)
     {
@@ -32,8 +28,8 @@ public class StudentProfileService(AppDBContext db, IWebHostEnvironment hostEnvi
             .SingleOrDefaultAsync(st => st.Id == _userInfo.UserId, ct) ??
             throw new ArgumentException("Invalid ID!");
 
-        ProfileUtilities.GetUserData(student, response);
-        ProfileUtilities.GetStudentData(student, response);
+        _profileUtilities.GetUserData(student, response);
+        _profileUtilities.GetStudentData(student, response);
 
         return response;
     }
@@ -50,8 +46,8 @@ public class StudentProfileService(AppDBContext db, IWebHostEnvironment hostEnvi
             .SingleOrDefaultAsync(st => st.Id == id, ct) ??
             throw new ArgumentException("Invalid ID!");
 
-        ProfileUtilities.GetOtherUserData(student, response);
-        ProfileUtilities.GetOtherStudentData(student, response);
+        _profileUtilities.GetOtherUserData(student, response);
+        _profileUtilities.GetOtherStudentData(student, response);
 
         return response;
     }
@@ -66,29 +62,8 @@ public class StudentProfileService(AppDBContext db, IWebHostEnvironment hostEnvi
                 .SingleOrDefaultAsync(st => st.Id == _userInfo.UserId, ct) ??
                 throw new ArgumentException("Invalid ID!");
 
-        ProfileUtilities.UpdateUserDataAsync(student, profileRequest, Path.Combine(_host.WebRootPath, BaseFolders.Student), ct);
+        _profileUtilities.UpdateUserDataAsync(student, profileRequest, Path.Combine(_host.WebRootPath, BaseTypes.Student), ct);
 
         await _db.SaveChangesAsync(ct);
     }
-
-    public async Task<FileContentResult?> GetFileContentAsync(Guid id, string fileType, CancellationToken ct)
-    {
-        var student =
-            await _db.Students.FindAsync([id.ToString()], ct) ??
-            throw new ArgumentException("Invalid ID!");
-
-        var result =
-            await FileUtilities.LoadFileAsync(Path.Combine(_host.WebRootPath, _folder, fileType), GetData(student, fileType), ct);
-
-        return result;
-    }
-
-    private static FileData? GetData(Student student, string file)
-        => file switch
-        {
-            FileTypes.Avatar => student.Avatar,
-            FileTypes.Header => student.Header,
-            FileTypes.CV => student.CV,
-            _ => null,
-        };
 }
