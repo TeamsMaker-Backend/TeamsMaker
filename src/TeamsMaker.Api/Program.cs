@@ -137,7 +137,8 @@ await SeedDB.Initialize(app.Services.GetRequiredService<IServiceScopeFactory>().
 
 // app.UseExceptionHandler(opt => { });
 
-app.UseCors();
+app.UseCors("CorsPolicy");
+// app.UseCors();
 
 app.UseHttpsRedirection();
 
