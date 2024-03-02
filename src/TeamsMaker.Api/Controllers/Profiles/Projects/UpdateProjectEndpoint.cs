@@ -11,7 +11,7 @@ public class UpdateProjectEndpoint(IProjectService projectService) : BaseApiCont
 {
     private readonly IProjectService _projectService = projectService;
 
-    [Tags("profiles/Projects")]
+    [Tags("profiles/projects")]
     [HttpPut("profiles/projects/{id}")]
     public async Task<IActionResult> Project(int id, ProjectRequest request, CancellationToken ct)
     {

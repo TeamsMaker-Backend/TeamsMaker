@@ -10,7 +10,7 @@ public class DeleteProjectEndpoint(IProjectService projectService) : BaseApiCont
 {
     private readonly IProjectService _projectService = projectService;
 
-    [Tags("profiles/Projects")]
+    [Tags("profiles/projects")]
     [HttpDelete("profiles/projects/{id}")]
     public async Task<IActionResult> Project(int id, CancellationToken ct)
     {

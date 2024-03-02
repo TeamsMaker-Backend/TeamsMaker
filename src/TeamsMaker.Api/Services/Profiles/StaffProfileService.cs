@@ -25,7 +25,9 @@ public class StaffProfileService(AppDBContext db, IWebHostEnvironment hostEnviro
         var response = new GetProfileResponse { Roles = _userInfo.Roles.ToList() };
 
         var staff =
-            await _db.Staff.Include(st => st.Links).SingleOrDefaultAsync(st => st.Id == _userInfo.UserId, ct) ??
+            await _db.Staff
+            .Include(st => st.Links)
+            .SingleOrDefaultAsync(st => st.Id == _userInfo.UserId, ct) ??
             throw new ArgumentException("Invalid ID!");
 
         ProfileUtilities.GetUserData(staff, response);
@@ -33,12 +35,15 @@ public class StaffProfileService(AppDBContext db, IWebHostEnvironment hostEnviro
 
         return response;
     }
-    public async Task<GetOtherProfileResponse> GetOtherProfileAsync(string id,CancellationToken ct)
+
+    public async Task<GetOtherProfileResponse> GetOtherProfileAsync(string id, CancellationToken ct)
     {
-        var response = new GetOtherProfileResponse { Roles = _userInfo.Roles.ToList() };
+        var response = new GetOtherProfileResponse();
 
         var staff =
-            await _db.Staff.Include(x => x.Links).SingleOrDefaultAsync(x => x.Id == id, ct) ??
+            await _db.Staff
+            .Include(st => st.Links)
+            .SingleOrDefaultAsync(st => st.Id == id, ct) ??
             throw new ArgumentException("Invalid ID!");
 
         ProfileUtilities.GetOtherUserData(staff, response);

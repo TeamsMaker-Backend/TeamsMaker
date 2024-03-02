@@ -20,8 +20,9 @@ public static class ProfileUtilities
         response.EmailConfirmed = user.EmailConfirmed;
         response.Phone = user.PhoneNumber;
         response.OrganizationId = user.OrganizationId;
-        response.Links = user.Links?.Select(l => l.Url).ToList();
+        response.Links = user.Links.Select(l => l.Url).ToList();
     }
+
     public static void GetOtherUserData(User user, GetOtherProfileResponse response)
     {
         response.FirstName = user.FirstName;
@@ -32,12 +33,12 @@ public static class ProfileUtilities
         response.Gender = user.Gender;
         response.City = user.City;
         response.Phone = user.PhoneNumber;
-        response.OrganizationId = user.OrganizationId;
-        response.Links = user.Links?.Select(x => x.Url).ToList();
+        response.Links = user.Links.Select(x => x.Url).ToList();
     }
+
     public static void GetStudentData(Student student, GetProfileResponse response)
     {
-        StudentInfo studentInfo = new()
+        var studentInfo = new StudentInfo
         {
             CollegeId = student.CollegeId,
             GPA = student.GPA,
@@ -46,7 +47,7 @@ public static class ProfileUtilities
             DepartmentName = student.Department?.Name,
 
             Experiences =
-                student?.Experiences?.Select(ex => new ExperienceInfo
+                student.Experiences.Select(ex => new ExperienceInfo
                 {
                     Id = ex.Id,
                     Organization = ex.Organization,
@@ -57,21 +58,22 @@ public static class ProfileUtilities
                 }).ToList(),
 
             Projects =
-                student?.Projects?.Select(prj => new ProjectInfo
+                student.Projects.Select(prj => new ProjectInfo
                 {
                     Id = prj.Id,
                     Name = prj.Name,
                     Url = prj.Url,
                     Description = prj.Description,
-                    Skills = prj.Skills?.Select(s => s.Name).ToList()
+                    Skills = prj.Skills.Select(s => s.Name).ToList()
                 }).ToList()
         };
 
         response.StudentInfo = studentInfo;
     }
+
     public static void GetOtherStudentData(Student student, GetOtherProfileResponse response)
     {
-        OtherStudentInfo otherStudentInfo = new()
+        var otherStudentInfo = new OtherStudentInfo
         {
             GPA = student.GPA,
             GraduationYear = student.GraduationYear,
@@ -79,24 +81,24 @@ public static class ProfileUtilities
             DepartmentName = student.Department?.Name,
 
             Experiences =
-                student?.Experiences?.Select(x => new ExperienceInfo
+                student.Experiences.Select(ex => new ExperienceInfo
                 {
-                    Id = x.Id,
-                    Organization = x.Organization,
-                    Role = x.Role,
-                    StartDate = x.StartDate,
-                    EndDate = x.EndDate,
-                    Description = x.Description
+                    Id = ex.Id,
+                    Organization = ex.Organization,
+                    Role = ex.Role,
+                    StartDate = ex.StartDate,
+                    EndDate = ex.EndDate,
+                    Description = ex.Description
                 }).ToList(),
 
             Projects =
-                student?.Projects?.Select(x => new ProjectInfo
+                student.Projects.Select(prj => new ProjectInfo
                 {
-                    Id = x.Id,
-                    Name = x.Name,
-                    Url = x.Url,
-                    Description = x.Description,
-                    Skills = x.Skills?.Select(s => s.Name).ToList()
+                    Id = prj.Id,
+                    Name = prj.Name,
+                    Url = prj.Url,
+                    Description = prj.Description,
+                    Skills = prj.Skills.Select(s => s.Name).ToList()
                 }).ToList()
         };
 
@@ -105,19 +107,20 @@ public static class ProfileUtilities
 
     public static void GetStaffData(Staff staff, GetProfileResponse response)
     {
-        StaffInfo staffInfo = new()
+        var staffInfo = new StaffInfo
         {
             Classification = staff.Classification
         };
         response.StaffInfo = staffInfo;
     }
+
     public static void GetOtherStaffData(Staff staff, GetOtherProfileResponse response)
     {
-        StaffInfo staffInfo = new()
+        var otherStaffInfo = new OtherStaffInfo
         {
             Classification = staff.Classification
         };
-        response.StaffInfo = staffInfo;
+        response.OtherStaffInfo = otherStaffInfo;
     }
 
     public static async void UpdateUserDataAsync(User user, UpdateProfileRequest request, string folder, CancellationToken ct)
