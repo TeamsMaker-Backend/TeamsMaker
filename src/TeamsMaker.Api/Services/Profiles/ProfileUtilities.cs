@@ -1,13 +1,22 @@
-﻿using TeamsMaker.Api.Contracts.Requests.Profile;
+﻿using DataAccess.Base.Interfaces;
+
+using TeamsMaker.Api.Contracts.Requests.Profile;
 using TeamsMaker.Api.Contracts.Responses.Profile;
 using TeamsMaker.Api.Core.Consts;
+using TeamsMaker.Api.DataAccess.Context;
+using TeamsMaker.Api.Services.Storage.Interfacecs;
 using TeamsMaker.Core.Enums;
+namespace TeamsMaker.Api.Services.Profiles;
 
-namespace TeamsMaker.Api.Services.Profiles.Utilities;
-
-public static class ProfileUtilities
+public class ProfileUtilities
+    (AppDBContext db, IWebHostEnvironment host, IUserInfo userInfo, IStorageService storageService)
 {
-    public static void GetUserData(User user, GetProfileResponse response)
+    private readonly AppDBContext _db = db;
+    private readonly IWebHostEnvironment _host = host;
+    private readonly IUserInfo _userInfo = userInfo;
+    private readonly IStorageService _storageService = storageService;
+
+    public void GetUserData(User user, GetProfileResponse response)
     {
         response.FirstName = user.FirstName;
         response.LastName = user.LastName;
@@ -23,7 +32,7 @@ public static class ProfileUtilities
         response.Links = user.Links.Select(l => l.Url).ToList();
     }
 
-    public static void GetOtherUserData(User user, GetOtherProfileResponse response)
+    public void GetOtherUserData(User user, GetOtherProfileResponse response)
     {
         response.FirstName = user.FirstName;
         response.LastName = user.LastName;
@@ -36,7 +45,7 @@ public static class ProfileUtilities
         response.Links = user.Links.Select(x => x.Url).ToList();
     }
 
-    public static void GetStudentData(Student student, GetProfileResponse response)
+    public void GetStudentData(Student student, GetProfileResponse response)
     {
         var studentInfo = new StudentInfo
         {
@@ -71,7 +80,7 @@ public static class ProfileUtilities
         response.StudentInfo = studentInfo;
     }
 
-    public static void GetOtherStudentData(Student student, GetOtherProfileResponse response)
+    public void GetOtherStudentData(Student student, GetOtherProfileResponse response)
     {
         var otherStudentInfo = new OtherStudentInfo
         {
@@ -105,7 +114,7 @@ public static class ProfileUtilities
         response.OtherStudentInfo = otherStudentInfo;
     }
 
-    public static void GetStaffData(Staff staff, GetProfileResponse response)
+    public void GetStaffData(Staff staff, GetProfileResponse response)
     {
         var staffInfo = new StaffInfo
         {
@@ -114,7 +123,7 @@ public static class ProfileUtilities
         response.StaffInfo = staffInfo;
     }
 
-    public static void GetOtherStaffData(Staff staff, GetOtherProfileResponse response)
+    public void GetOtherStaffData(Staff staff, GetOtherProfileResponse response)
     {
         var otherStaffInfo = new OtherStaffInfo
         {
@@ -123,8 +132,11 @@ public static class ProfileUtilities
         response.OtherStaffInfo = otherStaffInfo;
     }
 
-    public static async void UpdateUserDataAsync(User user, UpdateProfileRequest request, string folder, CancellationToken ct)
+    public async void UpdateUserDataAsync(User user, UpdateProfileRequest request, string folder, CancellationToken ct)
     {
+        var links = _db.Links.Where(l => l.UserId == _userInfo.UserId);
+        _db.Links.RemoveRange(links);
+
         user.FirstName = request.FirstName;
         user.LastName = request.LastName;
         user.Bio = request.Bio;
@@ -134,16 +146,17 @@ public static class ProfileUtilities
         user.PhoneNumber = request.Phone;
         user.Links = request.Links?.Select(l => new Link { UserId = user.Id, Url = l }).ToList() ?? [];
 
-        user.Avatar = await FileUtilities.UpdateFileAsync(user.Avatar?.Name, request.Avatar, FileUtilities.CreateName(user.Id, request.Avatar?.FileName),
-            Path.Combine(folder, FileTypes.Avatar), ct);
+        user.Avatar = await _storageService.UpdateFileAsync(user.Avatar?.Name, request.Avatar, CreateName(FileTypes.Avatar, request.Avatar?.FileName),
+            Path.Combine(folder, user.Id), ct);
 
-        user.Header = await FileUtilities.UpdateFileAsync(user.Header?.Name, request.Header, FileUtilities.CreateName(user.Id, request.Header?.FileName),
-            Path.Combine(folder, FileTypes.Header), ct);
+        user.Header = await _storageService.UpdateFileAsync(user.Header?.Name, request.Header, CreateName(FileTypes.Header, request.Header?.FileName),
+            Path.Combine(folder, user.Id), ct);
 
         if (user is Student student)
-        {
-            student.CV = await FileUtilities.UpdateFileAsync(student.CV?.Name, request.CV, FileUtilities.CreateName(student.Id, request.CV?.FileName),
-                Path.Combine(folder, FileTypes.CV), ct);
-        }
+            student.CV = await _storageService.UpdateFileAsync(student.CV?.Name, request.CV, CreateName(FileTypes.CV, request.CV?.FileName),
+                Path.Combine(folder, student.Id), ct);
     }
+
+    private static string CreateName(string fileType, string? file)
+        => $"{fileType}{Path.GetExtension(file)}";
 }

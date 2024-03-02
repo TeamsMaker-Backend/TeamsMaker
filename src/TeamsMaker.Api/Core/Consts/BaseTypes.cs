@@ -1,9 +1,9 @@
 ﻿namespace TeamsMaker.Api.Core.Consts;
 
-public static class BaseFolders
+public static class BaseTypes
 {
+    public const string Organization = "Organization";
     public const string Student = "Student";
     public const string Staff = "Staff";
-
-    //TODO: Add Circle
+    public const string Circle = "Circle";
 }
