@@ -33,6 +33,19 @@ public class StaffProfileService(AppDBContext db, IWebHostEnvironment hostEnviro
 
         return response;
     }
+    public async Task<GetOtherProfileResponse> GetOtherProfileAsync(string id,CancellationToken ct)
+    {
+        var response = new GetOtherProfileResponse { Roles = _userInfo.Roles.ToList() };
+
+        var staff =
+            await _db.Staff.Include(x => x.Links).SingleOrDefaultAsync(x => x.Id == id, ct) ??
+            throw new ArgumentException("Invalid ID!");
+
+        ProfileUtilities.GetOtherUserData(staff, response);
+        ProfileUtilities.GetOtherStaffData(staff, response);
+
+        return response;
+    }
 
     public async Task UpdateProfileAsync(UpdateProfileRequest profileRequest, CancellationToken ct)
     {
