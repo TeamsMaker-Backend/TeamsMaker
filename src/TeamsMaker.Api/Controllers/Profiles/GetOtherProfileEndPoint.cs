@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 
 using TeamsMaker.Api.Contracts.Responses.Profile;
+using TeamsMaker.Api.Controllers.Files;
 using TeamsMaker.Api.Core.Consts;
 using TeamsMaker.Api.Services.Profiles.Interfaces;
 using TeamsMaker.Core.Enums;
@@ -23,7 +24,7 @@ public class GetOtherProfileEndpoint(IServiceProvider serviceProvider) : BaseApi
         try
         {
             response = await profileService.GetOtherProfileAsync(id, ct);
-            LoadFiles(id, userEnum, response);
+            LoadFiles(id, GetBaseType(userEnum), response);
         }
         catch (ArgumentException)
         {
@@ -33,12 +34,20 @@ public class GetOtherProfileEndpoint(IServiceProvider serviceProvider) : BaseApi
         return Ok(_response.SuccessResponse(response));
     }
 
-    private void LoadFiles(string id, UserEnum userEnum, GetOtherProfileResponse response)
+    private void LoadFiles(string id, string? baseType, GetOtherProfileResponse response)
     {
-        response.Avatar = Url.Action(nameof(GetFileEndpoint.File), nameof(GetFileEndpoint), new { userEnum, id, fileType = FileTypes.Avatar }, Request.Scheme);
-        response.Header = Url.Action(nameof(GetFileEndpoint.File), nameof(GetFileEndpoint), new { userEnum, id, fileType = FileTypes.Header }, Request.Scheme);
+        response.Avatar = Url.Action(nameof(GetFileEndpoint.File), nameof(GetFileEndpoint), new { baseType, id, fileType = FileTypes.Avatar }, Request.Scheme);
+        response.Header = Url.Action(nameof(GetFileEndpoint.File), nameof(GetFileEndpoint), new { baseType, id, fileType = FileTypes.Header }, Request.Scheme);
 
         if (response.OtherStudentInfo != null)
-            response.OtherStudentInfo!.CV = Url.Action(nameof(GetFileEndpoint.File), nameof(GetFileEndpoint), new { userEnum, id, fileType = FileTypes.CV }, Request.Scheme);
+            response.OtherStudentInfo.CV = Url.Action(nameof(GetFileEndpoint.File), nameof(GetFileEndpoint), new { baseType, id, fileType = FileTypes.CV }, Request.Scheme);
     }
+
+    private static string GetBaseType(UserEnum userEnum)
+        => userEnum switch
+        {
+            UserEnum.Student => BaseTypes.Student,
+            UserEnum.Staff => BaseTypes.Staff,
+            _ => string.Empty,
+        };
 }

@@ -1,12 +1,17 @@
 using DataAccess.Base;
 using DataAccess.Base.Interfaces;
 
+using TeamsMaker.Api.Core.Consts;
 using TeamsMaker.Api.DataAccess.Context;
 using TeamsMaker.Api.DataAccess.Interceptors;
 using TeamsMaker.Api.Services.Auth;
+using TeamsMaker.Api.Services.Files;
+using TeamsMaker.Api.Services.Files.Interfaces;
 using TeamsMaker.Api.Services.Organizations;
 using TeamsMaker.Api.Services.Profiles;
 using TeamsMaker.Api.Services.Profiles.Interfaces;
+using TeamsMaker.Api.Services.Storage;
+using TeamsMaker.Api.Services.Storage.Interfacecs;
 using TeamsMaker.Core.Enums;
 
 namespace TeamsMaker.Api;
@@ -21,7 +26,7 @@ public static class ServiceRegistrationExtensions
                 options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"),
                     o => o
                         .UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
-                        .LogTo(Console.WriteLine, LogLevel.Debug)
+                        .LogTo(Console.WriteLine, LogLevel.Information)
                         .EnableSensitiveDataLogging());
 
         services.AddScoped<EntitySaveChangesInterceptor>();
@@ -46,10 +51,14 @@ public static class ServiceRegistrationExtensions
         services.AddScoped<IUserInfo, UserInfo>();
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IOrganizationService, OrganizationService>();
+        services.AddSingleton<IStorageService, StorageService>();
         services.AddKeyedScoped<IProfileService, StudentProfileService>(UserEnum.Student);
         services.AddKeyedScoped<IProfileService, StaffProfileService>(UserEnum.Staff);
+        services.AddKeyedScoped<IFileService, StudentFileService>(BaseTypes.Student);
+        services.AddKeyedScoped<IFileService, StaffFileService>(BaseTypes.Staff);
         services.AddScoped<IProjectService, ProjectService>();
         services.AddScoped<IExperienceService, ExperienceService>();
+        services.AddScoped<ProfileUtilities>();
 
         return services;
     }
