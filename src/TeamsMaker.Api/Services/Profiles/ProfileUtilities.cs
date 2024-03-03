@@ -4,17 +4,20 @@ using TeamsMaker.Api.Contracts.Requests.Profile;
 using TeamsMaker.Api.Contracts.Responses.Profile;
 using TeamsMaker.Api.Core.Consts;
 using TeamsMaker.Api.DataAccess.Context;
+using TeamsMaker.Api.Services.Files.Interfaces;
 using TeamsMaker.Api.Services.Storage.Interfacecs;
 using TeamsMaker.Core.Enums;
 namespace TeamsMaker.Api.Services.Profiles;
 
-public class ProfileUtilities
-    (AppDBContext db, IWebHostEnvironment host, IUserInfo userInfo, IStorageService storageService)
+public class ProfileUtilities // [Refactor] remove dublicates - Urgent
+    (AppDBContext db, IWebHostEnvironment host, IUserInfo userInfo, IStorageService storageService, IServiceProvider serviceProvider)
 {
     private readonly AppDBContext _db = db;
     private readonly IWebHostEnvironment _host = host;
     private readonly IUserInfo _userInfo = userInfo;
     private readonly IStorageService _storageService = storageService;
+    private readonly IServiceProvider _serviceProvider = serviceProvider;
+
 
     public void GetUserData(User user, GetProfileResponse response)
     {
@@ -47,6 +50,8 @@ public class ProfileUtilities
 
     public void GetStudentData(Student student, GetProfileResponse response)
     {
+        var fileService = _serviceProvider.GetRequiredKeyedService<IFileService>(BaseTypes.Student);
+
         var studentInfo = new StudentInfo
         {
             CollegeId = student.CollegeId,
@@ -54,6 +59,7 @@ public class ProfileUtilities
             GraduationYear = student.GraduationYear,
             Level = student.Level,
             DepartmentName = student.Department?.Name,
+            CV = fileService.GetFileUrl(student.Id, FileTypes.CV),
 
             Experiences =
                 student.Experiences.Select(ex => new ExperienceInfo
@@ -78,16 +84,21 @@ public class ProfileUtilities
         };
 
         response.StudentInfo = studentInfo;
+        response.Avatar = fileService.GetFileUrl(student.Id, FileTypes.Avatar);
+        response.Header = fileService.GetFileUrl(student.Id, FileTypes.Header);
     }
 
     public void GetOtherStudentData(Student student, GetOtherProfileResponse response)
     {
+        var fileService = _serviceProvider.GetRequiredKeyedService<IFileService>(BaseTypes.Student);
+
         var otherStudentInfo = new OtherStudentInfo
         {
             GPA = student.GPA,
             GraduationYear = student.GraduationYear,
             Level = student.Level,
             DepartmentName = student.Department?.Name,
+            CV = fileService.GetFileUrl(student.Id, FileTypes.CV),
 
             Experiences =
                 student.Experiences.Select(ex => new ExperienceInfo
@@ -112,15 +123,22 @@ public class ProfileUtilities
         };
 
         response.OtherStudentInfo = otherStudentInfo;
+        response.Avatar = fileService.GetFileUrl(student.Id, FileTypes.Avatar);
+        response.Header = fileService.GetFileUrl(student.Id, FileTypes.Header);
     }
 
     public void GetStaffData(Staff staff, GetProfileResponse response)
     {
+        var fileService = _serviceProvider.GetRequiredKeyedService<IFileService>(BaseTypes.Student);
+
         var staffInfo = new StaffInfo
         {
             Classification = staff.Classification
         };
+
         response.StaffInfo = staffInfo;
+        response.Avatar = fileService.GetFileUrl(staff.Id, FileTypes.Avatar);
+        response.Header = fileService.GetFileUrl(staff.Id, FileTypes.Header);
     }
 
     public void GetOtherStaffData(Staff staff, GetOtherProfileResponse response)
@@ -159,4 +177,7 @@ public class ProfileUtilities
 
     private static string CreateName(string fileType, string? file)
         => $"{fileType}{Path.GetExtension(file)}";
+
+    private static string? GetBaseType(User user)
+        => user is Student ? BaseTypes.Student : BaseTypes.Staff;
 }

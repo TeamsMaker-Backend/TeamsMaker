@@ -9,7 +9,7 @@ namespace TeamsMaker.Api.Services.Organizations;
 public interface IOrganizationService
 {
     Task<PagedList<GetOrganizationResponse>> GetAsync(OrganizationsQueryString queryString, CancellationToken ct);
-    Task AddAsync(AddOrganizationRequest organizationRequest, CancellationToken ct);
-    Task UpdateAsync(int organizationId, UpdateOrganizationRequest organizationRequest, CancellationToken ct);
+    Task AddAsync(OrganizationRequest organizationRequest, CancellationToken ct);
+    Task UpdateAsync(int organizationId, OrganizationRequest organizationRequest, CancellationToken ct);
     Task DeleteAsync(int organizationId, CancellationToken ct);
 }

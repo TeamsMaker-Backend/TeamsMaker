@@ -18,9 +18,9 @@ public class DeleteExperienceEndpoint(IExperienceService experienceService) : Ba
         {
             await _experienceService.DeleteExperienceAsync(id, ct);
         }
-        catch (ArgumentException)
+        catch (ArgumentException e)
         {
-            return NotFound(_response.FailureResponse("Invalid Data"));
+            return NotFound(_response.FailureResponse(e.Message));
         }
         return Ok();
     }

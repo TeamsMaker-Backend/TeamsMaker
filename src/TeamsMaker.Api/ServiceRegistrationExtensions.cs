@@ -50,15 +50,23 @@ public static class ServiceRegistrationExtensions
     {
         services.AddScoped<IUserInfo, UserInfo>();
         services.AddScoped<IAuthService, AuthService>();
-        services.AddScoped<IOrganizationService, OrganizationService>();
+
         services.AddSingleton<IStorageService, StorageService>();
-        services.AddKeyedScoped<IProfileService, StudentProfileService>(UserEnum.Student);
-        services.AddKeyedScoped<IProfileService, StaffProfileService>(UserEnum.Staff);
-        services.AddKeyedScoped<IFileService, StudentFileService>(BaseTypes.Student);
-        services.AddKeyedScoped<IFileService, StaffFileService>(BaseTypes.Staff);
-        services.AddScoped<IProjectService, ProjectService>();
-        services.AddScoped<IExperienceService, ExperienceService>();
+
+        services.AddScoped<IOrganizationService, OrganizationService>();
+        services.AddKeyedScoped<IFileService, OrganizationFileService>(BaseTypes.Organization);
+
         services.AddScoped<ProfileUtilities>();
+
+        services.AddScoped<IProjectService, ProjectService>();
+
+        services.AddScoped<IExperienceService, ExperienceService>();
+
+        services.AddKeyedScoped<IProfileService, StudentProfileService>(UserEnum.Student);
+        services.AddKeyedScoped<IFileService, StudentFileService>(BaseTypes.Student);
+
+        services.AddKeyedScoped<IProfileService, StaffProfileService>(UserEnum.Staff);
+        services.AddKeyedScoped<IFileService, StaffFileService>(BaseTypes.Staff);
 
         return services;
     }

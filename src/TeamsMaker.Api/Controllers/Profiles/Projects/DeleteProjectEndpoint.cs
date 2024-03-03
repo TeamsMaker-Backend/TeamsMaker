@@ -18,9 +18,9 @@ public class DeleteProjectEndpoint(IProjectService projectService) : BaseApiCont
         {
             await _projectService.DeleteProjectAsync(id, ct);
         }
-        catch (ArgumentException)
+        catch (ArgumentException e)
         {
-            return NotFound(_response.FailureResponse("Invalid Data"));
+            return NotFound(_response.FailureResponse(e.Message));
         }
         return Ok();
     }

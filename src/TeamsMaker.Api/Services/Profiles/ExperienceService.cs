@@ -36,11 +36,11 @@ public class ExperienceService(AppDBContext db, IUserInfo userInfo) : IExperienc
         await _db.SaveChangesAsync(ct);
     }
 
-        public async Task UpdateExperienceAsync(int experienceId, ExperienceRequest experienceRequest, CancellationToken ct)
-        {
-            var experience =
-                await _db.Experiences.SingleOrDefaultAsync(ex => ex.Id == experienceId, ct) ??
-                throw new ArgumentException("Invalid ID!");
+    public async Task UpdateExperienceAsync(int experienceId, ExperienceRequest experienceRequest, CancellationToken ct)
+    {
+        var experience =
+            await _db.Experiences.SingleOrDefaultAsync(ex => ex.Id == experienceId, ct) ??
+            throw new ArgumentException("Invalid ID!");
 
         experience.Organization = experienceRequest.Organization;
         experience.Role = experienceRequest.Role;

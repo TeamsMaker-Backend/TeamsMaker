@@ -2,11 +2,11 @@
 
 public class GetOrganizationResponse
 {
-    public int Id { get; init; }
-    public required string EngName { get; init; }
-    public required string LocName { get; init; }
-    public required string Address { get; init; }
-    public string? Phone { get; init; }
-    public string? Description { get; init; }
-    public string? Logo { get; init; }
+    public int Id { get; set; }
+    public string EngName { get; set; } = null!;
+    public string LocName { get; set; } = null!;
+    public string Address { get; set; } = null!;
+    public string? Phone { get; set; }
+    public string? Description { get; set; }
+    public string? Logo { get; set; }
 }
