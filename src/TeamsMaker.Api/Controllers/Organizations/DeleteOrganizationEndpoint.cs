@@ -7,28 +7,23 @@ using TeamsMaker.Api.Services.Organizations;
 namespace TeamsMaker.Api.Controllers.Organizations;
 
 [Authorize]
-public class DeleteOrganizationEndpoint : BaseApiController
+public class DeleteOrganizationEndpoint(IOrganizationService organizationService) : BaseApiController
 {
-    private readonly IOrganizationService _organizationService;
+    private readonly IOrganizationService _organizationService = organizationService;
 
-    public DeleteOrganizationEndpoint(IOrganizationService organizationService)
-    {
-        _organizationService = organizationService;
-    }
-
-    [Tags("Organizations")]
+    [Tags("organizations")]
     [HttpDelete("organizations/{id}")]
     public async Task<IActionResult> UpdateOrganization(int id, CancellationToken ct)
     {
         try
         {
             await _organizationService.DeleteAsync(id, ct);
-
-            return NoContent();
         }
         catch (Exception ex)
         {
             return BadRequest(_response.FailureResponse(ex.Message));
         }
+
+        return NoContent();
     }
 }

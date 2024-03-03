@@ -9,28 +9,23 @@ namespace TeamsMaker.Api.Controllers.Organizations;
 
 
 [Authorize]
-public class AddOrganizationEndpoint : BaseApiController
+public class AddOrganizationEndpoint(IOrganizationService organizationService) : BaseApiController
 {
-    private readonly IOrganizationService _organizationService;
+    private readonly IOrganizationService _organizationService = organizationService;
 
-    public AddOrganizationEndpoint(IOrganizationService organizationService)
-    {
-        _organizationService = organizationService;
-    }
-
-    [Tags("Organizations")]
+    [Tags("organizations")]
     [HttpPost("organizations")]
-    public async Task<IActionResult> AddOrganization(AddOrganizationRequest request, CancellationToken ct)
+    public async Task<IActionResult> AddOrganization([FromForm] OrganizationRequest request, CancellationToken ct)
     {
         try
         {
             await _organizationService.AddAsync(request, ct);
-
-            return Created("", _response.SuccessResponse(null));
         }
         catch (Exception ex)
         {
             return BadRequest(_response.FailureResponse(ex.Message));
         }
+
+        return Created();
     }
 }

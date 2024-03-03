@@ -19,9 +19,9 @@ public class AddProjectEndpoint(IProjectService projectService) : BaseApiControl
         {
             await _studentProfileService.AddProjectAsync(request, ct);
         }
-        catch (ArgumentException)
+        catch (ArgumentException e)
         {
-            return NotFound(_response.FailureResponse("Invalid Data"));
+            return NotFound(_response.FailureResponse(e.Message));
         }
         return Ok();
     }

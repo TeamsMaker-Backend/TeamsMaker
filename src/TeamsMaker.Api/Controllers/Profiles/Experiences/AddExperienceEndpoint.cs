@@ -19,9 +19,9 @@ public class AddExperiencEndpoint(IExperienceService experienceService) : BaseAp
         {
             await _experienceService.AddExperienceAsync(request, ct);
         }
-        catch (ArgumentException)
+        catch (ArgumentException e)
         {
-            return NotFound(_response.FailureResponse("Invalid Data"));
+            return NotFound(_response.FailureResponse(e.Message));
         }
         return Ok();
     }

@@ -3,19 +3,19 @@
 using TeamsMaker.Api.Contracts.QueryStringParameters;
 using TeamsMaker.Api.Contracts.Requests;
 using TeamsMaker.Api.Contracts.Responses;
-using TeamsMaker.Api.Core.Guards;
+using TeamsMaker.Api.Core.Consts;
 using TeamsMaker.Api.DataAccess.Context;
+using TeamsMaker.Api.Services.Files.Interfaces;
+using TeamsMaker.Api.Services.Storage.Interfacecs;
 
 namespace TeamsMaker.Api.Services.Organizations;
 
-public class OrganizationService : IOrganizationService
+public class OrganizationService(AppDBContext db, IStorageService storageService, IServiceProvider serviceProvider, IWebHostEnvironment host) : IOrganizationService
 {
-    private readonly AppDBContext _db;
-
-    public OrganizationService(AppDBContext db)
-    {
-        _db = db;
-    }
+    private readonly AppDBContext _db = db;
+    private readonly IStorageService _storageService = storageService;
+    private readonly IWebHostEnvironment _host = host;
+    private readonly IFileService _fileService = serviceProvider.GetRequiredKeyedService<IFileService>(BaseTypes.Organization);
 
     public async Task<PagedList<GetOrganizationResponse>> GetAsync(OrganizationsQueryString queryString, CancellationToken ct)
     {
@@ -28,54 +28,58 @@ public class OrganizationService : IOrganizationService
                 Address = org.Address,
                 Phone = org.Phone,
                 Description = org.Description,
-                Logo = org.Logo
+                Logo = _fileService.GetFileUrl(org.Id.ToString(), FileTypes.Logo)
             });
 
-
-        if (queryString.OrganizationId.HasValue) query = query.Where(o => o.Id == queryString.OrganizationId);
+        if (queryString.OrganizationId.HasValue) query = query.Where(org => org.Id == queryString.OrganizationId);
 
         return await PagedList<GetOrganizationResponse>.ToPagedListAsync(query, queryString.PageNumber, queryString.PageSize);
     }
 
-    public async Task AddAsync(AddOrganizationRequest organizationRequest, CancellationToken ct)
+    public async Task AddAsync(OrganizationRequest request, CancellationToken ct)
     {
-        Organization organization = new()
+        var organization = new Organization
         {
-            Name = new(organizationRequest.EngName, organizationRequest.LocName),
-            Address = organizationRequest.Address,
-            Phone = organizationRequest.Phone,
-            Description = organizationRequest.Description,
-            //Logo = organizationRequest.Logo,
+            Name = new(request.EngName, request.LocName),
+            Address = request.Address,
+            Phone = request.Phone,
+            Description = request.Description
         };
+        await _db.Organizations.AddAsync(organization, ct);
+        await _db.SaveChangesAsync(ct);
 
-        await _db.Organizations.AddAsync(organization);
-        await _db.SaveChangesAsync();
+        organization.Logo = await _storageService.UpdateFileAsync(null, request.Logo, CreateName(FileTypes.Logo, request.Logo?.FileName),
+            Path.Combine(_host.WebRootPath, BaseTypes.Organization, organization.Id.ToString()), ct);
+
+        await _db.SaveChangesAsync(ct);
     }
 
-    public async Task UpdateAsync(int organizationId, UpdateOrganizationRequest organizationRequest, CancellationToken ct)
+    public async Task UpdateAsync(int id, OrganizationRequest request, CancellationToken ct)
     {
-        var organization = await _db.Organizations.FindAsync(organizationId, ct);
+        var organization = await _db.Organizations.FindAsync([id], ct) ??
+            throw new ArgumentException("Invalid Id!");
 
-        Guard.Against.Null(organization, nameof(organization));
+        organization.Name.Eng = request.EngName;
+        organization.Name.Loc = request.LocName;
+        organization.Address = request.Address;
+        organization.Description = request.Description;
+        organization.Phone = request.Phone;
+        organization.Logo = await _storageService.UpdateFileAsync(organization.Logo?.Name, request.Logo, CreateName(FileTypes.Logo, request.Logo?.FileName),
+            Path.Combine(_host.WebRootPath, BaseTypes.Organization, organization.Id.ToString()), ct);
 
-        if (!string.IsNullOrEmpty(organizationRequest.EngName)) organization!.Name.Eng = organizationRequest.EngName;
-        if (!string.IsNullOrEmpty(organizationRequest.LocName)) organization!.Name.Loc = organizationRequest.LocName;
-        if (!string.IsNullOrEmpty(organizationRequest.Address)) organization!.Address = organizationRequest.Address;
-        if (!string.IsNullOrEmpty(organizationRequest.Description)) organization!.Description = organizationRequest.Description;
-        if (!string.IsNullOrEmpty(organizationRequest.Phone)) organization!.Phone = organizationRequest.Phone;
-        //if (organizationRequest.Logo != null && organizationRequest.Logo.Length > 0) organization!.Logo = organizationRequest.Logo;
-
-        await _db.SaveChangesAsync();
+        await _db.SaveChangesAsync(ct);
     }
 
-    public async Task DeleteAsync(int organizationId, CancellationToken ct)
+    public async Task DeleteAsync(int id, CancellationToken ct)
     {
-        var organization = await _db.Organizations.FindAsync(organizationId, ct);
+        var organization = await _db.Organizations.FindAsync([id], ct) ??
+            throw new ArgumentException("Invalid Id!");
 
-        Guard.Against.Null(organization, nameof(organization));
+        organization.IsActive = false;
 
-        organization!.IsActive = false;
-
-        await _db.SaveChangesAsync();
+        await _db.SaveChangesAsync(ct);
     }
+
+    private static string CreateName(string fileType, string? file)
+        => $"{fileType}{Path.GetExtension(file)}";
 }

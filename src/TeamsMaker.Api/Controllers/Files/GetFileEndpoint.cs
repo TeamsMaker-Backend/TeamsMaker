@@ -12,7 +12,7 @@ public class GetFileEndpoint(IServiceProvider serviceProvider) : BaseApiControll
 
     [Tags("files")]
     [HttpGet("files/{baseType}/{id}/{fileType}")]
-    public async Task<IActionResult> File(string baseType, Guid id, string fileType, CancellationToken ct)
+    public async Task<IActionResult> File(string baseType, string id, string fileType, CancellationToken ct)
     {
         var fileService = _serviceProvider.GetRequiredKeyedService<IFileService>(baseType);
         FileContentResult? result;
@@ -21,9 +21,9 @@ public class GetFileEndpoint(IServiceProvider serviceProvider) : BaseApiControll
         {
             result = await fileService.GetFileContentAsync(id, fileType, ct);
         }
-        catch (ArgumentException)
+        catch (ArgumentException e)
         {
-            return NotFound(_response.FailureResponse("Invalid Data"));
+            return NotFound(_response.FailureResponse(e.Message));
         }
 
         return Ok(_response.SuccessResponse(result));

@@ -10,7 +10,7 @@ public class Organization : TrackedEntity<int>, IActivable
     public TranslatableString Name { get; set; } = TranslatableString.Empty;
     public string Address { get; set; } = string.Empty;
     public string? Phone { get; set; }
-    public string? Logo { get; set; } //TODO: string url
+    public FileData? Logo { get; set; }
     public string? Description { get; set; }
 
     public bool IsActive { get; set; } = true;

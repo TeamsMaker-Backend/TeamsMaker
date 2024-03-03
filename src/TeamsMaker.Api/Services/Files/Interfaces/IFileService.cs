@@ -4,5 +4,6 @@ namespace TeamsMaker.Api.Services.Files.Interfaces;
 
 public interface IFileService
 {
-    Task<FileContentResult?> GetFileContentAsync(Guid id, string fileType, CancellationToken ct);
+    Task<FileContentResult?> GetFileContentAsync(string id, string fileType, CancellationToken ct);
+    string? GetFileUrl(string id, string fileType); // [Refactor] Remove dublicates Urgent
 }
