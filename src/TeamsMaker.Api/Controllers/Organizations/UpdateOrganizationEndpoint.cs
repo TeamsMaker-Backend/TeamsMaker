@@ -18,7 +18,7 @@ public class UpdateOrganizationEndpoint : BaseApiController
     }
 
     [Tags("Organizations")]
-    [HttpPut("organizations/{id}")]
+    [HttpPut("organizations/{id}")] 
     public async Task<IActionResult> UpdateOrganization(int id, UpdateOrganizationRequest request, CancellationToken ct)
     {
         try

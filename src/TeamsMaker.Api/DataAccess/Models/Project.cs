@@ -10,5 +10,5 @@ public class Project : BaseEntity<int>
     public ICollection<Skill> Skills { get; set; } = [];
 
     public string StudentId { get; set; } = null!;
-    public virtual Student? Student { get; set; }
+    public virtual Student Student { get; set; } = null!;
 }

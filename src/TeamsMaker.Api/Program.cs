@@ -13,7 +13,8 @@ using TeamsMaker.Api.DataAccess.Seeds;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+                .AddNewtonsoftJson();
 
 // builder.Services.AddCors(options => options.AddPolicy("CorsPolicy",
 //         builder => builder.WithOrigins("http://localhost:5173")
