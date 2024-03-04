@@ -48,10 +48,16 @@ public class UserConfig : IEntityTypeConfiguration<User>
             .WithMany(y => y.Users)
             .HasForeignKey(x => x.OrganizationId);
 
-        builder.HasMany(x => x.Links)
-            .WithOne(x => x.User)
-            .HasForeignKey(x => x.UserId)
+        builder
+            .HasMany(x => x.Links)
+            .WithOne(y => y.User)
+            .HasForeignKey(y => y.UserId)
             .IsRequired();
+
+        builder
+            .HasMany(x => x.MemberOn)
+            .WithOne(y => y.User)
+            .HasForeignKey(y => y.UserId);
 
         // Enums
         builder.Property(x => x.Gender)

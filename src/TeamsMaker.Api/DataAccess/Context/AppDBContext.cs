@@ -35,6 +35,10 @@ public class AppDBContext : IdentityDbContext<User, Role, string>
     public DbSet<Experience> Experiences { get; set; }
     public DbSet<Project> Projects { get; set; }
     public DbSet<Skill> Skills { get; set; }
+    public DbSet<Circle> Circles { get; set; }
+    public DbSet<CircleMember> CircleMembers { get; set; }
+    public DbSet<Permission> Permissions { get; set; }
+    public DbSet<MemberPermission> MemberPermissions { get; set; }
     #endregion
 
 
