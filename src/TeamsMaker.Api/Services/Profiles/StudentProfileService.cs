@@ -28,8 +28,8 @@ public class StudentProfileService
             .SingleOrDefaultAsync(st => st.Id == _userInfo.UserId, ct) ??
             throw new ArgumentException("Invalid ID!");
 
-        _profileUtilities.GetUserData(student, response);
         _profileUtilities.GetStudentData(student, response);
+        _profileUtilities.GetUserData(student, response);
 
         return response;
     }
@@ -46,8 +46,8 @@ public class StudentProfileService
             .SingleOrDefaultAsync(st => st.Id == id, ct) ??
             throw new ArgumentException("Invalid ID!");
 
-        _profileUtilities.GetOtherUserData(student, response);
         _profileUtilities.GetOtherStudentData(student, response);
+        _profileUtilities.GetOtherUserData(student, response);
 
         return response;
     }

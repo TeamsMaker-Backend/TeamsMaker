@@ -10,19 +10,19 @@ using TeamsMaker.Api.Services.Storage.Interfacecs;
 
 namespace TeamsMaker.Api.Services.Files;
 
-public class StudentFileService
+public class OrganizationFileService
     (AppDBContext db, IStorageService storageService, IWebHostEnvironment host, IHttpContextAccessor httpContextAccessor, LinkGenerator linkGenerator) : IFileService
 {
-    private const string BaseType = BaseTypes.Student;
+    private const string BaseType = BaseTypes.Organization;
 
     public async Task<FileContentResult?> GetFileContentAsync(string id, string fileType, CancellationToken ct)
     {
-        var student =
-            await db.Students.FindAsync([id.ToString()], ct) ??
+        var organization =
+            await db.Organizations.FindAsync([int.Parse(id)], ct) ??
             throw new ArgumentException("Invalid ID!");
 
         var result =
-            await storageService.LoadFileAsync(Path.Combine(host.WebRootPath, BaseType, id.ToString()), GetData(student, fileType), ct);
+            await storageService.LoadFileAsync(Path.Combine(host.WebRootPath, BaseType, id), GetData(organization, fileType), ct);
 
         return result;
     }
@@ -42,12 +42,10 @@ public class StudentFileService
         return url;
     }
 
-    private static FileData? GetData(Student student, string file)
+    private static FileData? GetData(Organization organization, string file)
         => file switch
         {
-            FileTypes.Avatar => student.Avatar,
-            FileTypes.Header => student.Header,
-            FileTypes.CV => student.CV,
+            FileTypes.Logo => organization.Logo,
             _ => null,
         };
 }

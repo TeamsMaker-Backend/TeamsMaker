@@ -19,9 +19,9 @@ public class UpdateProjectEndpoint(IProjectService projectService) : BaseApiCont
         {
             await _projectService.UpdateProjectAsync(id, request, ct);
         }
-        catch (ArgumentException)
+        catch (ArgumentException e)
         {
-            return NotFound(_response.FailureResponse("Invalid Data"));
+            return NotFound(_response.FailureResponse(e.Message));
         }
         return Ok();
     }

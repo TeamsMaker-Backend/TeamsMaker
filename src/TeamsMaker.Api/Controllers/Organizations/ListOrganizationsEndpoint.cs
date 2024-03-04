@@ -1,3 +1,5 @@
+using Core.Generics;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,28 +10,25 @@ namespace TeamsMaker.Api.Controllers.Organizations;
 
 
 [Authorize]
-public class ListOrganizationsEndpoint : BaseApiController
+public class ListOrganizationsEndpoint(IOrganizationService organizationService) : BaseApiController
 {
-    private readonly IOrganizationService _organizationService;
+    private readonly IOrganizationService _organizationService = organizationService;
 
-    public ListOrganizationsEndpoint(IOrganizationService organizationService)
-    {
-        _organizationService = organizationService;
-    }
-
-    [Tags("Organizations")]
+    [Tags("organizations")]
     [HttpGet("organizations")]
     public async Task<IActionResult> ListOrganization([FromQuery] OrganizationsQueryString queryString, CancellationToken ct)
     {
+        PagedList<Contracts.Responses.GetOrganizationResponse> orgs;
+
         try
         {
-            var orgs = await _organizationService.GetAsync(queryString, ct).ConfigureAwait(false);
-
-            return Ok(_response.SuccessResponseWithPagination(orgs));
+            orgs = await _organizationService.GetAsync(queryString, ct).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
             return BadRequest(_response.FailureResponse(ex.Message));
         }
+
+        return Ok(_response.SuccessResponseWithPagination(orgs));
     }
 }

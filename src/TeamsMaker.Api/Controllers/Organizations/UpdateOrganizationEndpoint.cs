@@ -8,28 +8,23 @@ using TeamsMaker.Api.Services.Organizations;
 namespace TeamsMaker.Api.Controllers.Organizations;
 
 [Authorize]
-public class UpdateOrganizationEndpoint : BaseApiController
+public class UpdateOrganizationEndpoint(IOrganizationService organizationService) : BaseApiController
 {
-    private readonly IOrganizationService _organizationService;
+    private readonly IOrganizationService _organizationService = organizationService;
 
-    public UpdateOrganizationEndpoint(IOrganizationService organizationService)
-    {
-        _organizationService = organizationService;
-    }
-
-    [Tags("Organizations")]
+    [Tags("organizations")]
     [HttpPut("organizations/{id}")]
-    public async Task<IActionResult> UpdateOrganization(int id, UpdateOrganizationRequest request, CancellationToken ct)
+    public async Task<IActionResult> UpdateOrganization(int id, [FromForm] OrganizationRequest request, CancellationToken ct)
     {
         try
         {
             await _organizationService.UpdateAsync(id, request, ct);
-
-            return NoContent();
         }
         catch (Exception ex)
         {
             return BadRequest(_response.FailureResponse(ex.Message));
         }
+
+        return NoContent();
     }
 }

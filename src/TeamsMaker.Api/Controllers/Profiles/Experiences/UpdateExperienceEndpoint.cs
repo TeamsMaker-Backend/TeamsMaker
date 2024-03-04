@@ -19,9 +19,9 @@ public class UpdateExperienceEndpoint(IExperienceService experienceService) : Ba
         {
             await _experienceService.UpdateExperienceAsync(id, request, ct);
         }
-        catch (ArgumentException)
+        catch (ArgumentException e)
         {
-            return NotFound(_response.FailureResponse("Invalid Data"));
+            return NotFound(_response.FailureResponse(e.Message));
         }
         return Ok();
     }

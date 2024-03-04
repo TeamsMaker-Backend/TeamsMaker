@@ -17,6 +17,9 @@ public class OrganizationConfig : IEntityTypeConfiguration<Organization>
             .HasData(LoadOwned());
 
         builder
+            .OwnsOne(x => x.Logo);
+
+        builder
             .HasMany(x => x.Users)
             .WithOne(y => y.Organization)
             .HasForeignKey(y => y.OrganizationId);

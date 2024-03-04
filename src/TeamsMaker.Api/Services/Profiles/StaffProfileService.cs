@@ -26,8 +26,8 @@ public class StaffProfileService
             .SingleOrDefaultAsync(st => st.Id == _userInfo.UserId, ct) ??
             throw new ArgumentException("Invalid ID!");
 
-        _profileUtilities.GetUserData(staff, response);
         _profileUtilities.GetStaffData(staff, response);
+        _profileUtilities.GetUserData(staff, response);
 
         return response;
     }
@@ -42,8 +42,8 @@ public class StaffProfileService
             .SingleOrDefaultAsync(st => st.Id == id, ct) ??
             throw new ArgumentException("Invalid ID!");
 
-        _profileUtilities.GetOtherUserData(staff, response);
         _profileUtilities.GetOtherStaffData(staff, response);
+        _profileUtilities.GetOtherUserData(staff, response);
 
         return response;
     }
