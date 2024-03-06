@@ -13,7 +13,7 @@ public class SkillConfig : IEntityTypeConfiguration<Skill>
         builder.HasKey(x => x.Id);
 
         builder.HasOne(x => x.Project)
-            .WithMany(x => x.Skills)
+            .WithMany(y => y.Skills)
             .HasForeignKey(x => x.ProjectId)
             .IsRequired();
     }

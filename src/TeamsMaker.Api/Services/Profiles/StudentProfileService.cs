@@ -38,11 +38,11 @@ public class StudentProfileService
     {
         var response = new GetOtherProfileResponse();
 
-        var student =
-            await _db.Students
+        var student = await _db.Students
             .Include(st => st.Links)
             .Include(st => st.Experiences)
-            .Include(st => st.Projects).ThenInclude(p => p.Skills)
+            .Include(st => st.Projects)
+                .ThenInclude(p => p.Skills)
             .SingleOrDefaultAsync(st => st.Id == id, ct) ??
             throw new ArgumentException("Invalid ID!");
 
@@ -54,11 +54,13 @@ public class StudentProfileService
 
     public async Task UpdateProfileAsync(UpdateProfileRequest profileRequest, CancellationToken ct)
     {
-        var student =
-            await _db.Students
-            .Include(st => st.Links)
-            .SingleOrDefaultAsync(st => st.Id == _userInfo.UserId, ct) ??
-            throw new ArgumentException("Invalid ID!");
+        var links = _db.Links.Where(l => l.UserId == _userInfo.UserId);
+        _db.Links.RemoveRange(links);
+
+        var student = await _db.Students
+                .Include(st => st.Links)
+                .SingleOrDefaultAsync(st => st.Id == _userInfo.UserId, ct) ??
+                throw new ArgumentException("Invalid ID!");
 
         _profileUtilities.UpdateUserDataAsync(student, profileRequest, Path.Combine(_host.WebRootPath, BaseTypes.Student), ct);
 

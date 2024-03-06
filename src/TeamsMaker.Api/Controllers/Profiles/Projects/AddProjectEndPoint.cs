@@ -13,7 +13,7 @@ public class AddProjectEndpoint(IProjectService projectService) : BaseApiControl
 
     [Tags("profiles/projects")]
     [HttpPost("profiles/projects")]
-    public async Task<IActionResult> Project(ProjectRequest request, CancellationToken ct)
+    public async Task<IActionResult> Project(AddProjectRequest request, CancellationToken ct)
     {
         try
         {

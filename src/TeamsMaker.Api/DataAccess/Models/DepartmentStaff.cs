@@ -4,6 +4,7 @@ namespace TeamsMaker.Api.DataAccess.Models;
 
 public class DepartmentStaff : TrackedEntity<Guid>
 {
+    public bool IsHead { get; set; }
     public int DepartmentId { get; set; }
     public Department Department { get; set; } = null!;
 

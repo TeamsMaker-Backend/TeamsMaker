@@ -13,7 +13,7 @@ public class UpdateProjectEndpoint(IProjectService projectService) : BaseApiCont
 
     [Tags("profiles/projects")]
     [HttpPut("profiles/projects/{id}")]
-    public async Task<IActionResult> Project(int id, ProjectRequest request, CancellationToken ct)
+    public async Task<IActionResult> Project(int id, AddProjectRequest request, CancellationToken ct)
     {
         try
         {

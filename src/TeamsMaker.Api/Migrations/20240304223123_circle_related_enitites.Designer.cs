@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TeamsMaker.Api.DataAccess.Context;
 
@@ -11,9 +12,11 @@ using TeamsMaker.Api.DataAccess.Context;
 namespace TeamsMaker.Api.Migrations
 {
     [DbContext(typeof(AppDBContext))]
-    partial class AppDBContextModelSnapshot : ModelSnapshot
+    [Migration("20240304223123_circle_related_enitites")]
+    partial class circle_related_enitites
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -484,6 +487,9 @@ namespace TeamsMaker.Api.Migrations
 
                     b.Property<DateTime?>("LastModificationDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("Logo")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ModifiedBy")
                         .HasColumnType("nvarchar(max)");
@@ -1017,29 +1023,6 @@ namespace TeamsMaker.Api.Migrations
                                     Loc = "الحاسبات ونظم المعلومات جامعة كفر الشيخ"
                                 });
                         });
-
-                    b.OwnsOne("Core.ValueObjects.FileData", "Logo", b1 =>
-                        {
-                            b1.Property<int>("OrganizationId")
-                                .HasColumnType("int");
-
-                            b1.Property<string>("ContentType")
-                                .IsRequired()
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.Property<string>("Name")
-                                .IsRequired()
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.HasKey("OrganizationId");
-
-                            b1.ToTable("Organization", "dbo");
-
-                            b1.WithOwner()
-                                .HasForeignKey("OrganizationId");
-                        });
-
-                    b.Navigation("Logo");
 
                     b.Navigation("Name")
                         .IsRequired();

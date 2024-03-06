@@ -13,7 +13,7 @@ public class BaseQueryStringParametersWithPagination
         get { return _pageSize; }
         set
         {
-            _pageSize = (value > MAX_PAGE_SIZE) ? MAX_PAGE_SIZE : value;
+            _pageSize = Math.Min(value, MAX_PAGE_SIZE);
         }
     }
 }

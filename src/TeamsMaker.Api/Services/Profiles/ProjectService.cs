@@ -11,9 +11,8 @@ public class ProjectService(AppDBContext db, IUserInfo userInfo) : IProjectServi
     private readonly AppDBContext _db = db;
     private readonly IUserInfo _userInfo = userInfo;
 
-    public async Task AddProjectAsync(ProjectRequest projectRequest, CancellationToken ct)
-    {
-        var project = new Project
+
+        public async Task AddProjectAsync(AddProjectRequest projectRequest, CancellationToken ct)
         {
             StudentId = _userInfo.UserId,
             Name = projectRequest.Name,
@@ -37,7 +36,7 @@ public class ProjectService(AppDBContext db, IUserInfo userInfo) : IProjectServi
         await _db.SaveChangesAsync(ct);
     }
 
-    public async Task UpdateProjectAsync(int projectId, ProjectRequest projectRequest, CancellationToken ct)
+    public async Task UpdateProjectAsync(int projectId, AddProjectRequest projectRequest, CancellationToken ct)
     {
         await DeleteSkillsAsync(projectId, ct);
 

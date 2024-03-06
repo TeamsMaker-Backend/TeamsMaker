@@ -1,5 +1,7 @@
 ﻿using DataAccess.Base.Interfaces;
 
+using Microsoft.AspNetCore.JsonPatch;
+
 using TeamsMaker.Api.Contracts.Requests.Profile;
 using TeamsMaker.Api.DataAccess.Context;
 using TeamsMaker.Api.Services.Profiles.Interfaces;
@@ -11,10 +13,11 @@ public class ExperienceService(AppDBContext db, IUserInfo userInfo) : IExperienc
     private readonly AppDBContext _db = db;
     private readonly IUserInfo _userInfo = userInfo;
 
-    public async Task AddExperienceAsync(ExperienceRequest experienceRequest, CancellationToken ct)
+    public async Task AddExperienceAsync(AddExperienceRequest experienceRequest, CancellationToken ct)
     {
         var experience = new Experience
         {
+            Title = experienceRequest.Title,
             Organization = experienceRequest.Organization,
             Role = experienceRequest.Role,
             StartDate = experienceRequest.StartDate,
@@ -36,17 +39,13 @@ public class ExperienceService(AppDBContext db, IUserInfo userInfo) : IExperienc
         await _db.SaveChangesAsync(ct);
     }
 
-    public async Task UpdateExperienceAsync(int experienceId, ExperienceRequest experienceRequest, CancellationToken ct)
-    {
-        var experience =
-            await _db.Experiences.SingleOrDefaultAsync(ex => ex.Id == experienceId, ct) ??
-            throw new ArgumentException("Invalid ID!");
+        public async Task UpdateExperienceAsync(int experienceId, JsonPatchDocument<Experience> experiencePatch, CancellationToken ct)
+        {
+            var experience =
+                await _db.Experiences.SingleOrDefaultAsync(ex => ex.Id == experienceId, ct) ??
+                throw new ArgumentException("Invalid ID!");
 
-        experience.Organization = experienceRequest.Organization;
-        experience.Role = experienceRequest.Role;
-        experience.StartDate = experienceRequest.StartDate;
-        experience.EndDate = experienceRequest.EndDate;
-        experience.Description = experienceRequest.Description;
+        experiencePatch.ApplyTo(experience);
 
         await _db.SaveChangesAsync(ct);
     }

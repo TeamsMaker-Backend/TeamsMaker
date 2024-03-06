@@ -13,7 +13,7 @@ public class AddExperiencEndpoint(IExperienceService experienceService) : BaseAp
 
     [Tags("profiles/experiences")]
     [HttpPost("profiles/experiences")]
-    public async Task<IActionResult> Experience(ExperienceRequest request, CancellationToken ct)
+    public async Task<IActionResult> Experience(AddExperienceRequest request, CancellationToken ct)
     {
         try
         {
