@@ -475,3 +475,9 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+
+# Entities Files
+/src/TeamsMaker.Api/wwwroot/Student/
+/src/TeamsMaker.Api/wwwroot/Staff/
+/src/TeamsMaker.Api/wwwroot/Organization/
+/src/TeamsMaker.Api/wwwroot/Circle/

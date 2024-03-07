@@ -17,6 +17,9 @@ public class LinkConfig : IEntityTypeConfiguration<Link>
             .HasMaxLength(2083)
             .IsRequired();
 
+        builder.Property(x => x.Type)
+            .IsRequired();
+
         builder.HasOne(x => x.User)
             .WithMany(x => x.Links)
             .HasForeignKey(x => x.UserId)

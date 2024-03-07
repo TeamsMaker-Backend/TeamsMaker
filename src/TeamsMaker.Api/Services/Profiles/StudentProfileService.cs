@@ -24,7 +24,8 @@ public class StudentProfileService
             await _db.Students
             .Include(st => st.Links)
             .Include(st => st.Experiences)
-            .Include(st => st.Projects).ThenInclude(p => p.Skills)
+            .Include(st => st.Projects)
+                .ThenInclude(p => p.Skills)
             .SingleOrDefaultAsync(st => st.Id == _userInfo.UserId, ct) ??
             throw new ArgumentException("Invalid ID!");
 

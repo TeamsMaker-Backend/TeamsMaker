@@ -21,6 +21,7 @@ public class ProfileUtilities // [Refactor] remove dublicates - Urgent
 
     public void GetUserData(User user, GetProfileResponse response)
     {
+        response.Id = user.Id;
         response.FirstName = user.FirstName;
         response.LastName = user.LastName;
         response.SSN = user.SSN;
@@ -32,11 +33,12 @@ public class ProfileUtilities // [Refactor] remove dublicates - Urgent
         response.EmailConfirmed = user.EmailConfirmed;
         response.Phone = user.PhoneNumber;
         response.OrganizationId = user.OrganizationId;
-        response.Links = user.Links.Select(l => l.Url).ToList();
+        response.Links = user.Links.Select(l => new LinkInfo { Url = l.Url, Type = l.Type }).ToList();
     }
 
     public void GetOtherUserData(User user, GetOtherProfileResponse response)
     {
+        response.Id = user.Id;
         response.FirstName = user.FirstName;
         response.LastName = user.LastName;
         response.Email = user.Email!;
@@ -45,7 +47,7 @@ public class ProfileUtilities // [Refactor] remove dublicates - Urgent
         response.Gender = user.Gender;
         response.City = user.City;
         response.Phone = user.PhoneNumber;
-        response.Links = user.Links.Select(x => x.Url).ToList();
+        response.Links = user.Links.Select(l => new LinkInfo { Url = l.Url, Type = l.Type }).ToList();
     }
 
     public void GetStudentData(Student student, GetProfileResponse response)
@@ -162,7 +164,7 @@ public class ProfileUtilities // [Refactor] remove dublicates - Urgent
         user.Gender = request.Gender ?? GenderEnum.Unknown;
         user.City = request.City;
         user.PhoneNumber = request.Phone;
-        user.Links = request.Links?.Select(l => new Link { UserId = user.Id, Url = l }).ToList() ?? [];
+        user.Links = request.Links?.Select(l => new Link { UserId = user.Id, Url = l.Url, Type = l.Type }).ToList() ?? [];
 
         user.Avatar = await _storageService.UpdateFileAsync(user.Avatar?.Name, request.Avatar, CreateName(FileTypes.Avatar, request.Avatar?.FileName),
             Path.Combine(folder, user.Id), ct);

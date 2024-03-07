@@ -1,6 +1,4 @@
-﻿using TeamsMaker.Core.Enums;
-
-namespace TeamsMaker.Api.Contracts.Requests.Profile;
+﻿namespace TeamsMaker.Api.Contracts.Requests.Profile;
 
 public class UpdateProjectRequest
 {

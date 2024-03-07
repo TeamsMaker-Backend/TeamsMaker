@@ -4,6 +4,7 @@ namespace TeamsMaker.Api.Contracts.Responses.Profile;
 
 public class GetOtherProfileResponse
 {
+    public string Id { get; set; } = null!;
     public string FirstName { get; set; } = null!;
     public string LastName { get; set; } = null!;
     public string Email { get; set; } = null!;
@@ -12,7 +13,7 @@ public class GetOtherProfileResponse
     public GenderEnum Gender { get; set; } = GenderEnum.Unknown;
     public string? City { get; set; }
     public string? Phone { get; set; }
-    public ICollection<string>? Links { get; set; } = [];
+    public ICollection<LinkInfo>? Links { get; set; } = [];
 
     public string? Avatar { get; set; }
     public string? Header { get; set; }

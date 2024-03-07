@@ -9,7 +9,7 @@ public class MemberPermission : BaseEntity<Guid>, IActivable
 
     public int PermissionId { get; set; }
     public Guid CircleMemberId { get; set; }
-    
+
     public virtual Permission Permission { get; set; } = null!;
     public virtual CircleMember CircleMember { get; set; } = null!;
 }

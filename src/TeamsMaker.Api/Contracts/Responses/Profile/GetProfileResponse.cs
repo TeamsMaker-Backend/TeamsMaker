@@ -1,9 +1,11 @@
-﻿using TeamsMaker.Core.Enums;
+﻿using TeamsMaker.Api.Core.Enums;
+using TeamsMaker.Core.Enums;
 
 namespace TeamsMaker.Api.Contracts.Responses.Profile;
 
 public class GetProfileResponse
 {
+    public string Id { get; set; } = null!;
     public string FirstName { get; set; } = null!;
     public string LastName { get; set; } = null!;
     public string SSN { get; set; } = null!;
@@ -16,13 +18,19 @@ public class GetProfileResponse
     public string? Phone { get; set; }
     public int OrganizationId { get; set; }
     public ICollection<string> Roles { get; set; } = [];
-    public ICollection<string>? Links { get; set; } = [];
+    public ICollection<LinkInfo>? Links { get; set; } = [];
 
     public string? Avatar { get; set; }
     public string? Header { get; set; }
 
     public StudentInfo? StudentInfo { get; set; }
     public StaffInfo? StaffInfo { get; set; }
+}
+
+public class LinkInfo
+{
+    public string Url { get; set; } = null!;
+    public LinkTypesEnum Type { get; set; } = LinkTypesEnum.Other;
 }
 
 public class StudentInfo
