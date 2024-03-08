@@ -12,3 +12,4 @@ public class CircleMember : BaseEntity<Guid>
     public virtual Circle Circle { get; set; } = null!;
     public virtual ICollection<MemberPermission> MemberPermissions { get; set; } = [];
 }
+//TODO: title
