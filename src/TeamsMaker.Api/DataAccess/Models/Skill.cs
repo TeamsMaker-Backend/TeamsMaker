@@ -2,6 +2,7 @@
 
 namespace TeamsMaker.Api.DataAccess.Models;
 
+//TODO: refacor the double relationship
 public class Skill : BaseEntity<int>
 {
     public string Name { get; set; } = null!;

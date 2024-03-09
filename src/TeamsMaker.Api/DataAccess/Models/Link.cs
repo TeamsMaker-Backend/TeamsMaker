@@ -3,6 +3,7 @@ using TeamsMaker.Api.DataAccess.Base;
 
 namespace TeamsMaker.Api.DataAccess.Models;
 
+//TODO: refacor the double relationship
 public class Link : BaseEntity<int>
 {
     public string Url { get; set; } = null!;
@@ -14,4 +15,3 @@ public class Link : BaseEntity<int>
     public virtual User? User { get; set; }
     public virtual Circle? Circle { get; set; }
 }
-
