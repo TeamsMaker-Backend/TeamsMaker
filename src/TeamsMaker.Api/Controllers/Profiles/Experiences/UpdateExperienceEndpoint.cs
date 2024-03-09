@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 
+using TeamsMaker.Api.Contracts.Requests.Profile;
+
 using TeamsMaker.Api.Services.Profiles.Interfaces;
 
 namespace TeamsMaker.Api.Controllers.Profiles.Experiences;
@@ -13,11 +15,12 @@ public class UpdateExperienceEndpoint(IExperienceService experienceService) : Ba
 
     [Tags("profiles/experiences")]
     [HttpPatch("profiles/experiences/{id}")]
-    public async Task<IActionResult> Experience(int id, [FromBody] JsonPatchDocument<Experience> experiencePatch, CancellationToken ct)
+    public async Task<IActionResult> Experience(int id, [FromBody] UpdateExperienceRequest updateExperienceRequest, CancellationToken ct)
     {
         try
         {
-            await _experienceService.UpdateExperienceAsync(id, experiencePatch, ct);
+            await _experienceService.UpdateExperienceAsync(id, updateExperienceRequest
+            , ct);
         }
         catch (ArgumentException e)
         {
