@@ -2,8 +2,8 @@
 
 public enum LinkTypesEnum
 {
-    GitHub,
-    LinkedIn,
-    FaceBook,
-    Other
+    Other = 0,
+    GitHub = 1,
+    LinkedIn = 2,
+    FaceBook = 3,
 }
