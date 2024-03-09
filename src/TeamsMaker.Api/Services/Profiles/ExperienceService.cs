@@ -39,13 +39,18 @@ public class ExperienceService(AppDBContext db, IUserInfo userInfo) : IExperienc
         await _db.SaveChangesAsync(ct);
     }
 
-    public async Task UpdateExperienceAsync(int experienceId, JsonPatchDocument<Experience> experiencePatch, CancellationToken ct)
+    public async Task UpdateExperienceAsync(int experienceId, UpdateExperienceRequest updateExperienceRequest, CancellationToken ct)
     {
         var experience =
             await _db.Experiences.SingleOrDefaultAsync(ex => ex.Id == experienceId, ct) ??
             throw new ArgumentException("Invalid ID!");
 
-        experiencePatch.ApplyTo(experience);
+        if (!string.IsNullOrEmpty(updateExperienceRequest.Title)) experience.Title = updateExperienceRequest.Title;
+        if (!string.IsNullOrEmpty(updateExperienceRequest.Organization)) experience.Organization = updateExperienceRequest.Organization;
+        if (!string.IsNullOrEmpty(updateExperienceRequest.Role)) experience.Role = updateExperienceRequest.Role;
+        if (updateExperienceRequest.StartDate.HasValue) experience.StartDate = updateExperienceRequest.StartDate.Value;
+        if (updateExperienceRequest.EndDate.HasValue) experience.EndDate = updateExperienceRequest.EndDate.Value;
+        if(!string.IsNullOrEmpty(updateExperienceRequest.Description)) experience.Description = updateExperienceRequest.Description;
 
         await _db.SaveChangesAsync(ct);
     }
