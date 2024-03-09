@@ -20,6 +20,8 @@ public class ProjectService(AppDBContext db, IUserInfo userInfo) : IProjectServi
             Name = projectRequest.Name,
             Url = projectRequest.Url,
             Description = projectRequest.Description,
+            StartDate = projectRequest.StartDate,
+            EndDate = projectRequest.EndDate,
             Skills = projectRequest.Skills?.Select(s => new Skill { Name = s }).ToList() ?? []
         };
 
@@ -51,6 +53,8 @@ public class ProjectService(AppDBContext db, IUserInfo userInfo) : IProjectServi
         project.Name = projectRequest.Name;
         project.Url = projectRequest.Url;
         project.Description = projectRequest.Description;
+        project.StartDate = projectRequest.StartDate;
+        project.EndDate = projectRequest.EndDate;
         project.Skills = projectRequest.Skills?.Select(s => new Skill { Name = s }).ToList() ?? [];
 
         await _db.SaveChangesAsync(ct);

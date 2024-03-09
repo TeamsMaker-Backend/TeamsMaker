@@ -81,6 +81,8 @@ public class ProfileUtilities //TODO: [Refactor] remove dublicates - Urgent
                     Name = prj.Name,
                     Url = prj.Url,
                     Description = prj.Description,
+                    StartDate = prj.StartDate,
+                    EndDate = prj.EndDate,
                     Skills = prj.Skills.Select(s => s.Name).ToList()
                 }).ToList()
         };
@@ -119,6 +121,8 @@ public class ProfileUtilities //TODO: [Refactor] remove dublicates - Urgent
                     Id = prj.Id,
                     Name = prj.Name,
                     Url = prj.Url,
+                    StartDate = prj.StartDate,
+                    EndDate = prj.EndDate,
                     Description = prj.Description,
                     Skills = prj.Skills.Select(s => s.Name).ToList()
                 }).ToList()

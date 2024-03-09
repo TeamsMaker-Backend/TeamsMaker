@@ -53,6 +53,8 @@ public class ProjectInfo
     public string Name { get; set; } = null!;
     public string Url { get; set; } = null!;
     public string? Description { get; set; }
+    public DateOnly? StartDate { get; set; }
+    public DateOnly? EndDate { get; set; }
     public ICollection<string>? Skills { get; set; } = [];
 }
 
