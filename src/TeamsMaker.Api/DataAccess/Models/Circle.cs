@@ -9,7 +9,7 @@ namespace TeamsMaker.Api.DataAccess.Models;
 public class Circle : TrackedEntity<Guid>, IReadOnlyOrganizationInfo
 {
     public string Name { get; set; } = null!;
-    public string? About { get; set; }
+    public string? Description { get; set; }
     public SummaryData? Summary { get; set; }
     public FileData? Avatar { get; set; }
     public FileData? Header { get; set; } // back ground

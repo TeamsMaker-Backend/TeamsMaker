@@ -20,9 +20,16 @@ public class LinkConfig : IEntityTypeConfiguration<Link>
         builder.Property(x => x.Type)
             .IsRequired();
 
-        builder.HasOne(x => x.User)
-            .WithMany(x => x.Links)
+        builder
+            .HasOne(x => x.User)
+            .WithMany(y => y.Links)
             .HasForeignKey(x => x.UserId)
-            .IsRequired();
+            .IsRequired(false);
+
+        builder
+            .HasOne(x => x.Circle)
+            .WithMany(y => y.Links)
+            .HasForeignKey(x => x.CircleId)
+            .IsRequired(false);
     }
 }

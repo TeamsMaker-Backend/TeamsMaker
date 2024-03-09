@@ -10,8 +10,8 @@ public class Link : BaseEntity<int>
     public LinkTypesEnum Type { get; set; }
 
     public string? UserId { get; set; }
-    public Guid? CricleId { get; set; }
-    
+    public Guid? CircleId { get; set; }
+
     public virtual User? User { get; set; }
     public virtual Circle? Circle { get; set; }
 }
