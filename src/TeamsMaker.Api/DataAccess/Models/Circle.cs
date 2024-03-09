@@ -1,6 +1,7 @@
 ﻿using Core.ValueObjects;
 
 using TeamsMaker.Api.DataAccess.Base;
+using TeamsMaker.Api.DataAccess.Base.Interfaces;
 using TeamsMaker.Core.Enums;
 
 namespace TeamsMaker.Api.DataAccess.Models;
@@ -8,48 +9,34 @@ namespace TeamsMaker.Api.DataAccess.Models;
 public class Circle : TrackedEntity<Guid>, IReadOnlyOrganizationInfo
 {
     public string Name { get; set; } = null!;
-    public string? Description { get; set; }
+    public string? About { get; set; }
+    public SummaryData? Summary { get; set; }
     public FileData? Avatar { get; set; }
     public FileData? Header { get; set; } // back ground
+    public long Rate { get; set; }
     public CircleStatusEnum Status { get; set; } = CircleStatusEnum.Active;
 
     public int OrganizationId { get; set; }
     public Organization Organization { get; set; } = null!;
     public virtual ICollection<CircleMember> CircleMembers { get; set; } = null!;
+    public virtual ICollection<Link> Links { get; set; } = [];
+    public virtual ICollection<Skill> Skills { get; set; } = []; // tech stack
 }
 
 /*
 
-members(owner, )
-posts
-tags: circle, tags: asp.net core, mssql, vue
-proposal
-*/
-
-/* other
-
-Description: very short keywords about the project(public)
-Summary: short notes about the idea (IsVisiable = false) exceptions: invitaions, members, staff 
-tags: circle, tags: asp.net core, mssql, vue,
-links
-memeber view:
-    owner, 
-    supervisors, 
-    students
-
-posts: public, private
-
-*/
-
-/*
-Proposal: PDF Reader,
-Sessions: Cards:   5 sessions
-    done, 
-    doing,
-    to do, 
-    ext session date, 
- 
-- Rate(Archive)
-- 
-
+circle
+    - avatar/header/name/bio(short key words about the project)
+    - join or invite
+    - settings  
+    - indicators: active/archived/ upvote
+    - member view -> with special page to view them whith badges
+    - tech stack
+    - summary (public/private)
+    - communciation chennels (telegram/whatsup/github/discord)
+    - sessions (todo, done, next)
+    - Proposal link 
+        - Form : (circle name, overview, objectives, tech stack )
+        - Approvals (name of doctor)
+    - posts
 */

@@ -2,8 +2,8 @@
 
 public class FileTypes
 {
-    public const string CV = "CV";
-    public const string Avatar = "Avatar";
-    public const string Header = "Header";
-    public const string Logo = "Logo";
+    public static readonly string CV = "CV";
+    public static readonly string Avatar = "Avatar";
+    public static readonly string Header = "Header";
+    public static readonly string Logo = "Logo";
 }
