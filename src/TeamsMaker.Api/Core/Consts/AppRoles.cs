@@ -2,11 +2,11 @@
 
 public static class AppRoles
 {
-    public static readonly string Admin = "Admin";
-    public static readonly string HeadOfDept = "HeadOfDept";
-    public static readonly string Professor = "Professor";
-    public static readonly string Assistant = "Assistant";
-    public static readonly string Student = "Student";
+    public const string Admin = "Admin";
+    public const string HeadOfDept = "HeadOfDept";
+    public const string Professor = "Professor";
+    public const string Assistant = "Assistant";
+    public const string Student = "Student";
 
     public static readonly List<string> StaffRoles =
     [

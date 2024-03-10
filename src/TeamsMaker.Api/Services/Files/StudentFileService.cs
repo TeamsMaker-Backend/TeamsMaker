@@ -13,7 +13,7 @@ namespace TeamsMaker.Api.Services.Files;
 public class StudentFileService
     (AppDBContext db, IStorageService storageService, IWebHostEnvironment host, IHttpContextAccessor httpContextAccessor, LinkGenerator linkGenerator) : IFileService
 {
-    private static readonly string BaseType = BaseTypes.Student;
+    private const string BaseType = BaseTypes.Student;
 
     public async Task<FileContentResult?> GetFileContentAsync(string id, string fileType, CancellationToken ct)
     {
@@ -45,9 +45,9 @@ public class StudentFileService
     private static FileData? GetData(Student student, string file)
         => file switch
         {
-            var avatar when avatar == FileTypes.Avatar => student.Avatar,
-            var header when header == FileTypes.Header => student.Header,
-            var cv when cv == FileTypes.CV => student.CV,
+            FileTypes.Avatar => student.Avatar,
+            FileTypes.Header => student.Header,
+            FileTypes.CV => student.CV,
             _ => null,
         };
 }

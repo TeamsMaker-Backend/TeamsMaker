@@ -2,6 +2,6 @@
 
 public static class DatabaseSchemas
 {
-    public static readonly string Dbo = "dbo";
-    public static readonly string Lookups = "lookups";
+    public const string Dbo = "dbo";
+    public const string Lookups = "lookups";
 }
