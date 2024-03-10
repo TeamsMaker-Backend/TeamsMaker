@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc.RazorPages.Infrastructure;
+﻿using Core.ValueObjects;
+
+using Microsoft.AspNetCore.Mvc.RazorPages.Infrastructure;
 
 using TeamsMaker.Api.DataAccess.Base;
 
@@ -6,11 +8,10 @@ namespace TeamsMaker.Api.DataAccess.Models;
 
 public class Permission : BaseEntity<int>
 {
-    public string Name { get; set; } = null!;
-    public string? Group { get; set; } // PermissionGroups const
-    public string? Description { get; set; }
+    public CircleInfoPermissions CircleInfoPermissions { get; set; } = null!;
 
-    public virtual ICollection<MemberPermission> MemberPermissions { get; set; } = [];
+    public Guid CircleMemberId { get; set; }
+    public virtual CircleMember CircleMember { get; set; } = null!;
 }
 
 /*

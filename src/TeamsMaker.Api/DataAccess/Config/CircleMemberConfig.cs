@@ -23,9 +23,9 @@ public class CircleMemberConfig : IEntityTypeConfiguration<CircleMember>
             .WithMany(y => y.MemberOn)
             .HasForeignKey(x => x.UserId);
 
-        builder
-            .HasMany(x => x.MemberPermissions)
+        builder 
+            .HasOne(x => x.Permission)
             .WithOne(y => y.CircleMember)
-            .HasForeignKey(y => y.CircleMemberId);
+            .HasForeignKey<Permission>(x => x.CircleMemberId);
     }
 }

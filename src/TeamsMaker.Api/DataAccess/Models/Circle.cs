@@ -53,3 +53,24 @@ circle
 8- proposal: to be continued
 
 */
+
+/*
+    1- Add circle.
+    2- update (info), (media), (privacy), (communication channels)
+    3- Add invitions.
+    4- Accept requests.
+    5- Remove members.
+    6- update permissions { grouped one, exception one }.
+    7- Get Circle (CircleMember), (Other), (other but invited ?? privacy issue)
+    8- Get Circle Members
+ */
+
+/*
+    Khalid: 2, 7
+
+    El-Saghir: 1, 8
+
+    Abdo: 3, 4, 5
+
+    Sa3d: 6
+ */

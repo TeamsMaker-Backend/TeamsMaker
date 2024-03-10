@@ -14,8 +14,15 @@ public class PermissionConfig : IEntityTypeConfiguration<Permission>
         builder.HasKey(x => x.Id);
 
         builder
-            .HasMany(x => x.MemberPermissions)
+            .OwnsOne(x => x.CircleInfoPermissions, x =>
+            {
+                x.Property(x => x.UpdateFiles).HasColumnName("UpdateFiles");
+                x.Property(x => x.UpdateInfo).HasColumnName("UpdateInfo");
+            });
+
+        builder 
+            .HasOne(x => x.CircleMember)
             .WithOne(y => y.Permission)
-            .HasForeignKey(y => y.PermissionId);
+            .HasForeignKey<Permission>(y => y.CircleMemberId);
     }
 }
