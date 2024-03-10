@@ -26,10 +26,10 @@ public class Circle : TrackedEntity<Guid>, IReadOnlyOrganizationInfo
 /*
 
 circle
-    - avatar/header/name/bio(short key words about the project)
-    - join or invite
+    - avatar/header/name/bio(short key words about the project) 
+    - join or invite 
     - settings  
-    - indicators: active/archived/ upvote
+    - indicators: active/archived/ upvote 
     - member view -> with special page to view them whith badges
     - tech stack
     - summary (public/private)
@@ -38,5 +38,18 @@ circle
     - Proposal link 
         - Form : (circle name, overview, objectives, tech stack )
         - Approvals (name of doctor)
-    - posts
+    - posts(public)
+*/
+
+/*
+
+1- Add Circle (student just a one circle, prof) , assign ownership permissions
+2- Update (info)
+3- Update files (fileService)
+4- Get => member , other, (other but invited ?? privacy issue)
+5- get circle members with details: name, badges
+6- Delete, Archive (owner, ??), Transfer ownership
+7- settings --
+8- proposal: to be continued
+
 */
