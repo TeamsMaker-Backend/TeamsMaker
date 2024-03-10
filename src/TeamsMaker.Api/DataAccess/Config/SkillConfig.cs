@@ -12,9 +12,16 @@ public class SkillConfig : IEntityTypeConfiguration<Skill>
 
         builder.HasKey(x => x.Id);
 
-        builder.HasOne(x => x.Project)
+        builder
+            .HasOne(x => x.Project)
             .WithMany(y => y.Skills)
             .HasForeignKey(x => x.ProjectId)
-            .IsRequired();
+            .IsRequired(false);
+
+        builder
+            .HasOne(x => x.Circle)
+            .WithMany(y => y.Skills)
+            .HasForeignKey(x => x.CircleId)
+            .IsRequired(false);
     }
 }

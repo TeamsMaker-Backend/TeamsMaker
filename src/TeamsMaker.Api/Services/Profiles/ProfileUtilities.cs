@@ -9,7 +9,7 @@ using TeamsMaker.Api.Services.Storage.Interfacecs;
 using TeamsMaker.Core.Enums;
 namespace TeamsMaker.Api.Services.Profiles;
 
-public class ProfileUtilities // [Refactor] remove dublicates - Urgent
+public class ProfileUtilities //TODO: [Refactor] remove dublicates - Urgent
     (AppDBContext db, IWebHostEnvironment host, IUserInfo userInfo, IStorageService storageService, IServiceProvider serviceProvider)
 {
     private readonly AppDBContext _db = db;

@@ -8,7 +8,7 @@ public static class AppRoles
     public const string Assistant = "Assistant";
     public const string Student = "Student";
 
-    public static List<string> StaffRoles =
+    public static readonly List<string> StaffRoles =
     [
         Admin,
         HeadOfDept,
@@ -16,7 +16,7 @@ public static class AppRoles
         Assistant
     ];
 
-    public static List<string> OrdinaryRoles =
+    public static readonly List<string> OrdinaryRoles =
     [
         HeadOfDept,
         Professor,

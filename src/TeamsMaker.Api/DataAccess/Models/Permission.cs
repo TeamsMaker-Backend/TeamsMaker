@@ -1,10 +1,25 @@
-﻿using TeamsMaker.Api.DataAccess.Base;
+﻿using Core.ValueObjects;
+
+using Microsoft.AspNetCore.Mvc.RazorPages.Infrastructure;
+
+using TeamsMaker.Api.DataAccess.Base;
 
 namespace TeamsMaker.Api.DataAccess.Models;
 
 public class Permission : BaseEntity<int>
 {
-    public string Name { get; set; } = null!;
+    public CircleInfoPermissions CircleInfoPermissions { get; set; } = null!;
 
-    public virtual ICollection<MemberPermission> MemberPermissions { get; set; } = [];
+    public Guid CircleMemberId { get; set; }
+    public virtual CircleMember CircleMember { get; set; } = null!;
 }
+
+/*
+owner: 
+    edit , name, logo, header, descripion, 
+    add: invite member, accept member request , remove member,
+
+    posts,
+    send proposal 
+    delete: circle, 
+*/

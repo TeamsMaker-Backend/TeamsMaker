@@ -29,6 +29,16 @@ public class OrganizationConfig : IEntityTypeConfiguration<Organization>
             .WithOne(y => y.Organization)
             .HasForeignKey(y => y.OrganizationId);
 
+        builder
+            .HasMany(x => x.Circles)
+            .WithOne(y => y.Organization)
+            .HasForeignKey(y => y.OrganizationId);
+
+        builder
+            .HasMany(x => x.Departments)
+            .WithOne(y => y.Organization)
+            .HasForeignKey(y => y.OrganizationId);
+
         builder.HasData(LoadData());
     }
 
