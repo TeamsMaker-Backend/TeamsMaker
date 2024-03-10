@@ -67,7 +67,7 @@ public class AuthService : IAuthService
     {
         if (verificationRequest.UserType == UserEnum.Student)
         {
-            if (!string.IsNullOrEmpty(verificationRequest.CollegeId)) throw new ArgumentException("College Id must has a value");
+            if (string.IsNullOrEmpty(verificationRequest.CollegeId)) throw new ArgumentException("College Id must has a value");
 
             return await _db.ImportedStudents.AnyAsync(s => s.SSN == verificationRequest.SSN && s.CollegeId == verificationRequest.CollegeId, ct);
         }
