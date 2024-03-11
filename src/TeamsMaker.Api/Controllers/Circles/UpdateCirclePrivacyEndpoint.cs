@@ -1,21 +1,20 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-using TeamsMaker.Api.Contracts.Requests.Circle;
 using TeamsMaker.Api.Services.Circles.Interfaces;
 
 namespace TeamsMaker.Api.Controllers.Circles;
 
 [Authorize]
-public class UpdateCircleLinksEndpoint(ICircleService circleService) : BaseApiController
+public class UpdateCirclePrivacyEndpoint(ICircleService circleService) : BaseApiController
 {
     [Tags("circles")]
-    [HttpPut("circles/links/{id}")]
-    public async Task<IActionResult> CircleLinks(Guid id, UpdateCircleLinksRequest request, CancellationToken ct)
+    [HttpPut("circles/privacies/{id}/{isPublic}")]
+    public async Task<IActionResult> CirclePrivacy(Guid id, bool isPublic, CancellationToken ct)
     {
         try
         {
-            await circleService.UpdateLinksAsync(id, request, ct);
+            await circleService.UpdatePrivacyAsync(id, isPublic, ct);
         }
         catch (ArgumentException e)
         {

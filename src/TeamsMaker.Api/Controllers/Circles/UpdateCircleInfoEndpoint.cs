@@ -7,15 +7,15 @@ using TeamsMaker.Api.Services.Circles.Interfaces;
 namespace TeamsMaker.Api.Controllers.Circles;
 
 [Authorize]
-public class UpdateCircleLinksEndpoint(ICircleService circleService) : BaseApiController
+public class UpdateCircleInfoEndpoint(ICircleService circleService) : BaseApiController
 {
     [Tags("circles")]
-    [HttpPut("circles/links/{id}")]
-    public async Task<IActionResult> CircleLinks(Guid id, UpdateCircleLinksRequest request, CancellationToken ct)
+    [HttpPut("circles/info/{id}")]
+    public async Task<IActionResult> CircleLinks(Guid id, UpdateCircleInfoRequest request, CancellationToken ct)
     {
         try
         {
-            await circleService.UpdateLinksAsync(id, request, ct);
+            await circleService.UpdateInfoAsync(id, request, ct);
         }
         catch (ArgumentException e)
         {
