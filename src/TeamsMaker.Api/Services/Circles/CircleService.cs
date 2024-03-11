@@ -1,13 +1,56 @@
 ﻿using Core.ValueObjects;
 
 using TeamsMaker.Api.Contracts.Requests.Circle;
+using TeamsMaker.Api.Contracts.Responses.Circle;
+using TeamsMaker.Api.Contracts.Responses.Profile;
+using TeamsMaker.Api.Core.Consts;
 using TeamsMaker.Api.DataAccess.Context;
 using TeamsMaker.Api.Services.Circles.Interfaces;
+using TeamsMaker.Api.Services.Files.Interfaces;
 
 namespace TeamsMaker.Api.Services.Circles;
 
-public class CircleService(AppDBContext db) : ICircleService
+public class CircleService(AppDBContext db, IServiceProvider serviceProvider) : ICircleService
 {
+    private readonly IFileService _fileService = serviceProvider.GetRequiredKeyedService<IFileService>(BaseTypes.Circle);
+
+    public async Task<GetCircleResponse> GetAsync(Guid id, CancellationToken ct)
+    {
+        var response = new GetCircleResponse();
+
+        var circle = await db.Circles
+            .Include(c => c.Skills)
+            .Include(c => c.Summary)
+            .Include(c => c.Links)
+            .Include(c => c.CircleMembers)
+                .ThenInclude(cm => cm.Permission)
+                    .ThenInclude(p => p.CircleInfoPermissions)
+            .SingleOrDefaultAsync(c => c.Id == id, ct) ??
+            throw new ArgumentException("Invalid Circle ID");
+
+        response.Name = circle.Name;
+        response.Description = circle.Description;
+        response.Summary = circle.Summary?.Summary;
+        response.IsPublic = circle.Summary?.IsPublic ?? false;
+        response.Avatar = _fileService.GetFileUrl(id.ToString(), FileTypes.Avatar);
+        response.Header = _fileService.GetFileUrl(id.ToString(), FileTypes.Header);
+        response.Rate = circle.Rate;
+        response.Status = circle.Status;
+        response.OrganizationId = circle.OrganizationId;
+        response.Links = circle.Links.Select(l => new LinkInfo { Type = l.Type, Url = l.Url }).ToList();
+        response.Skills = circle.Skills.Select(l => l.Name).ToList();
+        response.Members = circle.CircleMembers
+            .Select(cm => new CircleMemberInfo
+            {
+                UserId = cm.UserId,
+                IsOwner = cm.IsOwner,
+                Badge = cm.Badge,
+                Permissions = cm.Permission.CircleInfoPermissions
+            }).ToList();
+
+        return response;
+    }
+
     public async Task UpdateInfoAsync(Guid id, UpdateCircleInfoRequest request, CancellationToken ct)
     {
         var circle = await db.Circles
