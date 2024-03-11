@@ -12,8 +12,6 @@ namespace TeamsMaker.Api.Controllers.Organizations;
 [Authorize]
 public class ListOrganizationsEndpoint(IOrganizationService organizationService) : BaseApiController
 {
-    private readonly IOrganizationService _organizationService = organizationService;
-
     [Tags("organizations")]
     [HttpGet("organizations")]
     public async Task<IActionResult> ListOrganization([FromQuery] OrganizationsQueryString queryString, CancellationToken ct)
@@ -22,7 +20,7 @@ public class ListOrganizationsEndpoint(IOrganizationService organizationService)
 
         try
         {
-            orgs = await _organizationService.GetAsync(queryString, ct).ConfigureAwait(false);
+            orgs = await organizationService.GetAsync(queryString, ct).ConfigureAwait(false);
         }
         catch (Exception ex)
         {

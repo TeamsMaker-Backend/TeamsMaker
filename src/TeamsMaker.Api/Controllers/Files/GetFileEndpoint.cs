@@ -8,13 +8,11 @@ namespace TeamsMaker.Api.Controllers.Files;
 [Authorize]
 public class GetFileEndpoint(IServiceProvider serviceProvider) : BaseApiController
 {
-    private readonly IServiceProvider _serviceProvider = serviceProvider;
-
     [Tags("files")]
     [HttpGet("files/{baseType}/{id}/{fileType}")]
     public async Task<IActionResult> File(string baseType, string id, string fileType, CancellationToken ct)
     {
-        var fileService = _serviceProvider.GetRequiredKeyedService<IFileService>(baseType);
+        var fileService = serviceProvider.GetRequiredKeyedService<IFileService>(baseType);
         FileContentResult? result;
 
         try
