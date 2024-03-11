@@ -1,5 +1,7 @@
 ﻿using Core.ValueObjects;
 
+using DataAccess.Base.Interfaces;
+
 using TeamsMaker.Api.Contracts.Requests.Circle;
 using TeamsMaker.Api.Contracts.Responses.Circle;
 using TeamsMaker.Api.Contracts.Responses.Profile;
@@ -10,7 +12,7 @@ using TeamsMaker.Api.Services.Files.Interfaces;
 
 namespace TeamsMaker.Api.Services.Circles;
 
-public class CircleService(AppDBContext db, IServiceProvider serviceProvider) : ICircleService
+public class CircleService(AppDBContext db, IServiceProvider serviceProvider, IUserInfo userInfo) : ICircleService
 {
     private readonly IFileService _fileService = serviceProvider.GetRequiredKeyedService<IFileService>(BaseTypes.Circle);
 
@@ -30,7 +32,6 @@ public class CircleService(AppDBContext db, IServiceProvider serviceProvider) : 
 
         response.Name = circle.Name;
         response.Description = circle.Description;
-        response.Summary = circle.Summary?.Summary;
         response.IsPublic = circle.Summary?.IsPublic ?? false;
         response.Avatar = _fileService.GetFileUrl(id.ToString(), FileTypes.Avatar);
         response.Header = _fileService.GetFileUrl(id.ToString(), FileTypes.Header);
@@ -47,6 +48,11 @@ public class CircleService(AppDBContext db, IServiceProvider serviceProvider) : 
                 Badge = cm.Badge,
                 Permissions = cm.Permission.CircleInfoPermissions
             }).ToList();
+
+        if (circle.CircleMembers.Any(cm => cm.UserId == userInfo.UserId))
+        {
+            response.Summary = circle.Summary?.Summary;
+        }
 
         return response;
     }
