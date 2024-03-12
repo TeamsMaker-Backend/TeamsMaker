@@ -60,9 +60,6 @@ public class CircleService(AppDBContext db, IServiceProvider serviceProvider, IU
             .Include(c => c.Skills)
             .Include(c => c.Summary)
             .Include(c => c.Links)
-            .Include(c => c.CircleMembers)
-                .ThenInclude(cm => cm.Permission)
-                    .ThenInclude(p => p.CircleInfoPermissions)
             .SingleOrDefaultAsync(c => c.Id == id, ct) ??
             throw new ArgumentException("Invalid Circle ID");
 
@@ -76,6 +73,26 @@ public class CircleService(AppDBContext db, IServiceProvider serviceProvider, IU
         response.OrganizationId = circle.OrganizationId;
         response.Links = circle.Links.Select(l => new LinkInfo { Type = l.Type, Url = l.Url }).ToList();
         response.Skills = circle.Skills.Select(l => l.Name).ToList();
+
+        if (circle.CircleMembers.Any(cm => cm.UserId == userInfo.UserId))
+        {
+            response.Summary = circle.Summary?.Summary;
+        }
+
+        return response;
+    }
+
+    public async Task<GetCircleMembersResponse> GetMembersAsync(Guid id, CancellationToken ct)
+    {
+        var response = new GetCircleMembersResponse();
+
+        var circle = await db.Circles
+            .Include(c => c.CircleMembers)
+                .ThenInclude(cm => cm.Permission)
+                    .ThenInclude(p => p.CircleInfoPermissions)
+            .SingleOrDefaultAsync(c => c.Id == id, ct) ??
+            throw new ArgumentException("Invalid Circle ID");
+
         response.Members = circle.CircleMembers
             .Select(cm => new CircleMemberInfo
             {
@@ -84,11 +101,6 @@ public class CircleService(AppDBContext db, IServiceProvider serviceProvider, IU
                 Badge = cm.Badge,
                 Permissions = cm.Permission.CircleInfoPermissions
             }).ToList();
-
-        if (circle.CircleMembers.Any(cm => cm.UserId == userInfo.UserId))
-        {
-            response.Summary = circle.Summary?.Summary;
-        }
 
         return response;
     }

@@ -18,13 +18,4 @@ public class GetCircleResponse
     public int OrganizationId { get; set; }
     public ICollection<LinkInfo>? Links { get; set; } = []; // Replace LinkInfo
     public ICollection<string>? Skills { get; set; } = [];
-    public ICollection<CircleMemberInfo> Members { get; set; } = [];
-}
-
-public class CircleMemberInfo
-{
-    public string UserId { get; set; } = null!;
-    public bool IsOwner { get; set; }
-    public string? Badge { get; set; }
-    public CircleInfoPermissions Permissions { get; set; } = null!;
 }
