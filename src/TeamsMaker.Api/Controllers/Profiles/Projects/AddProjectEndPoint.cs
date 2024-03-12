@@ -9,15 +9,13 @@ namespace TeamsMaker.Api.Controllers.Profiles;
 [Authorize]
 public class AddProjectEndpoint(IProjectService projectService) : BaseApiController
 {
-    private readonly IProjectService _studentProfileService = projectService;
-
     [Tags("profiles/projects")]
     [HttpPost("profiles/projects")]
     public async Task<IActionResult> Project(AddProjectRequest request, CancellationToken ct)
     {
         try
         {
-            await _studentProfileService.AddProjectAsync(request, ct);
+            await projectService.AddAsync(request, ct);
         }
         catch (ArgumentException e)
         {

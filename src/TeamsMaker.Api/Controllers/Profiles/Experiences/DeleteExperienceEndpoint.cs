@@ -8,15 +8,13 @@ namespace TeamsMaker.Api.Controllers.Profiles.Experiences;
 [Authorize]
 public class DeleteExperienceEndpoint(IExperienceService experienceService) : BaseApiController
 {
-    private readonly IExperienceService _experienceService = experienceService;
-
     [Tags("profiles/experiences")]
     [HttpDelete("profiles/experiences/{id}")]
     public async Task<IActionResult> Experience(int id, CancellationToken ct)
     {
         try
         {
-            await _experienceService.DeleteExperienceAsync(id, ct);
+            await experienceService.DeleteAsync(id, ct);
         }
         catch (ArgumentException e)
         {

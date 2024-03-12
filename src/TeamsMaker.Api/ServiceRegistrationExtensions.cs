@@ -5,6 +5,8 @@ using TeamsMaker.Api.Core.Consts;
 using TeamsMaker.Api.DataAccess.Context;
 using TeamsMaker.Api.DataAccess.Interceptors;
 using TeamsMaker.Api.Services.Auth;
+using TeamsMaker.Api.Services.Circles;
+using TeamsMaker.Api.Services.Circles.Interfaces;
 using TeamsMaker.Api.Services.Files;
 using TeamsMaker.Api.Services.Files.Interfaces;
 using TeamsMaker.Api.Services.Organizations;
@@ -67,6 +69,9 @@ public static class ServiceRegistrationExtensions
 
         services.AddKeyedScoped<IProfileService, StaffProfileService>(UserEnum.Staff);
         services.AddKeyedScoped<IFileService, StaffFileService>(BaseTypes.Staff);
+
+        services.AddScoped<ICircleService, CircleService>();
+        services.AddKeyedScoped<IFileService, CircleFileService>(BaseTypes.Circle);
 
         return services;
     }

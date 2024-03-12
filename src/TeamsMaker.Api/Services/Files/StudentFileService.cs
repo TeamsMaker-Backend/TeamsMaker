@@ -2,6 +2,7 @@
 
 using Microsoft.AspNetCore.Mvc;
 
+using TeamsMaker.Api.Contracts.Requests.File;
 using TeamsMaker.Api.Controllers.Files;
 using TeamsMaker.Api.Core.Consts;
 using TeamsMaker.Api.DataAccess.Context;
@@ -15,6 +16,41 @@ public class StudentFileService
 {
     private const string BaseType = BaseTypes.Student;
 
+    public async Task UpdateFileAsync(string id, string fileType, UpdateFileRequest request, CancellationToken ct)
+    {
+        var student = await db.Students.FindAsync([id], ct) ??
+            throw new ArgumentException("Invalid student ID");
+
+        if (fileType == FileTypes.Avatar)
+        {
+            student.Avatar = await storageService.UpdateFileAsync(
+                oldFileName: student.Avatar?.Name,
+                newFile: request.File,
+                newFileName: CreateName(FileTypes.Avatar, request.File?.FileName),
+                folder: Path.Combine(host.WebRootPath, BaseType, id), ct);
+        }
+        else if (fileType == FileTypes.Header)
+        {
+            student.Header = await storageService.UpdateFileAsync(
+                oldFileName: student.Header?.Name,
+                newFile: request.File,
+                newFileName: CreateName(FileTypes.Header, request.File?.FileName),
+                folder: Path.Combine(host.WebRootPath, BaseType, id), ct);
+        }
+        else if (fileType == FileTypes.CV)
+        {
+            student.CV = await storageService.UpdateFileAsync(
+                oldFileName: student.CV?.Name,
+                newFile: request.File,
+                newFileName: CreateName(FileTypes.CV, request.File?.FileName),
+                folder: Path.Combine(host.WebRootPath, BaseType, id), ct);
+        }
+        else
+            throw new ArgumentException("Invalid File Type");
+
+        await db.SaveChangesAsync(ct);
+    }
+
     public async Task<FileContentResult?> GetFileContentAsync(string id, string fileType, CancellationToken ct)
     {
         var student =
@@ -22,7 +58,7 @@ public class StudentFileService
             throw new ArgumentException("Invalid ID!");
 
         var result =
-            await storageService.LoadFileAsync(Path.Combine(host.WebRootPath, BaseType, id.ToString()), GetData(student, fileType), ct);
+            await storageService.LoadFileAsync(Path.Combine(host.WebRootPath, BaseType, id), GetData(student, fileType), ct);
 
         return result;
     }
@@ -50,4 +86,7 @@ public class StudentFileService
             FileTypes.CV => student.CV,
             _ => null,
         };
+
+    private static string CreateName(string fileType, string? file)
+        => $"{fileType}{Path.GetExtension(file)}";
 }

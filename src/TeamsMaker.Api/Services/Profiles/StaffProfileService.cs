@@ -9,55 +9,50 @@ using TeamsMaker.Api.Services.Profiles.Interfaces;
 namespace TeamsMaker.Api.Services.Profiles;
 
 public class StaffProfileService
-    (AppDBContext db, IWebHostEnvironment hostEnvironment, IUserInfo userInfo, ProfileUtilities profileUtilities) : IProfileService
+    (AppDBContext db, IWebHostEnvironment host, IUserInfo userInfo, ProfileUtilities profileUtilities) : IProfileService
 {
-    private readonly AppDBContext _db = db;
-    private readonly IWebHostEnvironment _host = hostEnvironment;
-    private readonly IUserInfo _userInfo = userInfo;
-    private readonly ProfileUtilities _profileUtilities = profileUtilities;
-
-    public async Task<GetProfileResponse> GetProfileAsync(CancellationToken ct)
+    public async Task<GetProfileResponse> GetAsync(CancellationToken ct)
     {
-        var response = new GetProfileResponse { Roles = _userInfo.Roles.ToList() };
+        var response = new GetProfileResponse { Roles = userInfo.Roles.ToList() };
 
         var staff =
-            await _db.Staff
+            await db.Staff
             .Include(st => st.Links)
-            .SingleOrDefaultAsync(st => st.Id == _userInfo.UserId, ct) ??
+            .SingleOrDefaultAsync(st => st.Id == userInfo.UserId, ct) ??
             throw new ArgumentException("Invalid ID!");
 
-        _profileUtilities.GetStaffData(staff, response);
-        _profileUtilities.GetUserData(staff, response);
+        profileUtilities.GetStaffData(staff, response);
+        profileUtilities.GetUserData(staff, response);
 
         return response;
     }
 
-    public async Task<GetOtherProfileResponse> GetOtherProfileAsync(string id, CancellationToken ct)
+    public async Task<GetOtherProfileResponse> GetOtherAsync(string id, CancellationToken ct)
     {
         var response = new GetOtherProfileResponse();
 
         var staff =
-            await _db.Staff
+            await db.Staff
             .Include(st => st.Links)
             .SingleOrDefaultAsync(st => st.Id == id, ct) ??
             throw new ArgumentException("Invalid ID!");
 
-        _profileUtilities.GetOtherStaffData(staff, response);
-        _profileUtilities.GetOtherUserData(staff, response);
+        profileUtilities.GetOtherStaffData(staff, response);
+        profileUtilities.GetOtherUserData(staff, response);
 
         return response;
     }
 
-    public async Task UpdateProfileAsync(UpdateProfileRequest profileRequest, CancellationToken ct)
+    public async Task UpdateAsync(UpdateProfileRequest profileRequest, CancellationToken ct)
     {
         var staff =
-            await _db.Staff
+            await db.Staff
             .Include(st => st.Links)
-            .SingleOrDefaultAsync(st => st.Id == _userInfo.UserId, ct) ??
+            .SingleOrDefaultAsync(st => st.Id == userInfo.UserId, ct) ??
             throw new ArgumentException("Invalid ID!");
 
-        _profileUtilities.UpdateUserDataAsync(staff, profileRequest, Path.Combine(_host.WebRootPath, BaseTypes.Staff), ct);
+        profileUtilities.UpdateUserDataAsync(staff, profileRequest, Path.Combine(host.WebRootPath, BaseTypes.Staff), ct);
 
-        await _db.SaveChangesAsync(ct);
+        await db.SaveChangesAsync(ct);
     }
 }

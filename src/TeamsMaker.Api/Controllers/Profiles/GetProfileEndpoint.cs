@@ -14,19 +14,16 @@ namespace TeamsMaker.Api.Controllers.Profiles;
 [Authorize]
 public class GetProfileEndpoint(IServiceProvider serviceProvider, IUserInfo userInfo) : BaseApiController
 {
-    private readonly IServiceProvider _serviceProvider = serviceProvider;
-    private readonly IUserInfo _userInfo = userInfo;
-
     [Tags("profiles")]
     [HttpGet("profiles/me")]
     public async Task<IActionResult> Profile(CancellationToken ct)
     {
-        var profileService = _serviceProvider.GetRequiredKeyedService<IProfileService>(GetKey());
+        var profileService = serviceProvider.GetRequiredKeyedService<IProfileService>(GetKey());
         GetProfileResponse response;
 
         try
         {
-            response = await profileService.GetProfileAsync(ct);
+            response = await profileService.GetAsync(ct);
         }
         catch (ArgumentException ae)
         {
@@ -37,5 +34,5 @@ public class GetProfileEndpoint(IServiceProvider serviceProvider, IUserInfo user
     }
 
     private UserEnum GetKey()
-        => _userInfo.Roles.Contains(AppRoles.Student) ? UserEnum.Student : UserEnum.Staff;
+        => userInfo.Roles.Contains(AppRoles.Student) ? UserEnum.Student : UserEnum.Staff;
 }

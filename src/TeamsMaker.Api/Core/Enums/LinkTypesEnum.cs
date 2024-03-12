@@ -6,4 +6,8 @@ public enum LinkTypesEnum
     GitHub = 1,
     LinkedIn = 2,
     FaceBook = 3,
+
+    Telegram = 4,
+    Discord = 5,
+    WhatsApp = 6
 }
