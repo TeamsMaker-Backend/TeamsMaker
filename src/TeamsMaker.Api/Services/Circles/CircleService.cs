@@ -60,6 +60,7 @@ public class CircleService(AppDBContext db, IServiceProvider serviceProvider, IU
             .Include(c => c.Skills)
             .Include(c => c.Summary)
             .Include(c => c.Links)
+            .Include(c => c.CircleMembers)
             .SingleOrDefaultAsync(c => c.Id == id, ct) ??
             throw new ArgumentException("Invalid Circle ID");
 
