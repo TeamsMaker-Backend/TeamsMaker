@@ -52,7 +52,7 @@ public class UserConfig : IEntityTypeConfiguration<User>
             .HasMany(x => x.Links)
             .WithOne(y => y.User)
             .HasForeignKey(y => y.UserId)
-            .IsRequired();
+            .IsRequired(false);
 
         builder
             .HasMany(x => x.MemberOn)

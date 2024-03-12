@@ -11,22 +11,30 @@ using TeamsMaker.Api.Services.Storage.Interfacecs;
 
 namespace TeamsMaker.Api.Services.Files;
 
-public class OrganizationFileService
+public class CircleFileService
     (AppDBContext db, IStorageService storageService, IWebHostEnvironment host, IHttpContextAccessor httpContextAccessor, LinkGenerator linkGenerator) : IFileService
 {
-    private const string BaseType = BaseTypes.Organization;
+    private const string BaseType = BaseTypes.Circle;
 
     public async Task UpdateFileAsync(string id, string fileType, UpdateFileRequest request, CancellationToken ct)
     {
-        var organization = await db.Organizations.FindAsync([int.Parse(id)], ct) ??
-            throw new ArgumentException("Invalid Organization ID");
+        var circle = await db.Circles.FindAsync([Guid.Parse(id)], ct) ??
+            throw new ArgumentException("Invalid Circle ID");
 
-        if (fileType == FileTypes.Logo)
+        if (fileType == FileTypes.Avatar)
         {
-            organization.Logo = await storageService.UpdateFileAsync(
-                oldFileName: organization.Logo?.Name,
+            circle.Avatar = await storageService.UpdateFileAsync(
+                oldFileName: circle.Avatar?.Name,
                 newFile: request.File,
-                newFileName: CreateName(FileTypes.Logo, request.File?.FileName),
+                newFileName: CreateName(FileTypes.Avatar, request.File?.FileName),
+                folder: Path.Combine(host.WebRootPath, BaseType, id), ct);
+        }
+        else if (fileType == FileTypes.Header)
+        {
+            circle.Header = await storageService.UpdateFileAsync(
+                oldFileName: circle.Header?.Name,
+                newFile: request.File,
+                newFileName: CreateName(FileTypes.Header, request.File?.FileName),
                 folder: Path.Combine(host.WebRootPath, BaseType, id), ct);
         }
         else
@@ -37,12 +45,12 @@ public class OrganizationFileService
 
     public async Task<FileContentResult?> GetFileContentAsync(string id, string fileType, CancellationToken ct)
     {
-        var organization =
-            await db.Organizations.FindAsync([int.Parse(id)], ct) ??
+        var circle =
+            await db.Circles.FindAsync([Guid.Parse(id)], ct) ??
             throw new ArgumentException("Invalid ID!");
 
         var result =
-            await storageService.LoadFileAsync(Path.Combine(host.WebRootPath, BaseType, id), GetData(organization, fileType), ct);
+            await storageService.LoadFileAsync(Path.Combine(host.WebRootPath, BaseType, id), GetData(circle, fileType), ct);
 
         return result;
     }
@@ -62,10 +70,11 @@ public class OrganizationFileService
         return url;
     }
 
-    private static FileData? GetData(Organization organization, string file)
+    private static FileData? GetData(Circle circle, string file)
         => file switch
         {
-            FileTypes.Logo => organization.Logo,
+            FileTypes.Avatar => circle.Avatar,
+            FileTypes.Header => circle.Header,
             _ => null,
         };
 

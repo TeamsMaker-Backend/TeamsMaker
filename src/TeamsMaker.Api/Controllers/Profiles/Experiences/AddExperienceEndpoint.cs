@@ -9,15 +9,13 @@ namespace TeamsMaker.Api.Controllers.Profiles.Experiences;
 [Authorize]
 public class AddExperiencEndpoint(IExperienceService experienceService) : BaseApiController
 {
-    private readonly IExperienceService _experienceService = experienceService;
-
     [Tags("profiles/experiences")]
     [HttpPost("profiles/experiences")]
     public async Task<IActionResult> Experience(AddExperienceRequest request, CancellationToken ct)
     {
         try
         {
-            await _experienceService.AddExperienceAsync(request, ct);
+            await experienceService.AddAsync(request, ct);
         }
         catch (ArgumentException e)
         {

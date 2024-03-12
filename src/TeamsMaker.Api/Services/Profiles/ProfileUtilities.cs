@@ -10,15 +10,8 @@ using TeamsMaker.Core.Enums;
 namespace TeamsMaker.Api.Services.Profiles;
 
 public class ProfileUtilities //TODO: [Refactor] remove dublicates - Urgent
-    (AppDBContext db, IWebHostEnvironment host, IUserInfo userInfo, IStorageService storageService, IServiceProvider serviceProvider)
+    (AppDBContext db, IUserInfo userInfo, IStorageService storageService, IServiceProvider serviceProvider)
 {
-    private readonly AppDBContext _db = db;
-    private readonly IWebHostEnvironment _host = host;
-    private readonly IUserInfo _userInfo = userInfo;
-    private readonly IStorageService _storageService = storageService;
-    private readonly IServiceProvider _serviceProvider = serviceProvider;
-
-
     public void GetUserData(User user, GetProfileResponse response)
     {
         response.Id = user.Id;
@@ -52,7 +45,7 @@ public class ProfileUtilities //TODO: [Refactor] remove dublicates - Urgent
 
     public void GetStudentData(Student student, GetProfileResponse response)
     {
-        var fileService = _serviceProvider.GetRequiredKeyedService<IFileService>(BaseTypes.Student);
+        var fileService = serviceProvider.GetRequiredKeyedService<IFileService>(BaseTypes.Student);
 
         var studentInfo = new StudentInfo
         {
@@ -94,7 +87,7 @@ public class ProfileUtilities //TODO: [Refactor] remove dublicates - Urgent
 
     public void GetOtherStudentData(Student student, GetOtherProfileResponse response)
     {
-        var fileService = _serviceProvider.GetRequiredKeyedService<IFileService>(BaseTypes.Student);
+        var fileService = serviceProvider.GetRequiredKeyedService<IFileService>(BaseTypes.Student);
 
         var otherStudentInfo = new OtherStudentInfo
         {
@@ -135,7 +128,7 @@ public class ProfileUtilities //TODO: [Refactor] remove dublicates - Urgent
 
     public void GetStaffData(Staff staff, GetProfileResponse response)
     {
-        var fileService = _serviceProvider.GetRequiredKeyedService<IFileService>(BaseTypes.Student);
+        var fileService = serviceProvider.GetRequiredKeyedService<IFileService>(BaseTypes.Student);
 
         var staffInfo = new StaffInfo
         {
@@ -158,8 +151,8 @@ public class ProfileUtilities //TODO: [Refactor] remove dublicates - Urgent
 
     public async void UpdateUserDataAsync(User user, UpdateProfileRequest request, string folder, CancellationToken ct)
     {
-        var links = _db.Links.Where(l => l.UserId == _userInfo.UserId);
-        _db.Links.RemoveRange(links);
+        var links = db.Links.Where(l => l.UserId == userInfo.UserId);
+        db.Links.RemoveRange(links);
 
         user.FirstName = request.FirstName;
         user.LastName = request.LastName;
@@ -170,14 +163,14 @@ public class ProfileUtilities //TODO: [Refactor] remove dublicates - Urgent
         user.PhoneNumber = request.Phone;
         user.Links = request.Links?.Select(l => new Link { UserId = user.Id, Url = l.Url, Type = l.Type }).ToList() ?? [];
 
-        user.Avatar = await _storageService.UpdateFileAsync(user.Avatar?.Name, request.Avatar, CreateName(FileTypes.Avatar, request.Avatar?.FileName),
+        user.Avatar = await storageService.UpdateFileAsync(user.Avatar?.Name, request.Avatar, CreateName(FileTypes.Avatar, request.Avatar?.FileName),
             Path.Combine(folder, user.Id), ct);
 
-        user.Header = await _storageService.UpdateFileAsync(user.Header?.Name, request.Header, CreateName(FileTypes.Header, request.Header?.FileName),
+        user.Header = await storageService.UpdateFileAsync(user.Header?.Name, request.Header, CreateName(FileTypes.Header, request.Header?.FileName),
             Path.Combine(folder, user.Id), ct);
 
         if (user is Student student)
-            student.CV = await _storageService.UpdateFileAsync(student.CV?.Name, request.CV, CreateName(FileTypes.CV, request.CV?.FileName),
+            student.CV = await storageService.UpdateFileAsync(student.CV?.Name, request.CV, CreateName(FileTypes.CV, request.CV?.FileName),
                 Path.Combine(folder, student.Id), ct);
     }
 

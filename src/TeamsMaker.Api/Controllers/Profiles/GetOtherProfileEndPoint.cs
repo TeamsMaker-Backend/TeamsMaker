@@ -10,18 +10,16 @@ namespace TeamsMaker.Api.Controllers.Profiles;
 [Authorize]
 public class GetOtherProfileEndpoint(IServiceProvider serviceProvider) : BaseApiController
 {
-    private readonly IServiceProvider _serviceProvider = serviceProvider;
-
     [Tags("profiles")]
     [HttpGet("profiles/{userEnum}/{id}")]
     public async Task<IActionResult> Profile(UserEnum userEnum, string id, CancellationToken ct)
     {
-        var profileService = _serviceProvider.GetRequiredKeyedService<IProfileService>(userEnum);
+        var profileService = serviceProvider.GetRequiredKeyedService<IProfileService>(userEnum);
         GetOtherProfileResponse response;
 
         try
         {
-            response = await profileService.GetOtherProfileAsync(id, ct);
+            response = await profileService.GetOtherAsync(id, ct);
         }
         catch (ArgumentException e)
         {

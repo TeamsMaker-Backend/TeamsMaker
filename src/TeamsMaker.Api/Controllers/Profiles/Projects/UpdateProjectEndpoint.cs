@@ -9,15 +9,13 @@ namespace TeamsMaker.Api.Controllers.Profiles.Projects;
 [Authorize]
 public class UpdateProjectEndpoint(IProjectService projectService) : BaseApiController
 {
-    private readonly IProjectService _projectService = projectService;
-
     [Tags("profiles/projects")]
     [HttpPut("profiles/projects/{id}")]
     public async Task<IActionResult> Project(int id, AddProjectRequest request, CancellationToken ct)
     {
         try
         {
-            await _projectService.UpdateProjectAsync(id, request, ct);
+            await projectService.UpdateAsync(id, request, ct);
         }
         catch (ArgumentException e)
         {

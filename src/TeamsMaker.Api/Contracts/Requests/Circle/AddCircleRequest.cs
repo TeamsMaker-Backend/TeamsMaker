@@ -11,7 +11,4 @@ public class AddCircleRequest
     public SummaryData? Summary { get; init; }
     public ICollection<LinkInfo>? Links { get; init; }
     public ICollection<string>? Skills { get; init; }
-
-    public IFormFile? Avatar { get; init; }
-    public IFormFile? Header { get; init; }
 }
