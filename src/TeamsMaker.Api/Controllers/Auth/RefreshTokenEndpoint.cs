@@ -7,7 +7,6 @@ using TeamsMaker.Api.Services.Auth;
 
 namespace TeamsMaker.Api.Controllers.Auth;
 
-[Authorize]
 public class RefreshTokenEndpoint : BaseApiController
 {
     private readonly IAuthService _authService;
