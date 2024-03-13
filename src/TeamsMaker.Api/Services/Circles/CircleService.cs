@@ -3,6 +3,7 @@
 using DataAccess.Base.Interfaces;
 
 using TeamsMaker.Api.Contracts.Requests.Circle;
+using TeamsMaker.Api.Contracts.Requests.Circle;
 using TeamsMaker.Api.Contracts.Responses.Circle;
 using TeamsMaker.Api.Contracts.Responses.Profile;
 using TeamsMaker.Api.Core.Consts;
@@ -16,6 +17,41 @@ public class CircleService(AppDBContext db, IServiceProvider serviceProvider, IU
 {
     private readonly IFileService _fileService = serviceProvider.GetRequiredKeyedService<IFileService>(BaseTypes.Circle);
 
+    public async Task AddAsync(AddCircleRequest request, CancellationToken ct)
+    {
+        using var transaction = await db.Database.BeginTransactionAsync(ct);
+        var circle = new Circle
+        {
+            Name = request.Name,
+            Description = request.Description,
+            Summary = request.Summary,
+        };
+        await db.Circles.AddAsync(circle, ct);
+
+        circle.Skills = request.Skills?.Select(s => new Skill { CircleId = circle.Id, Name = s }).ToList() ?? [];
+        circle.Links = request.Links?.Select(l => new Link { CircleId = circle.Id, Url = l.Url, Type = l.Type }).ToList() ?? [];
+
+        var circleMember = new CircleMember
+        {
+            UserId = userInfo.UserId,
+            CircleId = circle.Id,
+            IsOwner = true,
+            Permission = new Permission
+            {
+                CircleInfoPermissions = new CircleInfoPermissions
+                {
+                    UpdateFiles = true,
+                    UpdateInfo = true
+                }
+            }
+        };
+
+        await db.CircleMembers.AddAsync(circleMember, ct);
+
+        await db.SaveChangesAsync(ct);
+        await transaction.CommitAsync(ct);
+    }
+
     public async Task<GetCircleResponse> GetAsync(Guid id, CancellationToken ct)
     {
         var response = new GetCircleResponse();
@@ -25,8 +61,6 @@ public class CircleService(AppDBContext db, IServiceProvider serviceProvider, IU
             .Include(c => c.Summary)
             .Include(c => c.Links)
             .Include(c => c.CircleMembers)
-                .ThenInclude(cm => cm.Permission)
-                    .ThenInclude(p => p.CircleInfoPermissions)
             .SingleOrDefaultAsync(c => c.Id == id, ct) ??
             throw new ArgumentException("Invalid Circle ID");
 
@@ -40,6 +74,26 @@ public class CircleService(AppDBContext db, IServiceProvider serviceProvider, IU
         response.OrganizationId = circle.OrganizationId;
         response.Links = circle.Links.Select(l => new LinkInfo { Type = l.Type, Url = l.Url }).ToList();
         response.Skills = circle.Skills.Select(l => l.Name).ToList();
+
+        if (circle.CircleMembers.Any(cm => cm.UserId == userInfo.UserId))
+        {
+            response.Summary = circle.Summary?.Summary;
+        }
+
+        return response;
+    }
+
+    public async Task<GetCircleMembersResponse> GetMembersAsync(Guid id, CancellationToken ct)
+    {
+        var response = new GetCircleMembersResponse();
+
+        var circle = await db.Circles
+            .Include(c => c.CircleMembers)
+                .ThenInclude(cm => cm.Permission)
+                    .ThenInclude(p => p.CircleInfoPermissions)
+            .SingleOrDefaultAsync(c => c.Id == id, ct) ??
+            throw new ArgumentException("Invalid Circle ID");
+
         response.Members = circle.CircleMembers
             .Select(cm => new CircleMemberInfo
             {
@@ -48,11 +102,6 @@ public class CircleService(AppDBContext db, IServiceProvider serviceProvider, IU
                 Badge = cm.Badge,
                 Permissions = cm.Permission.CircleInfoPermissions
             }).ToList();
-
-        if (circle.CircleMembers.Any(cm => cm.UserId == userInfo.UserId))
-        {
-            response.Summary = circle.Summary?.Summary;
-        }
 
         return response;
     }
@@ -70,6 +119,7 @@ public class CircleService(AppDBContext db, IServiceProvider serviceProvider, IU
 
         var skills = db.Skills.Where(s => s.CircleId == id);
         db.Skills.RemoveRange(skills);
+
         circle.Skills = request.Skills?.Select(s => new Skill { CircleId = id, Name = s }).ToList() ?? [];
 
         if (request.Summary != null)
