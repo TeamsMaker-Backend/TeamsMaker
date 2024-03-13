@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-using TeamsMaker.Api.Contracts.Requests.NewFolder;
+using TeamsMaker.Api.Contracts.Requests.Circle;
 using TeamsMaker.Api.Services.Circles.Interfaces;
 
 namespace TeamsMaker.Api.Controllers.Circles;

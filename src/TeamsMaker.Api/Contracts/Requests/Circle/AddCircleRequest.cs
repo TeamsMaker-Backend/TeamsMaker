@@ -2,7 +2,7 @@
 
 using TeamsMaker.Api.Contracts.Responses.Profile;
 
-namespace TeamsMaker.Api.Contracts.Requests.NewFolder;
+namespace TeamsMaker.Api.Contracts.Requests.Circle;
 
 public class AddCircleRequest
 {

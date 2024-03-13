@@ -1,5 +1,5 @@
 ﻿using TeamsMaker.Api.Contracts.Requests.Circle;
-using TeamsMaker.Api.Contracts.Requests.NewFolder;
+using TeamsMaker.Api.Contracts.Requests.Circle;
 using TeamsMaker.Api.Contracts.Responses.Circle;
 
 namespace TeamsMaker.Api.Services.Circles.Interfaces;
