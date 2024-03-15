@@ -1,8 +1,9 @@
-﻿using Core.ValueObjects;
+﻿using System.Collections.Generic;
+
+using Core.ValueObjects;
 
 using DataAccess.Base.Interfaces;
 
-using TeamsMaker.Api.Contracts.Requests.Circle;
 using TeamsMaker.Api.Contracts.Requests.Circle;
 using TeamsMaker.Api.Contracts.Responses.Circle;
 using TeamsMaker.Api.Contracts.Responses.Profile;

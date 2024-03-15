@@ -38,6 +38,7 @@ public class AppDBContext : IdentityDbContext<User, Role, string>
     public DbSet<Circle> Circles { get; set; }
     public DbSet<CircleMember> CircleMembers { get; set; }
     public DbSet<Permission> Permissions { get; set; }
+    public DbSet<JoinRequest> JoinRequests { get; set; }
 
     #endregion
 
