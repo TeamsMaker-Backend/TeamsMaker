@@ -4,13 +4,17 @@ using TeamsMaker.Api.Contracts.Requests.Profile;
 using TeamsMaker.Api.Contracts.Responses.Profile;
 using TeamsMaker.Api.Core.Consts;
 using TeamsMaker.Api.DataAccess.Context;
+using TeamsMaker.Api.Services.Files.Interfaces;
 using TeamsMaker.Api.Services.Profiles.Interfaces;
 
 namespace TeamsMaker.Api.Services.Profiles;
 
 public class StudentProfileService
-    (AppDBContext db, IWebHostEnvironment host, IUserInfo userInfo, ProfileUtilities profileUtilities) : IProfileService
+    (AppDBContext db, IWebHostEnvironment host,
+    IUserInfo userInfo, ProfileUtilities profileUtilities, IServiceProvider serviceProvider) : IProfileService
 {
+    private readonly IFileService _fileService = serviceProvider.GetRequiredKeyedService<IFileService>(BaseTypes.Student);
+
     public async Task<List<GetStudentAsRowResponse>> FilterAsync(string query, CancellationToken ct)
     {
         var studentsQuery = db.Students.AsQueryable();
@@ -25,7 +29,8 @@ public class StudentProfileService
                 Id = std.Id,
                 FirstName = std.FirstName,
                 LastName = std.LastName,
-                //TODO: Adham khalid Avatar = 
+                Bio = std.Bio,
+                Avatar = _fileService.GetFileUrl(std.Id, FileTypes.Avatar)
             })
             .ToListAsync(ct);
 
