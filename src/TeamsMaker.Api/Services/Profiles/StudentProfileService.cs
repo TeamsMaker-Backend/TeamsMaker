@@ -11,6 +11,28 @@ namespace TeamsMaker.Api.Services.Profiles;
 public class StudentProfileService
     (AppDBContext db, IWebHostEnvironment host, IUserInfo userInfo, ProfileUtilities profileUtilities) : IProfileService
 {
+    public async Task<List<GetStudentAsRowResponse>> FilterAsync(string query, CancellationToken ct)
+    {
+        var studentsQuery = db.Students.AsQueryable();
+
+        if(!string.IsNullOrEmpty(query))
+            studentsQuery.Where(std => std.FirstName.Contains(query)
+                        || std.LastName.Contains(query)
+                        || (std.Email != null && std.Email.Contains(query)));
+
+        var students = await studentsQuery
+            .Select(std => new GetStudentAsRowResponse{
+                Id = std.Id,
+                FirstName = std.FirstName,
+                LastName = std.LastName,
+                //TODO: Adham khalid Avatar = 
+            })
+            .ToListAsync(ct);
+
+        return students;
+    }
+
+
     public async Task<GetProfileResponse> GetAsync(CancellationToken ct)
     {
         var response = new GetProfileResponse { Roles = userInfo.Roles.ToList() };

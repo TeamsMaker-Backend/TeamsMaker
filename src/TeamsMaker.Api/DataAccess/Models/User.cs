@@ -20,8 +20,6 @@ public class User : IdentityUser, IActivable
     public bool IsActive { get; set; } = true;
     public int OrganizationId { get; set; }
     public virtual Organization Organization { get; set; } = null!;
-    public virtual ICollection<Student> Students { get; set; } = [];
-    public virtual ICollection<Staff> Staff { get; set; } = [];
     public virtual ICollection<RefreshToken> RefreshTokens { get; set; } = [];
     public virtual ICollection<Link> Links { get; set; } = [];
     public virtual ICollection<CircleMember> MemberOn { get; set; } = [];
