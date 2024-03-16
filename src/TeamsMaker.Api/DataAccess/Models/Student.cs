@@ -13,6 +13,7 @@ public class Student : User
     public virtual User User { get; set; } = null!;
     public virtual Department? Department { get; set; }
 
-    public ICollection<Experience> Experiences { get; set; } = [];
-    public ICollection<Project> Projects { get; set; } = [];
+    public virtual ICollection<Experience> Experiences { get; set; } = [];
+    public virtual ICollection<Project> Projects { get; set; } = [];
+    public virtual ICollection<JoinRequest> JoinRequests { get; set; } = [];
 }

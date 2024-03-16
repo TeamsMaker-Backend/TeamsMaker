@@ -1,8 +1,9 @@
-﻿using Core.ValueObjects;
+﻿using System.Collections.Generic;
+
+using Core.ValueObjects;
 
 using DataAccess.Base.Interfaces;
 
-using TeamsMaker.Api.Contracts.Requests.Circle;
 using TeamsMaker.Api.Contracts.Requests.Circle;
 using TeamsMaker.Api.Contracts.Responses.Circle;
 using TeamsMaker.Api.Contracts.Responses.Profile;
@@ -89,8 +90,8 @@ public class CircleService(AppDBContext db, IServiceProvider serviceProvider, IU
 
         var circle = await db.Circles
             .Include(c => c.CircleMembers)
-                .ThenInclude(cm => cm.Permission)
-                    .ThenInclude(p => p.CircleInfoPermissions)
+            .ThenInclude(cm => cm.Permission)
+            .ThenInclude(p => p.CircleInfoPermissions)
             .SingleOrDefaultAsync(c => c.Id == id, ct) ??
             throw new ArgumentException("Invalid Circle ID");
 

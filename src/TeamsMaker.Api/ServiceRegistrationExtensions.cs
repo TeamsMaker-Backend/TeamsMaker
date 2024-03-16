@@ -4,11 +4,14 @@ using DataAccess.Base.Interfaces;
 using TeamsMaker.Api.Core.Consts;
 using TeamsMaker.Api.DataAccess.Context;
 using TeamsMaker.Api.DataAccess.Interceptors;
+using TeamsMaker.Api.Migrations;
 using TeamsMaker.Api.Services.Auth;
 using TeamsMaker.Api.Services.Circles;
 using TeamsMaker.Api.Services.Circles.Interfaces;
 using TeamsMaker.Api.Services.Files;
 using TeamsMaker.Api.Services.Files.Interfaces;
+using TeamsMaker.Api.Services.JoinRequests;
+using TeamsMaker.Api.Services.JoinRequests.Interfaces;
 using TeamsMaker.Api.Services.Organizations;
 using TeamsMaker.Api.Services.Profiles;
 using TeamsMaker.Api.Services.Profiles.Interfaces;
@@ -72,6 +75,9 @@ public static class ServiceRegistrationExtensions
 
         services.AddScoped<ICircleService, CircleService>();
         services.AddKeyedScoped<IFileService, CircleFileService>(BaseTypes.Circle);
+
+        services.AddScoped<IJoinRequestService, JoinRequestService>();
+
 
         return services;
     }
