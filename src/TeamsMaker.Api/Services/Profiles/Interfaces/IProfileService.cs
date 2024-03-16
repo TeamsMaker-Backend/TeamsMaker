@@ -8,4 +8,5 @@ public interface IProfileService
     Task<GetProfileResponse> GetAsync(CancellationToken ct);
     Task<GetOtherProfileResponse> GetOtherAsync(string id, CancellationToken ct);
     Task UpdateAsync(UpdateProfileRequest profileRequest, CancellationToken ct);
+    Task<List<GetStudentAsRowResponse>> FilterAsync(string query, CancellationToken ct);
 }
