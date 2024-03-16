@@ -21,22 +21,16 @@ public class StaffFileService
         var staff = await db.Staff.FindAsync([id], ct) ??
             throw new ArgumentException("Invalid Staff ID");
 
+        var result = await storageService.UpdateFileAsync(
+                oldFileName: GetData(staff, fileType)?.Name,
+                newFile: request.File,
+                newFileName: CreateName(fileType, request.File?.FileName),
+                folder: Path.Combine(host.WebRootPath, BaseType, id), ct);
+
         if (fileType == FileTypes.Avatar)
-        {
-            staff.Avatar = await storageService.UpdateFileAsync(
-                oldFileName: staff.Avatar?.Name,
-                newFile: request.File,
-                newFileName: CreateName(FileTypes.Avatar, request.File?.FileName),
-                folder: Path.Combine(host.WebRootPath, BaseType, id), ct);
-        }
+            staff.Avatar = result;
         else if (fileType == FileTypes.Header)
-        {
-            staff.Header = await storageService.UpdateFileAsync(
-                oldFileName: staff.Header?.Name,
-                newFile: request.File,
-                newFileName: CreateName(FileTypes.Header, request.File?.FileName),
-                folder: Path.Combine(host.WebRootPath, BaseType, id), ct);
-        }
+            staff.Header = result;
         else
             throw new ArgumentException("Invalid File Type");
 
