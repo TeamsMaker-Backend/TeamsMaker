@@ -82,7 +82,7 @@ public class ProfileUtilities //TODO: [Refactor] remove dublicates - Urgent
 
             CircleJoinRequests =
                 student.JoinRequests
-                .Where(jr => jr.Sender != InvitationTypes.Circle) // join request from users
+                .Where(jr => jr.Sender == InvitationTypes.Student) // join request from users
                 .OrderByDescending(jr => jr.CreationDate)
                 .Take(3)
                 .Select(jr => new GetCircleJoinRequestResponse
@@ -90,7 +90,6 @@ public class ProfileUtilities //TODO: [Refactor] remove dublicates - Urgent
                     Id = jr.Id,
                     CircleId = jr.CircleId,
                     Name = jr.Circle.Name,
-                    IsAccepted = jr.IsAccepted,
                     Avatar = fileService.GetFileUrl(jr.CircleId.ToString(), FileTypes.Avatar)
                 })
                 .ToList(),
@@ -105,7 +104,6 @@ public class ProfileUtilities //TODO: [Refactor] remove dublicates - Urgent
                         Id = jr.Id,
                         CircleId = jr.CircleId,
                         Name = jr.Circle.Name,
-                        IsAccepted = jr.IsAccepted,
                         Avatar = fileService.GetFileUrl(jr.CircleId.ToString(), FileTypes.Avatar)
                     })
                     .ToList(),

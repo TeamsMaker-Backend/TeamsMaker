@@ -6,5 +6,4 @@ public class GetCircleJoinRequestResponse
     public string Name { get; set; } = null!; // circle name
     public string? Avatar { get; set; } // circle avatar || student avatar
     public Guid CircleId { get; set; }
-    public bool IsAccepted { get; set; }
 }

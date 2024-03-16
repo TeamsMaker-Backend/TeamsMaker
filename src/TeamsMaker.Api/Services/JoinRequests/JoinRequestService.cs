@@ -23,6 +23,7 @@ public class JoinRequestService(AppDBContext db) : IJoinRequestService
             !request.EntityType.Equals(InvitationTypes.Student, StringComparison.CurrentCultureIgnoreCase))
                 throw new ArgumentException("Invalid Entity Type");
 
+
         var joinRequest = new JoinRequest
         {
             Sender = request.EntityType,
