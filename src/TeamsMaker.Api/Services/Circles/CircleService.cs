@@ -3,7 +3,6 @@
 using DataAccess.Base.Interfaces;
 
 using TeamsMaker.Api.Contracts.Requests.Circle;
-using TeamsMaker.Api.Contracts.Requests.Circle;
 using TeamsMaker.Api.Contracts.Responses.Circle;
 using TeamsMaker.Api.Contracts.Responses.Profile;
 using TeamsMaker.Api.Core.Consts;
@@ -164,3 +163,7 @@ public class CircleService(AppDBContext db, IServiceProvider serviceProvider, IU
         await db.SaveChangesAsync(ct);
     }
 }
+
+// api/circle/accept
+// api/joinRequest/accept/{id} = true
+// 
