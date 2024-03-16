@@ -4,49 +4,46 @@ using TeamsMaker.Api.DataAccess.Context;
 using TeamsMaker.Api.DataAccess.Models;
 using TeamsMaker.Api.Services.JoinRequests.Interfaces;
 
-namespace TeamsMaker.Api.Services.JoinRequests
+namespace TeamsMaker.Api.Services.JoinRequests;
+
+public class JoinRequestService(AppDBContext db) : IJoinRequestService
 {
-    public class JoinRequestService(AppDBContext db) : IJoinRequestService
+    public async Task AddJoinRequestAsync(AddJoinRequest request, CancellationToken ct)
     {
-        public async Task AddJoinRequestAsync(AddJoinRequest request, CancellationToken ct)
-        {
-            var userId = await db.Users.FindAsync(request.UserId, ct);
-            var circleId = await db.Circles.FindAsync(request.CircleId, ct);
+        var studentId = await db.Students.FindAsync([request.StudentId], ct);
+        var circleId = await db.Circles.FindAsync([request.CircleId], ct);
 
-            if (userId == null)
-                throw new ArgumentException("Invalid User ID");
+        if (studentId == null)
+            throw new ArgumentException("Invalid User Id");
 
-            if (circleId == null)
-                throw new ArgumentException("Invalid Circle ID");
+        if (circleId == null)
+            throw new ArgumentException("Invalid Circle Id");
 
-            if(request.EntityType.ToLower() == InvitationTypes.Circle.ToLower() || 
-                request.EntityType.ToLower() == InvitationTypes.User.ToLower())
-            {
-                var joinRequest = new JoinRequest
-                {
-                    Sender = request.EntityType,
-                    IsAccepted = false,
-                    UserId = request.UserId,
-                    CircleId = request.CircleId,
-
-                };
-                await db.JoinRequests.AddAsync(joinRequest, ct);
-                await db.SaveChangesAsync(ct);
-            }
-            else
+        if (!request.EntityType.Equals(InvitationTypes.Circle, StringComparison.CurrentCultureIgnoreCase) ||
+            !request.EntityType.Equals(InvitationTypes.Student, StringComparison.CurrentCultureIgnoreCase))
                 throw new ArgumentException("Invalid Entity Type");
 
-        }
-
-        public async Task DeleteJoinRequestAsync(Guid id, CancellationToken ct)
+        var joinRequest = new JoinRequest
         {
-            var joinRequest = 
-                await db.JoinRequests.FindAsync(id, ct) ??
-                throw new ArgumentException("Not found");
+            Sender = request.EntityType,
+            IsAccepted = false,
+            StudentId = request.StudentId,
+            CircleId = request.CircleId,
+        };
 
-            db.JoinRequests.Remove(joinRequest);
+        await db.JoinRequests.AddAsync(joinRequest, ct);
+        await db.SaveChangesAsync(ct);
+    }
 
-            await db.SaveChangesAsync(ct);
-        }
+    public async Task DeleteJoinRequestAsync(Guid id, CancellationToken ct)
+    {
+        var joinRequest =
+            await db.JoinRequests.FindAsync([id], ct) ??
+            throw new ArgumentException("Not found");
+
+        db.JoinRequests.Remove(joinRequest);
+
+        await db.SaveChangesAsync(ct);
     }
 }
+

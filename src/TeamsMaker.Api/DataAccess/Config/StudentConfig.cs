@@ -29,15 +29,21 @@ public class StudentConfig : IEntityTypeConfiguration<Student>
             .HasForeignKey(x => x.DepartmentId);
 
         builder
+           .HasMany(x => x.JoinRequests)
+           .WithOne(y => y.Student)
+           .HasForeignKey(y => y.StudentId)
+           .IsRequired();
+
+        builder
            .HasMany(x => x.Experiences)
-           .WithOne(x => x.Student)
-           .HasForeignKey(x => x.StudentId)
+           .WithOne(y => y.Student)
+           .HasForeignKey(y => y.StudentId)
            .IsRequired();
 
         builder
             .HasMany(x => x.Projects)
-            .WithOne(x => x.Student)
-            .HasForeignKey(x => x.StudentId)
+            .WithOne(y => y.Student)
+            .HasForeignKey(y => y.StudentId)
             .IsRequired();
     }
 }

@@ -2,7 +2,7 @@
 {
     public class AddJoinRequest
     {
-        public string UserId { get; set; } = null!;
+        public string StudentId { get; set; } = null!;
         public Guid CircleId { get; set; }
         public string EntityType { get; set; } = null!;
     }

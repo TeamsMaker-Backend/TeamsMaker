@@ -27,9 +27,9 @@ namespace TeamsMaker.Api.DataAccess.Config
                .IsRequired();
 
             builder
-               .HasOne(x => x.User)
-               .WithMany(y => y.Requests)
-               .HasForeignKey(x => x.UserId)
+               .HasOne(x => x.Student)
+               .WithMany(y => y.JoinRequests)
+               .HasForeignKey(x => x.StudentId)
                .IsRequired();
         }
     }
