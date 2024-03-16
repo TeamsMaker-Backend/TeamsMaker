@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TeamsMaker.Api.DataAccess.Context;
 
@@ -11,9 +12,11 @@ using TeamsMaker.Api.DataAccess.Context;
 namespace TeamsMaker.Api.Migrations
 {
     [DbContext(typeof(AppDBContext))]
-    partial class AppDBContextModelSnapshot : ModelSnapshot
+    [Migration("20240315161405_handle_user_childs_relationships")]
+    partial class handle_user_childs_relationships
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -420,38 +423,6 @@ namespace TeamsMaker.Api.Migrations
                             OrganizationId = 1,
                             SSN = "776-11-4808"
                         });
-                });
-
-            modelBuilder.Entity("TeamsMaker.Api.DataAccess.Models.JoinRequest", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("CircleId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<bool>("IsAccepted")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false);
-
-                    b.Property<string>("Sender")
-                        .IsRequired()
-                        .HasMaxLength(6)
-                        .HasColumnType("nvarchar(6)");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CircleId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("JoinRequest", "dbo");
                 });
 
             modelBuilder.Entity("TeamsMaker.Api.DataAccess.Models.Link", b =>
@@ -1029,25 +1000,6 @@ namespace TeamsMaker.Api.Migrations
                     b.Navigation("Student");
                 });
 
-            modelBuilder.Entity("TeamsMaker.Api.DataAccess.Models.JoinRequest", b =>
-                {
-                    b.HasOne("TeamsMaker.Api.DataAccess.Models.Circle", "Circle")
-                        .WithMany("Invitions")
-                        .HasForeignKey("CircleId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("TeamsMaker.Api.DataAccess.Models.User", "User")
-                        .WithMany("Requests")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Circle");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("TeamsMaker.Api.DataAccess.Models.Link", b =>
                 {
                     b.HasOne("TeamsMaker.Api.DataAccess.Models.Circle", "Circle")
@@ -1318,8 +1270,6 @@ namespace TeamsMaker.Api.Migrations
                 {
                     b.Navigation("CircleMembers");
 
-                    b.Navigation("Invitions");
-
                     b.Navigation("Links");
 
                     b.Navigation("Skills");
@@ -1361,8 +1311,6 @@ namespace TeamsMaker.Api.Migrations
                     b.Navigation("MemberOn");
 
                     b.Navigation("RefreshTokens");
-
-                    b.Navigation("Requests");
 
                     b.Navigation("Staff");
 
