@@ -1,8 +1,9 @@
 ﻿using TeamsMaker.Api.DataAccess.Base;
+using TeamsMaker.Api.DataAccess.Base.Interfaces;
 
 namespace TeamsMaker.Api.DataAccess.Models
 {
-    public class JoinRequest : BaseEntity<Guid>
+    public class JoinRequest : TrackedEntity<Guid>
     {
         public string Sender { get; set; } = null!;
         public bool IsAccepted { get; set; } = false;

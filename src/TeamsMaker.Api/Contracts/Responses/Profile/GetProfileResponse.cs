@@ -1,4 +1,5 @@
-﻿using TeamsMaker.Api.Core.Enums;
+﻿using TeamsMaker.Api.Contracts.Responses.JoinRequest;
+using TeamsMaker.Api.Core.Enums;
 using TeamsMaker.Core.Enums;
 
 namespace TeamsMaker.Api.Contracts.Responses.Profile;
@@ -45,6 +46,8 @@ public class StudentInfo
 
     public ICollection<ExperienceInfo>? Experiences { get; set; } = [];
     public ICollection<ProjectInfo>? Projects { get; set; } = [];
+    public ICollection<GetCircleJoinRequestResponse> CircleJoinRequests { get; set; } = [];
+    public ICollection<GetCircleJoinRequestResponse> Invitations { get; set; } = [];
 }
 
 public class ProjectInfo
