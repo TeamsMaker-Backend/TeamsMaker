@@ -1,6 +1,7 @@
 ﻿using DataAccess.Base.Interfaces;
 
 using TeamsMaker.Api.Contracts.Requests.Profile;
+using TeamsMaker.Api.Contracts.Responses.JoinRequest;
 using TeamsMaker.Api.Contracts.Responses.Profile;
 using TeamsMaker.Api.Core.Consts;
 using TeamsMaker.Api.DataAccess.Context;
@@ -77,7 +78,37 @@ public class ProfileUtilities //TODO: [Refactor] remove dublicates - Urgent
                     StartDate = prj.StartDate,
                     EndDate = prj.EndDate,
                     Skills = prj.Skills.Select(s => s.Name).ToList()
-                }).ToList()
+                }).ToList(),
+
+            CircleJoinRequests =
+                student.JoinRequests
+                .Where(jr => jr.Sender != InvitationTypes.Circle) // join request from users
+                .OrderByDescending(jr => jr.CreationDate)
+                .Take(3)
+                .Select(jr => new GetCircleJoinRequestResponse
+                {
+                    Id = jr.Id,
+                    CircleId = jr.CircleId,
+                    Name = jr.Circle.Name,
+                    IsAccepted = jr.IsAccepted,
+                    Avatar = fileService.GetFileUrl(jr.CircleId.ToString(), FileTypes.Avatar)
+                })
+                .ToList(),
+
+            Invitations =
+                student.JoinRequests
+                    .Where(jr => jr.Sender == InvitationTypes.Circle) // invitation from circle
+                    .OrderByDescending(jr => jr.CreationDate)
+                    .Take(3)
+                    .Select(jr => new GetCircleJoinRequestResponse
+                    {
+                        Id = jr.Id,
+                        CircleId = jr.CircleId,
+                        Name = jr.Circle.Name,
+                        IsAccepted = jr.IsAccepted,
+                        Avatar = fileService.GetFileUrl(jr.CircleId.ToString(), FileTypes.Avatar)
+                    })
+                    .ToList(),
         };
 
         response.StudentInfo = studentInfo;
