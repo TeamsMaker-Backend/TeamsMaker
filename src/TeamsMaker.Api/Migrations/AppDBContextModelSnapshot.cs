@@ -424,13 +424,11 @@ namespace TeamsMaker.Api.Migrations
 
             modelBuilder.Entity("TeamsMaker.Api.DataAccess.Models.JoinRequest", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("uniqueidentifier");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<Guid?>("CircleId")
+                    b.Property<Guid>("CircleId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<bool>("IsAccepted")
@@ -439,10 +437,12 @@ namespace TeamsMaker.Api.Migrations
                         .HasDefaultValue(false);
 
                     b.Property<string>("Sender")
+                        .IsRequired()
                         .HasMaxLength(6)
                         .HasColumnType("nvarchar(6)");
 
                     b.Property<string>("UserId")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
@@ -1033,11 +1033,15 @@ namespace TeamsMaker.Api.Migrations
                 {
                     b.HasOne("TeamsMaker.Api.DataAccess.Models.Circle", "Circle")
                         .WithMany("Invitions")
-                        .HasForeignKey("CircleId");
+                        .HasForeignKey("CircleId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.HasOne("TeamsMaker.Api.DataAccess.Models.User", "User")
                         .WithMany("Requests")
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.Navigation("Circle");
 
