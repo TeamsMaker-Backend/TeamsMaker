@@ -21,14 +21,14 @@ public class OrganizationFileService
         var organization = await db.Organizations.FindAsync([int.Parse(id)], ct) ??
             throw new ArgumentException("Invalid Organization ID");
 
-        if (fileType == FileTypes.Logo)
-        {
-            organization.Logo = await storageService.UpdateFileAsync(
-                oldFileName: organization.Logo?.Name,
+        var result = await storageService.UpdateFileAsync(
+                oldFileName: GetData(organization, fileType)?.Name,
                 newFile: request.File,
-                newFileName: CreateName(FileTypes.Logo, request.File?.FileName),
+                newFileName: CreateName(fileType, request.File?.FileName),
                 folder: Path.Combine(host.WebRootPath, BaseType, id), ct);
-        }
+
+        if (fileType == FileTypes.Logo)
+            organization.Logo = result;
         else
             throw new ArgumentException("Invalid File Type");
 

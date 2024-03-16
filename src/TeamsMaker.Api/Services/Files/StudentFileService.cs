@@ -21,30 +21,18 @@ public class StudentFileService
         var student = await db.Students.FindAsync([id], ct) ??
             throw new ArgumentException("Invalid student ID");
 
+        var result = await storageService.UpdateFileAsync(
+                oldFileName: GetData(student, fileType)?.Name,
+                newFile: request.File,
+                newFileName: CreateName(fileType, request.File?.FileName),
+                folder: Path.Combine(host.WebRootPath, BaseType, id), ct);
+
         if (fileType == FileTypes.Avatar)
-        {
-            student.Avatar = await storageService.UpdateFileAsync(
-                oldFileName: student.Avatar?.Name,
-                newFile: request.File,
-                newFileName: CreateName(FileTypes.Avatar, request.File?.FileName),
-                folder: Path.Combine(host.WebRootPath, BaseType, id), ct);
-        }
+            student.Avatar = result;
         else if (fileType == FileTypes.Header)
-        {
-            student.Header = await storageService.UpdateFileAsync(
-                oldFileName: student.Header?.Name,
-                newFile: request.File,
-                newFileName: CreateName(FileTypes.Header, request.File?.FileName),
-                folder: Path.Combine(host.WebRootPath, BaseType, id), ct);
-        }
+            student.Header = result;
         else if (fileType == FileTypes.CV)
-        {
-            student.CV = await storageService.UpdateFileAsync(
-                oldFileName: student.CV?.Name,
-                newFile: request.File,
-                newFileName: CreateName(FileTypes.CV, request.File?.FileName),
-                folder: Path.Combine(host.WebRootPath, BaseType, id), ct);
-        }
+            student.CV = result;
         else
             throw new ArgumentException("Invalid File Type");
 

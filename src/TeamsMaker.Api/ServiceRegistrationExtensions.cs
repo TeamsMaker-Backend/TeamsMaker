@@ -28,7 +28,7 @@ public static class ServiceRegistrationExtensions
                 options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"),
                     o => o
                         .UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
-                        .LogTo(Console.WriteLine, LogLevel.Information)
+                        .LogTo(Console.WriteLine, LogLevel.Warning)
                         .EnableSensitiveDataLogging());
 
         services.AddScoped<EntitySaveChangesInterceptor>();

@@ -21,22 +21,16 @@ public class CircleFileService
         var circle = await db.Circles.FindAsync([Guid.Parse(id)], ct) ??
             throw new ArgumentException("Invalid Circle ID");
 
+        var result = await storageService.UpdateFileAsync(
+                oldFileName: GetData(circle, fileType)?.Name,
+                newFile: request.File,
+                newFileName: CreateName(fileType, request.File?.FileName),
+                folder: Path.Combine(host.WebRootPath, BaseType, id), ct);
+
         if (fileType == FileTypes.Avatar)
-        {
-            circle.Avatar = await storageService.UpdateFileAsync(
-                oldFileName: circle.Avatar?.Name,
-                newFile: request.File,
-                newFileName: CreateName(FileTypes.Avatar, request.File?.FileName),
-                folder: Path.Combine(host.WebRootPath, BaseType, id), ct);
-        }
+            circle.Avatar = result;
         else if (fileType == FileTypes.Header)
-        {
-            circle.Header = await storageService.UpdateFileAsync(
-                oldFileName: circle.Header?.Name,
-                newFile: request.File,
-                newFileName: CreateName(FileTypes.Header, request.File?.FileName),
-                folder: Path.Combine(host.WebRootPath, BaseType, id), ct);
-        }
+            circle.Header = result;
         else
             throw new ArgumentException("Invalid File Type");
 
