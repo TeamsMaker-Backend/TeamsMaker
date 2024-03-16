@@ -60,11 +60,12 @@ public class CircleFileService
         if (httpContextAccessor.HttpContext is null)
             throw new ArgumentException("Http Context is Null!");
 
-        var url = linkGenerator.GetPathByAction(
+        var url = linkGenerator.GetUriByAction(
             httpContext: httpContextAccessor.HttpContext,
             action: nameof(GetFileEndpoint.File),
             controller: nameof(GetFileEndpoint),
-            values: new { baseType = BaseType, id, fileType });
+            values: new { baseType = BaseType, id, fileType },
+            scheme: httpContextAccessor.HttpContext.Request.Scheme);
 
         return url;
     }

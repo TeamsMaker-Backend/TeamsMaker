@@ -29,8 +29,7 @@ public class CircleConfig : IEntityTypeConfiguration<Circle>
             .OwnsOne(x => x.Header);
 
         builder
-            .OwnsOne(x => x.Summary, x =>
-            {
+            .OwnsOne(x => x.Summary, x => {
                 x.Property(x => x.Summary).HasColumnName("Summary");
                 x.Property(x => x.IsPublic).HasColumnName("IsSummaryPublic");
             });
