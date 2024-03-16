@@ -1,4 +1,3 @@
-using TeamsMaker.Api.Contracts.Responses.JoinRequest;
 using TeamsMaker.Api.Core.Enums;
 using TeamsMaker.Core.Enums;
 

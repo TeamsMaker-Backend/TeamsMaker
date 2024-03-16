@@ -16,10 +16,9 @@ public class StudentProfileService
         var studentsQuery = db.Students.AsQueryable();
 
         if(!string.IsNullOrEmpty(query))
-            studentsQuery.Where(std => std.User != null 
-                        && (std.User.FirstName.Contains(query)
-                        || std.User.LastName.Contains(query)
-                        || (std.User.Email != null && std.User.Email.Contains(query))));
+            studentsQuery.Where(std => std.FirstName.Contains(query)
+                        || std.LastName.Contains(query)
+                        || (std.Email != null && std.Email.Contains(query)));
 
         var students = await studentsQuery
             .Select(std => new GetStudentAsRowResponse{

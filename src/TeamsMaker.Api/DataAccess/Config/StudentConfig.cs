@@ -18,12 +18,6 @@ public class StudentConfig : IEntityTypeConfiguration<Student>
             .OwnsOne(x => x.CV);
 
         builder
-            .HasOne(x => x.User)
-            .WithMany(y => y.Students)
-            .HasForeignKey(x => x.Id)
-            .IsRequired();
-
-        builder
             .HasOne(x => x.Department)
             .WithMany(y => y.Students)
             .HasForeignKey(x => x.DepartmentId);

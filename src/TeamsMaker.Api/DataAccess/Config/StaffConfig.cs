@@ -11,12 +11,6 @@ public class StaffConfig : IEntityTypeConfiguration<Staff>
         builder.ToTable(nameof(Staff), DatabaseSchemas.Dbo);
 
         builder
-            .HasOne(x => x.User)
-            .WithMany(y => y.Staff)
-            .HasForeignKey(x => x.Id)
-            .IsRequired();
-
-        builder
             .HasMany(x => x.DepartmentStaff)
             .WithOne(y => y.Staff)
             .HasForeignKey(y => y.StaffId);
