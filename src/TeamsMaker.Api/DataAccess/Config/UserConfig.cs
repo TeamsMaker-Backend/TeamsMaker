@@ -49,16 +49,6 @@ public class UserConfig : IEntityTypeConfiguration<User>
             .HasForeignKey(x => x.OrganizationId);
 
         builder
-            .HasMany(x => x.Students)
-            .WithOne(y => y.User)
-            .HasForeignKey(y => y.Id);
-
-        builder
-            .HasMany(x => x.Staff)
-            .WithOne(y => y.User)
-            .HasForeignKey(y => y.Id);
-
-        builder
             .HasMany(x => x.Links)
             .WithOne(y => y.User)
             .HasForeignKey(y => y.UserId)
