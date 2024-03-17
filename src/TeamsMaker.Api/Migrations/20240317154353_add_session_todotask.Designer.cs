@@ -12,7 +12,7 @@ using TeamsMaker.Api.DataAccess.Context;
 namespace TeamsMaker.Api.Migrations
 {
     [DbContext(typeof(AppDBContext))]
-    [Migration("20240317134908_add_session_todotask")]
+    [Migration("20240317154353_add_session_todotask")]
     partial class add_session_todotask
     {
         /// <inheritdoc />
@@ -711,7 +711,7 @@ namespace TeamsMaker.Api.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
-                    b.Property<TimeOnly>("Time")
+                    b.Property<TimeOnly?>("Time")
                         .HasColumnType("time");
 
                     b.Property<string>("Title")

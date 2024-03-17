@@ -1,4 +1,5 @@
 ﻿using System;
+
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -21,7 +22,7 @@ namespace TeamsMaker.Api.Migrations
                     Notes = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
                     Date = table.Column<DateOnly>(type: "date", nullable: false),
-                    Time = table.Column<TimeOnly>(type: "time", nullable: false),
+                    Time = table.Column<TimeOnly>(type: "time", nullable: true),
                     CircleId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreationDate = table.Column<DateTime>(type: "datetime2", nullable: true),

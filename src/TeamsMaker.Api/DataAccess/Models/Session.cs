@@ -8,7 +8,7 @@ public class Session : TrackedEntity<Guid>
     public string? Notes { get; set; }
     public SessionStatus Status { get; set; } = SessionStatus.Upcoming;
     public DateOnly Date { get; set; }
-    public TimeOnly Time { get; set; }
+    public TimeOnly? Time { get; set; }
 
     public virtual ICollection<TodoTask> TodoTasks { get; set; } = [];
 

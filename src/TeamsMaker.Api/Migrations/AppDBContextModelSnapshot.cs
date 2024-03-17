@@ -708,7 +708,7 @@ namespace TeamsMaker.Api.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
-                    b.Property<TimeOnly>("Time")
+                    b.Property<TimeOnly?>("Time")
                         .HasColumnType("time");
 
                     b.Property<string>("Title")
