@@ -29,7 +29,8 @@ public class CircleConfig : IEntityTypeConfiguration<Circle>
             .OwnsOne(x => x.Header);
 
         builder
-            .OwnsOne(x => x.Summary, x => {
+            .OwnsOne(x => x.Summary, x =>
+            {
                 x.Property(x => x.Summary).HasColumnName("Summary");
                 x.Property(x => x.IsPublic).HasColumnName("IsSummaryPublic");
             });
@@ -53,5 +54,17 @@ public class CircleConfig : IEntityTypeConfiguration<Circle>
             .HasMany(x => x.Skills)
             .WithOne(y => y.Circle)
             .HasForeignKey(y => y.CircleId);
+
+        builder
+            .HasMany(c => c.Sessions)
+            .WithOne(s => s.Circle)
+            .HasForeignKey(s => s.CircleId)
+            .IsRequired();
+
+        builder
+            .HasMany(c => c.TodoTasks)
+            .WithOne(s => s.Circle)
+            .HasForeignKey(s => s.CircleId)
+            .IsRequired();
     }
 }

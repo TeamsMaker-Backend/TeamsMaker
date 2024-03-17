@@ -19,9 +19,11 @@ public class Circle : TrackedEntity<Guid>, IReadOnlyOrganizationInfo
     public int OrganizationId { get; set; }
     public virtual Organization Organization { get; set; } = null!;
     public virtual ICollection<CircleMember> CircleMembers { get; set; } = null!;
-    public virtual ICollection<Link> Links { get; set; } = []; 
+    public virtual ICollection<Link> Links { get; set; } = [];
     public virtual ICollection<Skill> Skills { get; set; } = []; // tech stack
     public virtual ICollection<JoinRequest> Invitions { get; set; } = []; // tech stack
+    public virtual ICollection<Session> Sessions { get; set; } = [];
+    public virtual ICollection<TodoTask> TodoTasks { get; set; } = [];
 }
 
 /*
