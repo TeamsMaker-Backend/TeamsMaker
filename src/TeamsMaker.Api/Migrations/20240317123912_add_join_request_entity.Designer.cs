@@ -12,8 +12,8 @@ using TeamsMaker.Api.DataAccess.Context;
 namespace TeamsMaker.Api.Migrations
 {
     [DbContext(typeof(AppDBContext))]
-    [Migration("20240316074051_join_request_tracking_properties")]
-    partial class join_request_tracking_properties
+    [Migration("20240317123912_add_join_request_entity")]
+    partial class add_join_request_entity
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -1278,13 +1278,11 @@ namespace TeamsMaker.Api.Migrations
 
             modelBuilder.Entity("TeamsMaker.Api.DataAccess.Models.Staff", b =>
                 {
-                    b.HasOne("TeamsMaker.Api.DataAccess.Models.User", "User")
-                        .WithMany("Staff")
-                        .HasForeignKey("Id")
-                        .OnDelete(DeleteBehavior.Restrict)
+                    b.HasOne("TeamsMaker.Api.DataAccess.Models.User", null)
+                        .WithOne()
+                        .HasForeignKey("TeamsMaker.Api.DataAccess.Models.Staff", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("TeamsMaker.Api.DataAccess.Models.Student", b =>
@@ -1295,10 +1293,10 @@ namespace TeamsMaker.Api.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("TeamsMaker.Api.DataAccess.Models.User", "User")
-                        .WithMany("Students")
-                        .HasForeignKey("Id")
-                        .OnDelete(DeleteBehavior.Restrict)
+                    b.HasOne("TeamsMaker.Api.DataAccess.Models.User", null)
+                        .WithOne()
+                        .HasForeignKey("TeamsMaker.Api.DataAccess.Models.Student", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.OwnsOne("Core.ValueObjects.FileData", "CV", b1 =>
@@ -1325,8 +1323,6 @@ namespace TeamsMaker.Api.Migrations
                     b.Navigation("CV");
 
                     b.Navigation("Department");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("TeamsMaker.Api.DataAccess.Models.Circle", b =>
@@ -1376,10 +1372,6 @@ namespace TeamsMaker.Api.Migrations
                     b.Navigation("MemberOn");
 
                     b.Navigation("RefreshTokens");
-
-                    b.Navigation("Staff");
-
-                    b.Navigation("Students");
                 });
 
             modelBuilder.Entity("TeamsMaker.Api.DataAccess.Models.Staff", b =>

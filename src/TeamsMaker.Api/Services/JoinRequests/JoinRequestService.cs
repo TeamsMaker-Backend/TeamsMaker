@@ -1,7 +1,6 @@
 ﻿using TeamsMaker.Api.Contracts.Requests.JoinRequest;
 using TeamsMaker.Api.Core.Consts;
 using TeamsMaker.Api.DataAccess.Context;
-using TeamsMaker.Api.DataAccess.Models;
 using TeamsMaker.Api.Services.JoinRequests.Interfaces;
 
 namespace TeamsMaker.Api.Services.JoinRequests;
@@ -21,7 +20,8 @@ public class JoinRequestService(AppDBContext db) : IJoinRequestService
 
         if (!request.EntityType.Equals(InvitationTypes.Circle, StringComparison.CurrentCultureIgnoreCase) ||
             !request.EntityType.Equals(InvitationTypes.Student, StringComparison.CurrentCultureIgnoreCase))
-                throw new ArgumentException("Invalid Entity Type");
+            throw new ArgumentException("Invalid Entity Type");
+
 
 
         var joinRequest = new JoinRequest
