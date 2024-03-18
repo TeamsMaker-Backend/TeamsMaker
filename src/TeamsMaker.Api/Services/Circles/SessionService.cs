@@ -1,4 +1,8 @@
-﻿using TeamsMaker.Api.Contracts.Requests.Session;
+﻿using Core.Generics;
+
+using TeamsMaker.Api.Contracts.QueryStringParameters;
+using TeamsMaker.Api.Contracts.Requests.Session;
+using TeamsMaker.Api.Contracts.Responses.Session;
 using TeamsMaker.Api.DataAccess.Context;
 using TeamsMaker.Api.Services.Circles.Interfaces;
 
@@ -28,6 +32,26 @@ public class SessionService(AppDBContext db) : ISessionService
         await db.SaveChangesAsync(ct);
 
         return session.Id;
+    }
+
+    public async Task<PagedList<GetSessionResponse>> GetListAsync(Guid circleId, SessionStatus status, SessionsQueryString queryString, CancellationToken ct)
+    {
+        var sessions = db.Sessions
+            .Where(s => s.CircleId == circleId && s.Status == status)
+            .Select(s => new GetSessionResponse
+            {
+                Id = s.Id,
+                CreatedBy = s.CreatedBy,
+                CreationDate = s.CreationDate,
+
+                Title = s.Title,
+                Notes = s.Notes,
+                Date = s.Date,
+                Time = s.Time
+            });
+
+        return await PagedList<GetSessionResponse>
+                        .ToPagedListAsync(sessions, queryString.PageNumber, queryString.PageSize, ct);
     }
 
     public async Task UpdateInfoAsync(Guid id, UpdateSessionInfoRequest request, CancellationToken ct)

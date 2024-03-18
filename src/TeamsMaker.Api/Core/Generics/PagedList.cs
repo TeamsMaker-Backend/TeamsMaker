@@ -22,15 +22,15 @@ public class PagedList<T> : List<T> where T : class
     public static PagedList<T> ToPagedList(IQueryable<T> source, int pageNumber, int pageSize)
     {
         var count = source.Count();
-        var items = source.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
+        var items = source.Skip(Math.Max(0, (pageNumber - 1)) * pageSize).Take(pageSize).ToList();
 
         return new PagedList<T>(items, count, pageNumber, pageSize);
     }
 
-    public static async Task<PagedList<T>> ToPagedListAsync(IQueryable<T> source, int pageNumber, int pageSize)
+    public static async Task<PagedList<T>> ToPagedListAsync(IQueryable<T> source, int pageNumber, int pageSize, CancellationToken ct)
     {
         var count = source.Count();
-        var items = await source.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
+        var items = await source.Skip(Math.Max(0, (pageNumber - 1)) * pageSize).Take(pageSize).ToListAsync(ct);
 
         return new PagedList<T>(items, count, pageNumber, pageSize);
     }
