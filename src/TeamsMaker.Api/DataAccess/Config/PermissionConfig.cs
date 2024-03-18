@@ -20,7 +20,7 @@ public class PermissionConfig : IEntityTypeConfiguration<Permission>
                 x.Property(x => x.UpdateInfo).HasColumnName("UpdateInfo");
             });
 
-        builder 
+        builder
             .HasOne(x => x.CircleMember)
             .WithOne(y => y.Permission)
             .HasForeignKey<Permission>(y => y.CircleMemberId);

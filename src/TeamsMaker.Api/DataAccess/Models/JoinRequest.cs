@@ -11,3 +11,4 @@ public class JoinRequest : TrackedEntity<Guid>
     public virtual Student Student { get; set; } = null!;
     public virtual Circle Circle { get; set; } = null!;
 }
+

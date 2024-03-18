@@ -1,6 +1,4 @@
-﻿using Core.ValueObjects;
-
-using TeamsMaker.Api.Contracts.Responses.Profile;
+﻿using TeamsMaker.Api.Contracts.Responses.Profile;
 using TeamsMaker.Core.Enums;
 
 namespace TeamsMaker.Api.Contracts.Responses.Circle;

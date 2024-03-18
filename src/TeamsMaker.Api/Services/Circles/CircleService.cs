@@ -163,4 +163,7 @@ public class CircleService(AppDBContext db, IServiceProvider serviceProvider, IU
         await db.SaveChangesAsync(ct);
     }
 }
-//TODO: filterdBy, 
+
+// api/circle/accept
+// api/joinRequest/accept/{id} = true
+// //TODO: filterdBy, 
