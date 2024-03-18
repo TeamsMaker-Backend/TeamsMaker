@@ -1,8 +1,7 @@
-﻿namespace TeamsMaker.Api.Core.Consts
+﻿namespace TeamsMaker.Api.Core.Consts;
+
+public static class InvitationTypes
 {
-    public static class InvitationTypes
-    {
-        public const string Circle = "Circle";
-        public const string Student = "Student";
-    }
+    public const string Circle = "Circle";
+    public const string Student = "Student";
 }

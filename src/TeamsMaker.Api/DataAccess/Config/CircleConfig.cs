@@ -54,5 +54,17 @@ public class CircleConfig : IEntityTypeConfiguration<Circle>
             .HasMany(x => x.Skills)
             .WithOne(y => y.Circle)
             .HasForeignKey(y => y.CircleId);
+
+        builder
+            .HasMany(c => c.Sessions)
+            .WithOne(s => s.Circle)
+            .HasForeignKey(s => s.CircleId)
+            .IsRequired();
+
+        builder
+            .HasMany(c => c.TodoTasks)
+            .WithOne(s => s.Circle)
+            .HasForeignKey(s => s.CircleId)
+            .IsRequired();
     }
 }

@@ -2,35 +2,34 @@
 
 using TeamsMaker.Api.Core.Consts;
 
-namespace TeamsMaker.Api.DataAccess.Config
+namespace TeamsMaker.Api.DataAccess.Config;
+
+public class JoinRequestConfig : IEntityTypeConfiguration<JoinRequest>
 {
-    public class JoinRequestConfig : IEntityTypeConfiguration<JoinRequest>
+    public void Configure(EntityTypeBuilder<JoinRequest> builder)
     {
-        public void Configure(EntityTypeBuilder<JoinRequest> builder)
-        {
-            builder.ToTable(nameof(JoinRequest), DatabaseSchemas.Dbo);
+        builder.ToTable(nameof(JoinRequest), DatabaseSchemas.Dbo);
 
-            builder.HasKey(x => x.Id);
-            
-            builder
-                .Property(x => x.IsAccepted)
-                .HasDefaultValue(false);
+        builder.HasKey(x => x.Id);
 
-            builder
-                .Property(x => x.Sender)
-                .HasMaxLength(6);
+        builder
+            .Property(x => x.IsAccepted)
+            .HasDefaultValue(false);
 
-            builder
-               .HasOne(x => x.Circle)
-               .WithMany(y => y.Invitions)
-               .HasForeignKey(x => x.CircleId)
-               .IsRequired();
+        builder
+            .Property(x => x.Sender)
+            .HasMaxLength(6);
 
-            builder
-               .HasOne(x => x.Student)
-               .WithMany(y => y.JoinRequests)
-               .HasForeignKey(x => x.StudentId)
-               .IsRequired();
-        }
+        builder
+           .HasOne(x => x.Circle)
+           .WithMany(y => y.Invitions)
+           .HasForeignKey(x => x.CircleId)
+           .IsRequired();
+
+        builder
+           .HasOne(x => x.Student)
+           .WithMany(y => y.JoinRequests)
+           .HasForeignKey(x => x.StudentId)
+           .IsRequired();
     }
 }

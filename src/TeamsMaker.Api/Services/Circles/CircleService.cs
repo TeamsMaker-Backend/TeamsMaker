@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-using Core.ValueObjects;
+﻿using Core.ValueObjects;
 
 using DataAccess.Base.Interfaces;
 

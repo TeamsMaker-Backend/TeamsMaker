@@ -30,9 +30,10 @@ public class JoinRequestService(AppDBContext db,IServiceProvider serviceProvider
         if (circleId == null)
             throw new ArgumentException("Invalid Circle Id");
 
-        if (request.EntityType.ToLower() == InvitationTypes.Circle.ToLower() ||
-            request.EntityType.ToLower() == InvitationTypes.Student.ToLower())
-        {
+        if (!request.EntityType.Equals(InvitationTypes.Circle, StringComparison.CurrentCultureIgnoreCase) ||
+            !request.EntityType.Equals(InvitationTypes.Student, StringComparison.CurrentCultureIgnoreCase))
+            throw new ArgumentException("Invalid Entity Type");
+
             var joinRequest = new JoinRequest
             {
                 Sender = request.EntityType,
@@ -43,9 +44,6 @@ public class JoinRequestService(AppDBContext db,IServiceProvider serviceProvider
 
             await db.JoinRequests.AddAsync(joinRequest, ct);
             await db.SaveChangesAsync(ct);
-
-        }else
-            throw new ArgumentException("Invalid Entity Type");
     }
 
     public async Task<List<GetCircleJoinRequestResponse>> GetCircleJoinRequesAsync(string id, CancellationToken ct)

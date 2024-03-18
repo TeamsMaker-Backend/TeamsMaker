@@ -30,7 +30,7 @@ public class OrganizationService(AppDBContext db, IStorageService storageService
 
         if (queryString.OrganizationId.HasValue) query = query.Where(org => org.Id == queryString.OrganizationId);
 
-        return await PagedList<GetOrganizationResponse>.ToPagedListAsync(query, queryString.PageNumber, queryString.PageSize);
+        return await PagedList<GetOrganizationResponse>.ToPagedListAsync(query, queryString.PageNumber, queryString.PageSize, ct);
     }
 
     public async Task AddAsync(OrganizationRequest request, CancellationToken ct)

@@ -12,7 +12,7 @@ using TeamsMaker.Api.DataAccess.Context;
 namespace TeamsMaker.Api.Migrations
 {
     [DbContext(typeof(AppDBContext))]
-    [Migration("20240316205811_add_join_request_entity")]
+    [Migration("20240317123912_add_join_request_entity")]
     partial class add_join_request_entity
     {
         /// <inheritdoc />
@@ -434,10 +434,22 @@ namespace TeamsMaker.Api.Migrations
                     b.Property<Guid>("CircleId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("CreationDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<bool>("IsAccepted")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
                         .HasDefaultValue(false);
+
+                    b.Property<DateTime?>("LastModificationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Sender")
                         .IsRequired()
