@@ -31,7 +31,7 @@ public class ProjectService(AppDBContext db, IUserInfo userInfo) : IProjectServi
 
         var project =
             await db.Projects.FindAsync([projectId], ct) ??
-            throw new ArgumentException("Not found"); ;
+            throw new ArgumentException("Not found");
 
         db.Projects.Remove(project);
 

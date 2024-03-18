@@ -1,10 +1,10 @@
 using DataAccess.Base;
 using DataAccess.Base.Interfaces;
 
+using TeamsMaker.Api.Controllers.Circles;
 using TeamsMaker.Api.Core.Consts;
 using TeamsMaker.Api.DataAccess.Context;
 using TeamsMaker.Api.DataAccess.Interceptors;
-using TeamsMaker.Api.Migrations;
 using TeamsMaker.Api.Services.Auth;
 using TeamsMaker.Api.Services.Circles;
 using TeamsMaker.Api.Services.Circles.Interfaces;
@@ -78,6 +78,9 @@ public static class ServiceRegistrationExtensions
 
         services.AddScoped<IJoinRequestService, JoinRequestService>();
 
+        services.AddScoped<ISessionService, SessionService>();
+
+        services.AddScoped<ITodoTaskService, TodoTaskSerevice>();
 
         return services;
     }

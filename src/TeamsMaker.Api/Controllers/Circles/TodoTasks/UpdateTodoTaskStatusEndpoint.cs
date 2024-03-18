@@ -1,21 +1,20 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-using TeamsMaker.Api.Contracts.Requests.TodoTask;
 using TeamsMaker.Api.Services.Circles.Interfaces;
 
 namespace TeamsMaker.Api.Controllers.Circles.TodoTasks;
 
 [Authorize]
-public class AddTodoTaskEndpoint(ITodoTaskService todoTaskService) : BaseApiController
+public class UpdateTodoTaskStatusEndpoint(ITodoTaskService todoTaskService) : BaseApiController
 {
     [Tags("circles/todo_tasks")]
-    [HttpPost("circles/todo_tasks")]
-    public async Task<IActionResult> TodoTask(AddTodoTaskRequest request, CancellationToken ct)
+    [HttpPut("circles/todo_tasks/{id}/{status}")]
+    public async Task<IActionResult> TodoTask(Guid id, TodoTaskStatus status, CancellationToken ct)
     {
         try
         {
-            await todoTaskService.AddAsync(request, ct);
+            await todoTaskService.UpdateStatusAsync(id, status, ct);
         }
         catch (ArgumentException e)
         {

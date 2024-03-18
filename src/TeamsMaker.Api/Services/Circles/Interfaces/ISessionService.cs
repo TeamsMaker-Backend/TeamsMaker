@@ -4,5 +4,8 @@ namespace TeamsMaker.Api.Services.Circles.Interfaces;
 
 public interface ISessionService
 {
-    Task AddAsync(AddSessionRequest request, CancellationToken ct);
+    Task<Guid> AddAsync(AddSessionRequest request, CancellationToken ct);
+    Task UpdateInfoAsync(Guid id, UpdateSessionInfoRequest request, CancellationToken ct);
+    Task UpdateStatusAsync(Guid id, SessionStatus status, CancellationToken ct);
+    Task DeleteAsync(Guid id, CancellationToken ct);
 }
