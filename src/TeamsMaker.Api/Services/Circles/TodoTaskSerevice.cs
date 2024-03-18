@@ -1,4 +1,8 @@
-﻿using TeamsMaker.Api.Contracts.Requests.TodoTask;
+﻿using Core.Generics;
+
+using TeamsMaker.Api.Contracts.QueryStringParameters;
+using TeamsMaker.Api.Contracts.Requests.TodoTask;
+using TeamsMaker.Api.Contracts.Responses.TodoTask;
 using TeamsMaker.Api.DataAccess.Context;
 using TeamsMaker.Api.Services.Circles.Interfaces;
 
@@ -28,6 +32,33 @@ public class TodoTaskSerevice(AppDBContext db) : ITodoTaskService
         await db.SaveChangesAsync(ct);
 
         return todoTask.Id;
+    }
+
+    public async Task<PagedList<GetTodoTaskResponse>> ListAsync(Guid circleId, TodoTaskStatus? status, TodoTaskQueryString queryString, CancellationToken ct)
+    {
+        var todoTasks = db.TodoTasks
+            .Include(td => td.Session)
+            .Where(td => td.CircleId == circleId)
+            .OrderBy(td => td.DeadLine)
+            .Select(td => new GetTodoTaskResponse
+            {
+                Id = td.Id,
+                CreatedBy = td.CreatedBy,
+                CreationDate = td.CreationDate,
+
+                Title = td.Title,
+                Notes = td.Notes,
+                Status = td.Status,
+                DeadLine = td.DeadLine,
+
+                SessionId = td.SessionId
+            });
+
+        if (status is not null)
+            todoTasks = todoTasks.Where(td => td.Status == status);
+
+        return await PagedList<GetTodoTaskResponse>
+                        .ToPagedListAsync(todoTasks, queryString.PageNumber, queryString.PageSize, ct);
     }
 
     public async Task UpdateInfoAsync(Guid id, UpdateTodoTaskInfoRequest request, CancellationToken ct)

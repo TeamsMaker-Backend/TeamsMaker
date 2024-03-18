@@ -34,10 +34,12 @@ public class SessionService(AppDBContext db) : ISessionService
         return session.Id;
     }
 
-    public async Task<PagedList<GetSessionResponse>> GetListAsync(Guid circleId, SessionStatus status, SessionsQueryString queryString, CancellationToken ct)
+    public async Task<PagedList<GetSessionResponse>> ListAsync(Guid circleId, SessionStatus status, SessionsQueryString queryString, CancellationToken ct)
     {
         var sessions = db.Sessions
             .Where(s => s.CircleId == circleId && s.Status == status)
+            .OrderBy(s => s.Date)
+            .ThenBy(s => s.Time)
             .Select(s => new GetSessionResponse
             {
                 Id = s.Id,

@@ -15,7 +15,7 @@ public class ListSessionsEndpoint(ISessionService sessionService) : BaseApiContr
     {
         try
         {
-            var sessions = await sessionService.GetListAsync(id, status, queryString, ct);
+            var sessions = await sessionService.ListAsync(id, status, queryString, ct);
             return sessions is not null ? Ok(_response.SuccessResponse(sessions)) : NotFound();
         }
         catch (ArgumentException e)
