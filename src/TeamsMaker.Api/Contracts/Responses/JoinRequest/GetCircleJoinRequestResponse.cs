@@ -1,3 +1,4 @@
+
 namespace TeamsMaker.Api.Contracts.Responses.JoinRequest;
 
 public class GetCircleJoinRequestResponse
