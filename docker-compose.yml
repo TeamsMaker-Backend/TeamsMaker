@@ -1,0 +1,44 @@
+# Containers
+services:
+  teams-maker-api:
+    image: teams-maker-api
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: teams-maker-api
+    ports:
+      - 5161:80
+      - 7062:443
+    networks:
+      - teams-maker-network
+    depends_on:
+      - mssql
+    environment:
+      - ConnectionStrings:DefaultConnection:Data Source=172.17.0.2,1433;Initial Catalog=TeamsMakerDB;Persist Security Info=True;User ID=sa;Password=P@ssword123;Encrypt=False;MultipleActiveResultSets=true;
+
+  mssql:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: mssql-producation
+    user: root
+    networks:
+      - teams-maker-network
+    hostname: mssql-host
+    environment:
+      - ACCEPT_EULA="Y"
+      - MSSQL_SA_PASSWORD="P@ssword123"
+    restart: always
+    volumes:
+      - sqldata:/var/opt/mssql/data 
+
+
+#Networks
+networks:
+  teams-maker-network:
+    driver: bridge
+
+#volumes
+volumes:
+  sqldata:
+
+
+
