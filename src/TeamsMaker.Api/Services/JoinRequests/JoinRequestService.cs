@@ -2,20 +2,13 @@
 using TeamsMaker.Api.Contracts.Responses.JoinRequest;
 using TeamsMaker.Api.Core.Consts;
 using TeamsMaker.Api.DataAccess.Context;
-using TeamsMaker.Api.DataAccess.Models;
 using TeamsMaker.Api.Services.Files.Interfaces;
 using TeamsMaker.Api.Services.JoinRequests.Interfaces;
-using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using TeamsMaker.Api.Services.Files;
-using Azure.Core;
-using Microsoft.AspNetCore.Http.HttpResults;
 
 
 namespace TeamsMaker.Api.Services.JoinRequests;
 
-public class JoinRequestService(AppDBContext db,IServiceProvider serviceProvider) : IJoinRequestService
+public class JoinRequestService(AppDBContext db, IServiceProvider serviceProvider) : IJoinRequestService
 {
     private readonly IFileService fileService = serviceProvider.GetRequiredKeyedService<IFileService>(BaseTypes.Circle);
 
@@ -34,16 +27,16 @@ public class JoinRequestService(AppDBContext db,IServiceProvider serviceProvider
             !request.EntityType.Equals(InvitationTypes.Student, StringComparison.CurrentCultureIgnoreCase))
             throw new ArgumentException("Invalid Entity Type");
 
-            var joinRequest = new JoinRequest
-            {
-                Sender = request.EntityType,
-                IsAccepted = false,
-                StudentId = request.StudentId,
-                CircleId = request.CircleId,
-            };
+        var joinRequest = new JoinRequest
+        {
+            Sender = request.EntityType,
+            IsAccepted = false,
+            StudentId = request.StudentId,
+            CircleId = request.CircleId,
+        };
 
-            await db.JoinRequests.AddAsync(joinRequest, ct);
-            await db.SaveChangesAsync(ct);
+        await db.JoinRequests.AddAsync(joinRequest, ct);
+        await db.SaveChangesAsync(ct);
     }
 
     public async Task<List<GetCircleJoinRequestResponse>> GetCircleJoinRequesAsync(string id, CancellationToken ct)
@@ -61,7 +54,7 @@ public class JoinRequestService(AppDBContext db,IServiceProvider serviceProvider
             Avatar = fileService.GetFileUrl(jr.CircleId.ToString(), FileTypes.Avatar),
             CircleId = jr.CircleId,
         })
-        .ToListAsync(ct); 
+        .ToListAsync(ct);
 
         return response;
     }

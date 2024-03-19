@@ -3,8 +3,6 @@ using TeamsMaker.Api.Contracts.Responses.JoinRequest;
 
 namespace TeamsMaker.Api.Services.JoinRequests.Interfaces;
 
-public interface IJoinRequestService;
-
 public interface IJoinRequestService
 {
     Task AddJoinRequestAsync(AddJoinRequest request, CancellationToken ct);
