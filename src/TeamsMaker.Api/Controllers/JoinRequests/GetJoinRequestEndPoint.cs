@@ -17,7 +17,7 @@ namespace TeamsMaker.Api.Controllers.JoinRequests
 
             try
             {
-                response = await joinRequestService.GetCircleJoinRequesAsync(id, ct);
+                response = await joinRequestService.GetAsync(id, ct);
             }
             catch (ArgumentException e)
             {

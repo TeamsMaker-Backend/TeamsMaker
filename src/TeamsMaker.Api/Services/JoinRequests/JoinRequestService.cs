@@ -10,17 +10,14 @@ namespace TeamsMaker.Api.Services.JoinRequests;
 
 public class JoinRequestService(AppDBContext db, IServiceProvider serviceProvider) : IJoinRequestService
 {
-    private readonly IFileService fileService = serviceProvider.GetRequiredKeyedService<IFileService>(BaseTypes.Circle);
+    private readonly IFileService _fileService = serviceProvider.GetRequiredKeyedService<IFileService>(BaseTypes.Circle);
 
-    public async Task AddJoinRequestAsync(AddJoinRequest request, CancellationToken ct)
+    public async Task AddAsync(AddJoinRequest request, CancellationToken ct)
     {
-        var studentId = await db.Students.FindAsync([request.StudentId], ct);
-        var circleId = await db.Circles.FindAsync([request.CircleId], ct);
-
-        if (studentId == null)
+        var studentId = await db.Students.FindAsync([request.StudentId], ct) ??
             throw new ArgumentException("Invalid User Id");
 
-        if (circleId == null)
+        var circleId = await db.Circles.FindAsync([request.CircleId], ct) ??
             throw new ArgumentException("Invalid Circle Id");
 
         if (!request.EntityType.Equals(InvitationTypes.Circle, StringComparison.CurrentCultureIgnoreCase) ||
@@ -39,31 +36,29 @@ public class JoinRequestService(AppDBContext db, IServiceProvider serviceProvide
         await db.SaveChangesAsync(ct);
     }
 
-    public async Task<List<GetCircleJoinRequestResponse>> GetCircleJoinRequesAsync(string id, CancellationToken ct)
+    public async Task<List<GetCircleJoinRequestResponse>> GetAsync(string id, CancellationToken ct)
     {
         var studentId = await db.JoinRequests
-        .FirstOrDefaultAsync(jr => jr.StudentId == id) ??
-        throw new ArgumentException("Invalid Student Id");
+            .SingleOrDefaultAsync(jr => jr.StudentId == id, ct) ??
+            throw new ArgumentException("Invalid Student Id");
 
         var response = await db.JoinRequests
-        .Where(jr => jr.Sender == InvitationTypes.Student && jr.StudentId == id)
-        .Select(jr => new GetCircleJoinRequestResponse
-        {
-            Id = jr.Id,
-            Name = jr.Circle.Name,
-            Avatar = fileService.GetFileUrl(jr.CircleId.ToString(), FileTypes.Avatar),
-            CircleId = jr.CircleId,
-        })
-        .ToListAsync(ct);
+            .Where(jr => jr.Sender == InvitationTypes.Student && jr.StudentId == id)
+            .Select(jr => new GetCircleJoinRequestResponse
+            {
+                Id = jr.Id,
+                Name = jr.Circle.Name,
+                Avatar = _fileService.GetFileUrl(jr.CircleId.ToString(), FileTypes.Avatar),
+                CircleId = jr.CircleId,
+            })
+            .ToListAsync(ct);
 
         return response;
     }
 
-    public async Task AcceptJoinRequestAsync(Guid id, CancellationToken ct)
+    public async Task AcceptAsync(Guid id, CancellationToken ct)
     {
-        var joinRequest = await db.JoinRequests.FindAsync([id], ct);
-
-        if (joinRequest == null)
+        var joinRequest = await db.JoinRequests.FindAsync([id], ct) ??
             throw new ArgumentException("Invalid Join Request Id");
 
         joinRequest.IsAccepted = true;
@@ -75,7 +70,7 @@ public class JoinRequestService(AppDBContext db, IServiceProvider serviceProvide
         // Add Cirle Member
     }
 
-    public async Task DeleteJoinRequestAsync(Guid id, CancellationToken ct)
+    public async Task DeleteAsync(Guid id, CancellationToken ct)
     {
         var joinRequest =
             await db.JoinRequests.FindAsync([id], ct) ??
@@ -85,6 +80,4 @@ public class JoinRequestService(AppDBContext db, IServiceProvider serviceProvide
 
         await db.SaveChangesAsync(ct);
     }
-
 }
-

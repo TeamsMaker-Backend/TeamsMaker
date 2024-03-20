@@ -5,8 +5,8 @@ namespace TeamsMaker.Api.Services.JoinRequests.Interfaces;
 
 public interface IJoinRequestService
 {
-    Task AddJoinRequestAsync(AddJoinRequest request, CancellationToken ct);
-    Task<List<GetCircleJoinRequestResponse>> GetCircleJoinRequesAsync(string id, CancellationToken ct);
-    Task AcceptJoinRequestAsync(Guid id, CancellationToken ct);
-    Task DeleteJoinRequestAsync(Guid id, CancellationToken ct);
+    Task AddAsync(AddJoinRequest request, CancellationToken ct);
+    Task<List<GetCircleJoinRequestResponse>> GetAsync(string id, CancellationToken ct);
+    Task AcceptAsync(Guid id, CancellationToken ct);
+    Task DeleteAsync(Guid id, CancellationToken ct);
 }

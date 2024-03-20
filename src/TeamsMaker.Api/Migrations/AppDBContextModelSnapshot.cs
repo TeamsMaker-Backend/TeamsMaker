@@ -551,10 +551,28 @@ namespace TeamsMaker.Api.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<Guid>("CircleId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("CircleManagment")
+                        .HasColumnType("bit");
+
                     b.Property<Guid>("CircleMemberId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<bool>("FeedManagment")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("MemberManagement")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("ProposalManagment")
+                        .HasColumnType("bit");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("CircleId")
+                        .IsUnique();
 
                     b.HasIndex("CircleMemberId")
                         .IsUnique();
@@ -1233,35 +1251,19 @@ namespace TeamsMaker.Api.Migrations
 
             modelBuilder.Entity("TeamsMaker.Api.DataAccess.Models.Permission", b =>
                 {
+                    b.HasOne("TeamsMaker.Api.DataAccess.Models.Circle", "Circle")
+                        .WithOne("DefaultPermission")
+                        .HasForeignKey("TeamsMaker.Api.DataAccess.Models.Permission", "CircleId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("TeamsMaker.Api.DataAccess.Models.CircleMember", "CircleMember")
-                        .WithOne("Permission")
+                        .WithOne("ExceptionPermission")
                         .HasForeignKey("TeamsMaker.Api.DataAccess.Models.Permission", "CircleMemberId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.OwnsOne("Core.ValueObjects.CircleInfoPermissions", "CircleInfoPermissions", b1 =>
-                        {
-                            b1.Property<int>("PermissionId")
-                                .HasColumnType("int");
-
-                            b1.Property<bool>("UpdateFiles")
-                                .HasColumnType("bit")
-                                .HasColumnName("UpdateFiles");
-
-                            b1.Property<bool>("UpdateInfo")
-                                .HasColumnType("bit")
-                                .HasColumnName("UpdateInfo");
-
-                            b1.HasKey("PermissionId");
-
-                            b1.ToTable("Permission", "lookups");
-
-                            b1.WithOwner()
-                                .HasForeignKey("PermissionId");
-                        });
-
-                    b.Navigation("CircleInfoPermissions")
-                        .IsRequired();
+                    b.Navigation("Circle");
 
                     b.Navigation("CircleMember");
                 });
@@ -1452,6 +1454,9 @@ namespace TeamsMaker.Api.Migrations
                 {
                     b.Navigation("CircleMembers");
 
+                    b.Navigation("DefaultPermission")
+                        .IsRequired();
+
                     b.Navigation("Invitions");
 
                     b.Navigation("Links");
@@ -1465,8 +1470,7 @@ namespace TeamsMaker.Api.Migrations
 
             modelBuilder.Entity("TeamsMaker.Api.DataAccess.Models.CircleMember", b =>
                 {
-                    b.Navigation("Permission")
-                        .IsRequired();
+                    b.Navigation("ExceptionPermission");
                 });
 
             modelBuilder.Entity("TeamsMaker.Api.DataAccess.Models.Department", b =>

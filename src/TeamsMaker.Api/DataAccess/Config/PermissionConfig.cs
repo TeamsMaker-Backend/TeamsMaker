@@ -14,15 +14,14 @@ public class PermissionConfig : IEntityTypeConfiguration<Permission>
         builder.HasKey(x => x.Id);
 
         builder
-            .OwnsOne(x => x.CircleInfoPermissions, x =>
-            {
-                x.Property(x => x.UpdateFiles).HasColumnName("UpdateFiles");
-                x.Property(x => x.UpdateInfo).HasColumnName("UpdateInfo");
-            });
+            .HasOne(x => x.Circle)
+            .WithOne(y => y.DefaultPermission)
+            .HasForeignKey<Permission>(x => x.CircleId)
+            .IsRequired();
 
         builder
             .HasOne(x => x.CircleMember)
-            .WithOne(y => y.Permission)
+            .WithOne(y => y.ExceptionPermission)
             .HasForeignKey<Permission>(y => y.CircleMemberId);
     }
 }

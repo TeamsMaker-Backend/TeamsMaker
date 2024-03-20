@@ -1,6 +1,4 @@
-﻿using DataAccess.Base.Interfaces;
-
-using TeamsMaker.Api.Contracts.Requests.Profile;
+﻿using TeamsMaker.Api.Contracts.Requests.Profile;
 using TeamsMaker.Api.Contracts.Responses.JoinRequest;
 using TeamsMaker.Api.Contracts.Responses.Profile;
 using TeamsMaker.Api.Core.Consts;
@@ -11,7 +9,7 @@ using TeamsMaker.Core.Enums;
 namespace TeamsMaker.Api.Services.Profiles;
 
 public class ProfileUtilities //TODO: [Refactor] remove dublicates - Urgent
-    (AppDBContext db, IUserInfo userInfo, IStorageService storageService, IServiceProvider serviceProvider)
+    (AppDBContext db, IStorageService storageService, IServiceProvider serviceProvider)
 {
     public void GetUserData(User user, GetProfileResponse response)
     {
@@ -180,9 +178,6 @@ public class ProfileUtilities //TODO: [Refactor] remove dublicates - Urgent
 
     public async void UpdateUserDataAsync(User user, UpdateProfileRequest request, string folder, CancellationToken ct)
     {
-        var links = db.Links.Where(l => l.UserId == userInfo.UserId);
-        db.Links.RemoveRange(links);
-
         user.FirstName = request.FirstName;
         user.LastName = request.LastName;
         user.Bio = request.Bio;
@@ -190,6 +185,8 @@ public class ProfileUtilities //TODO: [Refactor] remove dublicates - Urgent
         user.Gender = request.Gender ?? GenderEnum.Unknown;
         user.City = request.City;
         user.PhoneNumber = request.Phone;
+
+        db.Links.RemoveRange(user.Links);
         user.Links = request.Links?.Select(l => new Link { UserId = user.Id, Url = l.Url, Type = l.Type }).ToList() ?? [];
 
         user.Avatar = await storageService.UpdateFileAsync(user.Avatar?.Name, request.Avatar, CreateName(FileTypes.Avatar, request.Avatar?.FileName),

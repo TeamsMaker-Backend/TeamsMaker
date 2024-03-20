@@ -16,6 +16,7 @@ public class Circle : TrackedEntity<Guid>, IReadOnlyOrganizationInfo
     public long Rate { get; set; }
     public CircleStatusEnum Status { get; set; } = CircleStatusEnum.Active;
 
+    public Permission DefaultPermission { get; set; } = null!;
     public int OrganizationId { get; set; }
     public virtual Organization Organization { get; set; } = null!;
     public virtual ICollection<CircleMember> CircleMembers { get; set; } = null!;

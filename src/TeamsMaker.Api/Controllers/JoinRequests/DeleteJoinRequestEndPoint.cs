@@ -5,24 +5,25 @@ using Microsoft.AspNetCore.Mvc;
 
 using TeamsMaker.Api.Services.JoinRequests.Interfaces;
 
-namespace TeamsMaker.Api.Controllers.JoinRequests;
-
-[Authorize]
-public class DeleteJoinRequestEndPoint(IJoinRequestService joinRequestService) : BaseApiController
+namespace TeamsMaker.Api.Controllers.JoinRequests
 {
-    [Tags("join Request")]
-    [HttpDelete("join_request/{id}")]
-    public async Task<IActionResult> JoinRequest(Guid id, CancellationToken ct)
+    [Authorize]
+    public class DeleteJoinRequestEndPoint(IJoinRequestService joinRequestService) : BaseApiController
     {
-        try
+        [Tags("join Request")]
+        [HttpDelete("join_request/{id}")]
+        public async Task<IActionResult> JoinRequest(Guid id, CancellationToken ct)
         {
-            await joinRequestService.DeleteJoinRequestAsync(id, ct);
-        }
-        catch (ArgumentException e)
-        {
-            return NotFound(_response.FailureResponse(e.Message));
-        }
+            try
+            {
+                await joinRequestService.DeleteAsync(id, ct);
+            }
+            catch (ArgumentException e)
+            {
+                return NotFound(_response.FailureResponse(e.Message));
+            }
 
-        return Ok();
+            return Ok();
+        }
     }
 }

@@ -1,10 +1,6 @@
-﻿using Azure.Core;
-
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-using TeamsMaker.Api.Migrations;
-using TeamsMaker.Api.Services.JoinRequests;
 using TeamsMaker.Api.Services.JoinRequests.Interfaces;
 
 namespace TeamsMaker.Api.Controllers.JoinRequests
@@ -19,7 +15,7 @@ namespace TeamsMaker.Api.Controllers.JoinRequests
 
             try
             {
-                await joinRequestService.AcceptJoinRequestAsync(id, ct);
+                await joinRequestService.AcceptAsync(id, ct);
             }
             catch (ArgumentException e)
             {

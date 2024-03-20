@@ -19,13 +19,14 @@ public class StudentProfileService
     {
         var studentsQuery = db.Students.AsQueryable();
 
-        if(!string.IsNullOrEmpty(query))
+        if (!string.IsNullOrEmpty(query))
             studentsQuery.Where(std => std.FirstName.Contains(query)
                         || std.LastName.Contains(query)
                         || (std.Email != null && std.Email.Contains(query)));
 
         var students = await studentsQuery
-            .Select(std => new GetStudentAsRowResponse{
+            .Select(std => new GetStudentAsRowResponse
+            {
                 Id = std.Id,
                 FirstName = std.FirstName,
                 LastName = std.LastName,
@@ -77,13 +78,12 @@ public class StudentProfileService
 
     public async Task UpdateAsync(UpdateProfileRequest profileRequest, CancellationToken ct)
     {
-        var links = db.Links.Where(l => l.UserId == userInfo.UserId);
-        db.Links.RemoveRange(links);
-
         var student = await db.Students
                 .Include(st => st.Links)
                 .SingleOrDefaultAsync(st => st.Id == userInfo.UserId, ct) ??
                 throw new ArgumentException("Invalid ID!");
+
+        db.Links.RemoveRange(student.Links);
 
         profileUtilities.UpdateUserDataAsync(student, profileRequest, Path.Combine(host.WebRootPath, BaseTypes.Student), ct);
 

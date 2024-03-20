@@ -27,11 +27,13 @@ public class ProjectService(AppDBContext db, IUserInfo userInfo) : IProjectServi
 
     public async Task DeleteAsync(int projectId, CancellationToken ct)
     {
-        await DeleteSkillsAsync(projectId, ct);
-
         var project =
-            await db.Projects.FindAsync([projectId], ct) ??
+            await db.Projects
+            .Include(prj => prj.Skills)
+            .SingleOrDefaultAsync(prj => prj.Id == projectId, ct) ??
             throw new ArgumentException("Not found");
+
+        db.Skills.RemoveRange(project.Skills);
 
         db.Projects.Remove(project);
 
@@ -40,8 +42,6 @@ public class ProjectService(AppDBContext db, IUserInfo userInfo) : IProjectServi
 
     public async Task UpdateAsync(int projectId, AddProjectRequest projectRequest, CancellationToken ct)
     {
-        await DeleteSkillsAsync(projectId, ct);
-
         var project =
             await db.Projects
             .Include(prj => prj.Skills)
@@ -53,15 +53,9 @@ public class ProjectService(AppDBContext db, IUserInfo userInfo) : IProjectServi
         project.Description = projectRequest.Description;
         project.StartDate = projectRequest.StartDate;
         project.EndDate = projectRequest.EndDate;
+
+        db.Skills.RemoveRange(project.Skills);
         project.Skills = projectRequest.Skills?.Select(s => new Skill { Name = s }).ToList() ?? [];
-
-        await db.SaveChangesAsync(ct);
-    }
-
-    private async Task DeleteSkillsAsync(int projectId, CancellationToken ct)
-    {
-        var skills = db.Skills.Where(s => s.ProjectId == projectId);
-        db.Skills.RemoveRange(skills);
 
         await db.SaveChangesAsync(ct);
     }

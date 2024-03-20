@@ -9,13 +9,13 @@ namespace TeamsMaker.Api.Controllers.Circles;
 [Authorize]
 public class UpdateCircleInfoEndpoint(ICircleService circleService) : BaseApiController
 {
-    [Tags("circles")]
-    [HttpPut("circles/info/{id}")]
-    public async Task<IActionResult> CircleLinks(Guid id, UpdateCircleInfoRequest request, CancellationToken ct)
+    [Tags("circles/permissions/management")]
+    [HttpPut("circles/{circleId}/info")]
+    public async Task<IActionResult> CircleInfo(Guid circleId, UpdateCircleInfoRequest request, CancellationToken ct)
     {
         try
         {
-            await circleService.UpdateInfoAsync(id, request, ct);
+            await circleService.UpdateInfoAsync(circleId, request, ct);
         }
         catch (ArgumentException e)
         {

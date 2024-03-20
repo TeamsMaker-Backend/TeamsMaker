@@ -7,20 +7,21 @@ using TeamsMaker.Api.Services.Circles.Interfaces;
 namespace TeamsMaker.Api.Controllers.Circles;
 
 [Authorize]
-public class UpdateCircleLinksEndpoint(ICircleService circleService) : BaseApiController
+public class UpdateCircleDefaultPermissionEndpoint(ICircleService circleService) : BaseApiController
 {
-    [Tags("circles/permissions/management")]
-    [HttpPut("circles/{circleId}/links")]
-    public async Task<IActionResult> CircleLinks(Guid circleId, UpdateCircleLinksRequest request, CancellationToken ct)
+    [Tags("circles/permissions/danger_zone")]
+    [HttpPut("circles/{circleId}/default_permission")]
+    public async Task<IActionResult> CircleDefaultPermission(Guid circleId, UpdateDeafultPermissionRequest request, CancellationToken ct)
     {
         try
         {
-            await circleService.UpdateLinksAsync(circleId, request, ct);
+            await circleService.UpdateDefaultPermissionAsync(circleId, request, ct);
         }
         catch (ArgumentException e)
         {
             return NotFound(_response.FailureResponse(e.Message));
         }
+
         return Ok();
     }
 }
