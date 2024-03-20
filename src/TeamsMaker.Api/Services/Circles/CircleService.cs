@@ -6,6 +6,7 @@ using TeamsMaker.Api.Contracts.Requests.Circle;
 using TeamsMaker.Api.Contracts.Responses.Circle;
 using TeamsMaker.Api.Contracts.Responses.Profile;
 using TeamsMaker.Api.Core.Consts;
+using TeamsMaker.Api.Core.Enums;
 using TeamsMaker.Api.DataAccess.Context;
 using TeamsMaker.Api.Services.Circles.Interfaces;
 using TeamsMaker.Api.Services.Files.Interfaces;
@@ -13,7 +14,8 @@ using TeamsMaker.Core.Enums;
 
 namespace TeamsMaker.Api.Services.Circles;
 
-public class CircleService(AppDBContext db, IServiceProvider serviceProvider, IUserInfo userInfo) : ICircleService
+public class CircleService
+    (AppDBContext db, IServiceProvider serviceProvider, IUserInfo userInfo, ICirclePermissionService permissionService) : ICircleService
 {
     private readonly IFileService _fileService = serviceProvider.GetRequiredKeyedService<IFileService>(BaseTypes.Circle);
 
@@ -130,14 +132,7 @@ public class CircleService(AppDBContext db, IServiceProvider serviceProvider, IU
     // CircleManagment
     public async Task UpdateInfoAsync(Guid circleId, UpdateCircleInfoRequest request, CancellationToken ct)
     {
-        var circleMember =
-            await db.CircleMembers
-            .Include(cm => cm.ExceptionPermission)
-            .SingleOrDefaultAsync(cm => cm.UserId == userInfo.UserId && cm.CircleId == circleId, ct) ??
-            throw new ArgumentException("Not a Circle Member");
-
-        if (circleMember.ExceptionPermission is not null && !circleMember.ExceptionPermission.CircleManagment)
-            throw new ArgumentException("Donot Have The Permission");
+        var circleMember = await permissionService.TryGetCircleMemberAsync(userInfo.UserId, circleId, ct);
 
         var circle = await db.Circles
             .Include(c => c.DefaultPermission)
@@ -146,8 +141,7 @@ public class CircleService(AppDBContext db, IServiceProvider serviceProvider, IU
             .SingleOrDefaultAsync(c => c.Id == circleId, ct) ??
             throw new ArgumentException("Invalid Circle ID");
 
-        if (circle.DefaultPermission.CircleManagment)
-            throw new ArgumentException("Donot Have The Permission");
+        permissionService.HasPermission(circleMember, circle, PermissionsEnum.CircleManagement);
 
         circle.Name = request.Name;
         circle.Description = request.Description;
@@ -171,14 +165,7 @@ public class CircleService(AppDBContext db, IServiceProvider serviceProvider, IU
 
     public async Task UpdateLinksAsync(Guid circleId, UpdateCircleLinksRequest request, CancellationToken ct)
     {
-        var circleMember =
-            await db.CircleMembers
-            .Include(cm => cm.ExceptionPermission)
-            .SingleOrDefaultAsync(cm => cm.UserId == userInfo.UserId && cm.CircleId == circleId, ct) ??
-            throw new ArgumentException("Not a Circle Member");
-
-        if (circleMember.ExceptionPermission is not null && !circleMember.ExceptionPermission.CircleManagment)
-            throw new ArgumentException("Donot Have The Permission");
+        var circleMember = await permissionService.TryGetCircleMemberAsync(userInfo.UserId, circleId, ct);
 
         var circle = await db.Circles
             .Include(c => c.DefaultPermission)
@@ -186,8 +173,7 @@ public class CircleService(AppDBContext db, IServiceProvider serviceProvider, IU
             .SingleOrDefaultAsync(c => c.Id == circleId, ct) ??
             throw new ArgumentException("Invalid Circle ID");
 
-        if (circle.DefaultPermission.CircleManagment)
-            throw new ArgumentException("Donot Have The Permission");
+        permissionService.HasPermission(circleMember, circle, PermissionsEnum.CircleManagement);
 
         db.Links.RemoveRange(circle.Links);
         circle.Links = request.Links?.Select(l => new Link { CircleId = circleId, Url = l.Url, Type = l.Type }).ToList() ?? [];
@@ -197,14 +183,7 @@ public class CircleService(AppDBContext db, IServiceProvider serviceProvider, IU
 
     public async Task UpdatePrivacyAsync(Guid circleId, bool isPublic, CancellationToken ct)
     {
-        var circleMember =
-            await db.CircleMembers
-            .Include(cm => cm.ExceptionPermission)
-            .SingleOrDefaultAsync(cm => cm.UserId == userInfo.UserId && cm.CircleId == circleId, ct) ??
-            throw new ArgumentException("Not a Circle Member");
-
-        if (circleMember.ExceptionPermission is not null && !circleMember.ExceptionPermission.CircleManagment)
-            throw new ArgumentException("Donot Have The Permission");
+        var circleMember = await permissionService.TryGetCircleMemberAsync(userInfo.UserId, circleId, ct);
 
         var circle = await db.Circles
             .Include(c => c.DefaultPermission)
@@ -212,8 +191,7 @@ public class CircleService(AppDBContext db, IServiceProvider serviceProvider, IU
             .SingleOrDefaultAsync(c => c.Id == circleId, ct) ??
             throw new ArgumentException("Invalid Circle ID");
 
-        if (circle.DefaultPermission.CircleManagment)
-            throw new ArgumentException("Donot Have The Permission");
+        permissionService.HasPermission(circleMember, circle, PermissionsEnum.CircleManagement);
 
         if (circle.Summary != null)
             circle.Summary.IsPublic = isPublic;
@@ -224,18 +202,12 @@ public class CircleService(AppDBContext db, IServiceProvider serviceProvider, IU
     // DangerZone
     public async Task UpdateDefaultPermissionAsync(Guid circleId, UpdateDeafultPermissionRequest request, CancellationToken ct)
     {
-        var owner =
-        await db.CircleMembers
-            .SingleOrDefaultAsync(cm => cm.UserId == userInfo.UserId && cm.CircleId == circleId, ct) ??
-            throw new ArgumentException("Not a Circle Member");
+        var owner = await permissionService.TryGetOwnerAsync(userInfo.UserId, circleId, ct);
 
         var circle = await db.Circles
             .Include(c => c.DefaultPermission)
             .SingleOrDefaultAsync(c => c.Id == circleId, ct) ??
             throw new ArgumentException("Invalid Circle Id");
-
-        if (!owner.IsOwner || owner.CircleId != circle.Id)
-            throw new ArgumentException("Not The Circle Owner");
 
         circle.DefaultPermission = new Permission
         {
@@ -250,18 +222,9 @@ public class CircleService(AppDBContext db, IServiceProvider serviceProvider, IU
 
     public async Task ChangeOwnershipAsync(Guid circleId, string newOwnerId, CancellationToken ct)
     {
-        var oldOwner =
-            await db.CircleMembers
-            .SingleOrDefaultAsync(cm => cm.UserId == userInfo.UserId && cm.CircleId == circleId, ct) ??
-            throw new ArgumentException("Not a Circle Member");
+        var oldOwner = await permissionService.TryGetOwnerAsync(userInfo.UserId, circleId, ct);
 
-        if (!oldOwner.IsOwner)
-            throw new ArgumentException("Not a Circle Owner");
-
-        var newOwner =
-            await db.CircleMembers
-            .SingleOrDefaultAsync(cm => cm.UserId == newOwnerId && cm.CircleId == circleId, ct) ??
-            throw new ArgumentException("Not a Circle Member");
+        var newOwner = await permissionService.TryGetCircleMemberAsync(newOwnerId, circleId, ct);
 
         oldOwner.IsOwner = false;
         newOwner.IsOwner = true;
@@ -271,16 +234,10 @@ public class CircleService(AppDBContext db, IServiceProvider serviceProvider, IU
 
     public async Task ArchiveAsync(Guid circleId, CancellationToken ct)
     {
-        var owner =
-            await db.CircleMembers
-            .SingleOrDefaultAsync(cm => cm.UserId == userInfo.UserId && cm.CircleId == circleId, ct) ??
-            throw new ArgumentException("Not a Circle Member");
+        var owner = await permissionService.TryGetOwnerAsync(userInfo.UserId, circleId, ct);
 
         var circle = await db.Circles.FindAsync([circleId], ct) ??
             throw new ArgumentException("Invalid Circle Id");
-
-        if (!owner.IsOwner)
-            throw new ArgumentException("Not a Circle Owner");
 
         circle.Status = CircleStatusEnum.Archived;
 
@@ -289,10 +246,7 @@ public class CircleService(AppDBContext db, IServiceProvider serviceProvider, IU
 
     public async Task DeleteAsync(Guid circleId, CancellationToken ct)
     {
-        var owner =
-            await db.CircleMembers
-            .SingleOrDefaultAsync(cm => cm.UserId == userInfo.UserId && cm.CircleId == circleId, ct) ??
-            throw new ArgumentException("Not a Circle Member");
+        var owner = await permissionService.TryGetOwnerAsync(userInfo.UserId, circleId, ct);
 
         var circle = await db.Circles
             .Include(c => c.CircleMembers)
@@ -304,9 +258,6 @@ public class CircleService(AppDBContext db, IServiceProvider serviceProvider, IU
             .Include(c => c.Sessions)
             .SingleOrDefaultAsync(c => c.Id == circleId, ct) ??
             throw new ArgumentException("Invalid Circle Id");
-
-        if (!owner.IsOwner)
-            throw new ArgumentException("Not a Circle Owner");
 
         // Todo: if Circle has an accepted , throw exception cuz it can't be deleted
 

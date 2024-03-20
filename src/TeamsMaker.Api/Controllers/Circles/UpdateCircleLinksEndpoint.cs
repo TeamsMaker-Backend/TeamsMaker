@@ -9,7 +9,7 @@ namespace TeamsMaker.Api.Controllers.Circles;
 [Authorize]
 public class UpdateCircleLinksEndpoint(ICircleService circleService) : BaseApiController
 {
-    [Tags("circles/permissions/management")]
+    [Tags("circles/permissions/circle_management")]
     [HttpPut("circles/{circleId}/links")]
     public async Task<IActionResult> CircleLinks(Guid circleId, UpdateCircleLinksRequest request, CancellationToken ct)
     {

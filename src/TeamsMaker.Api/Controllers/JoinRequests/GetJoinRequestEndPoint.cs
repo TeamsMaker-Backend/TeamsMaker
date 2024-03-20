@@ -9,7 +9,7 @@ namespace TeamsMaker.Api.Controllers.JoinRequests
     [Authorize]
     public class GetCircleEndpoint(IJoinRequestService joinRequestService) : BaseApiController
     {
-        [Tags("join Request")]
+        [Tags("join_request")]
         [HttpGet("join_request/{id}")]
         public async Task<IActionResult> JoinRequest(string id, CancellationToken ct)
         {

@@ -1,14 +1,19 @@
-﻿using TeamsMaker.Api.Contracts.Requests.JoinRequest;
+﻿using DataAccess.Base.Interfaces;
+
+using TeamsMaker.Api.Contracts.Requests.JoinRequest;
 using TeamsMaker.Api.Contracts.Responses.JoinRequest;
 using TeamsMaker.Api.Core.Consts;
+using TeamsMaker.Api.Core.Enums;
 using TeamsMaker.Api.DataAccess.Context;
+using TeamsMaker.Api.Services.Circles.Interfaces;
 using TeamsMaker.Api.Services.Files.Interfaces;
 using TeamsMaker.Api.Services.JoinRequests.Interfaces;
 
 
 namespace TeamsMaker.Api.Services.JoinRequests;
 
-public class JoinRequestService(AppDBContext db, IServiceProvider serviceProvider) : IJoinRequestService
+public class JoinRequestService
+    (AppDBContext db, IUserInfo userInfo, ICirclePermissionService permissionService, IServiceProvider serviceProvider) : IJoinRequestService
 {
     private readonly IFileService _fileService = serviceProvider.GetRequiredKeyedService<IFileService>(BaseTypes.Circle);
 
@@ -17,8 +22,10 @@ public class JoinRequestService(AppDBContext db, IServiceProvider serviceProvide
         var studentId = await db.Students.FindAsync([request.StudentId], ct) ??
             throw new ArgumentException("Invalid User Id");
 
-        var circleId = await db.Circles.FindAsync([request.CircleId], ct) ??
-            throw new ArgumentException("Invalid Circle Id");
+        var circle = await db.Circles
+            .Include(c => c.DefaultPermission)
+            .SingleOrDefaultAsync(c => c.Id == request.CircleId, ct) ??
+            throw new ArgumentException("Invalid CircleId");
 
         if (!request.EntityType.Equals(InvitationTypes.Circle, StringComparison.CurrentCultureIgnoreCase) ||
             !request.EntityType.Equals(InvitationTypes.Student, StringComparison.CurrentCultureIgnoreCase))
@@ -31,6 +38,19 @@ public class JoinRequestService(AppDBContext db, IServiceProvider serviceProvide
             StudentId = request.StudentId,
             CircleId = request.CircleId,
         };
+
+        // In case of sender is a circle
+        if (joinRequest.Sender == InvitationTypes.Circle)
+        {
+            // Check wether the circle member have a permission to send an invitition or not
+            var circleMember = await permissionService.TryGetCircleMemberAsync(userInfo.UserId, joinRequest.CircleId, ct);
+            permissionService.HasPermission(circleMember, circle, PermissionsEnum.MemberManagement);
+
+            // Todo: check the reciever not in a circle
+        }
+
+        // Todo: In case of sender is a student
+        // check the student wether in a circle or not
 
         await db.JoinRequests.AddAsync(joinRequest, ct);
         await db.SaveChangesAsync(ct);
@@ -63,8 +83,21 @@ public class JoinRequestService(AppDBContext db, IServiceProvider serviceProvide
 
         joinRequest.IsAccepted = true;
 
-        await db.SaveChangesAsync(ct);
+        // In case of reciever is a circle
+        if (joinRequest.Sender != InvitationTypes.Circle)
+        {
+            // Check wether the circle member have a permission to accept a request or not
+            var circleMember = await permissionService.TryGetCircleMemberAsync(userInfo.UserId, joinRequest.CircleId, ct);
 
+            var circle = await db.Circles
+                .Include(c => c.DefaultPermission)
+                .SingleOrDefaultAsync(c => c.Id == joinRequest.CircleId, ct) ??
+                throw new ArgumentException("Invalid CircleId");
+
+            permissionService.HasPermission(circleMember, circle, PermissionsEnum.MemberManagement);
+        }
+
+        await db.SaveChangesAsync(ct);
 
         //TODO
         // Add Cirle Member
@@ -77,6 +110,20 @@ public class JoinRequestService(AppDBContext db, IServiceProvider serviceProvide
             throw new ArgumentException("Not found");
 
         db.JoinRequests.Remove(joinRequest);
+
+        // In case of sender is a circle
+        if (joinRequest.Sender == InvitationTypes.Circle)
+        {
+            // Check wether the circle member have a permission to delete an invitition or not
+            var circleMember = await permissionService.TryGetCircleMemberAsync(userInfo.UserId, joinRequest.CircleId, ct);
+
+            var circle = await db.Circles
+                .Include(c => c.DefaultPermission)
+                .SingleOrDefaultAsync(c => c.Id == joinRequest.CircleId, ct) ??
+                throw new ArgumentException("Invalid CircleId");
+
+            permissionService.HasPermission(circleMember, circle, PermissionsEnum.MemberManagement);
+        }
 
         await db.SaveChangesAsync(ct);
     }

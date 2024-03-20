@@ -30,6 +30,7 @@ owner:
     TransferOwnerShip
     ArchiveCircle
     DeleteCiCle
+    UpdateDefaultPermissions <==
     
 - MemberManagement
     
