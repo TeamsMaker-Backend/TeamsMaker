@@ -10,6 +10,7 @@ public class GetFileEndpoint(IServiceProvider serviceProvider) : BaseApiControll
 {
     [Tags("files")]
     [HttpGet("files/{baseType}/{id}/{fileType}")]
+    [ResponseCache(Duration = 60)]
     public async Task<IActionResult> File(string baseType, string id, string fileType, CancellationToken ct)
     {
         var fileService = serviceProvider.GetRequiredKeyedService<IFileService>(baseType);
