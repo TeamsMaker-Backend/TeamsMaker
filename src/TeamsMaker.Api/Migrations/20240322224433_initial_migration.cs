@@ -520,7 +520,7 @@ namespace TeamsMaker.Api.Migrations
                     CircleManagment = table.Column<bool>(type: "bit", nullable: false),
                     ProposalManagment = table.Column<bool>(type: "bit", nullable: false),
                     FeedManagment = table.Column<bool>(type: "bit", nullable: false),
-                    CircleId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CircleId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CircleMemberId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
                 constraints: table =>
@@ -537,8 +537,7 @@ namespace TeamsMaker.Api.Migrations
                         column: x => x.CircleId,
                         principalSchema: "dbo",
                         principalTable: "Circle",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -853,7 +852,8 @@ namespace TeamsMaker.Api.Migrations
                 schema: "lookups",
                 table: "Permission",
                 column: "CircleId",
-                unique: true);
+                unique: true,
+                filter: "[CircleId] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Permission_CircleMemberId",

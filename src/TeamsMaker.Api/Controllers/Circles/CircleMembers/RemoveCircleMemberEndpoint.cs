@@ -8,8 +8,8 @@ namespace TeamsMaker.Api.Controllers.Circles.CircleMembers;
 [Authorize]
 public class RemoveCircleMemberEndpoint(ICircleMemberService memberService) : BaseApiController
 {
-    [Tags("circles/circle_members")]
-    [HttpDelete("circle_members/{memberID}")]
+    [Tags("circles/members")]
+    [HttpDelete("members/{memberId}")]
     public async Task<IActionResult> CircleMember(Guid memberId, CancellationToken ct)
     {
         try

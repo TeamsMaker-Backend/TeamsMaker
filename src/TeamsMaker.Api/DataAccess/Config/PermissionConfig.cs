@@ -16,8 +16,7 @@ public class PermissionConfig : IEntityTypeConfiguration<Permission>
         builder
             .HasOne(x => x.Circle)
             .WithOne(y => y.DefaultPermission)
-            .HasForeignKey<Permission>(x => x.CircleId)
-            .IsRequired();
+            .HasForeignKey<Permission>(x => x.CircleId);
 
         builder
             .HasOne(x => x.CircleMember)

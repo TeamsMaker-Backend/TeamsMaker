@@ -9,10 +9,10 @@ public class Permission : BaseEntity<int>
     public bool ProposalManagment { get; set; } = false;
     public bool FeedManagment { get; set; } = false;
 
-    public Guid CircleId { get; set; }
-    public Circle Circle { get; set; } = null!;
+    public Guid? CircleId { get; set; }
+    public virtual Circle? Circle { get; set; } = null!;
     public Guid? CircleMemberId { get; set; }
-    public virtual CircleMember CircleMember { get; set; } = null!;
+    public virtual CircleMember? CircleMember { get; set; }
 }
 
 /*

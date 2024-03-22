@@ -551,7 +551,7 @@ namespace TeamsMaker.Api.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<Guid>("CircleId")
+                    b.Property<Guid?>("CircleId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<bool>("CircleManagment")
@@ -572,7 +572,8 @@ namespace TeamsMaker.Api.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CircleId")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("[CircleId] IS NOT NULL");
 
                     b.HasIndex("CircleMemberId")
                         .IsUnique()
@@ -1254,9 +1255,7 @@ namespace TeamsMaker.Api.Migrations
                 {
                     b.HasOne("TeamsMaker.Api.DataAccess.Models.Circle", "Circle")
                         .WithOne("DefaultPermission")
-                        .HasForeignKey("TeamsMaker.Api.DataAccess.Models.Permission", "CircleId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .HasForeignKey("TeamsMaker.Api.DataAccess.Models.Permission", "CircleId");
 
                     b.HasOne("TeamsMaker.Api.DataAccess.Models.CircleMember", "CircleMember")
                         .WithOne("ExceptionPermission")

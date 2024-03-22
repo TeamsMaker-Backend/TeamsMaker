@@ -2,7 +2,7 @@
 
 namespace TeamsMaker.Api.Services.Circles.Interfaces;
 
-public interface ICircleVerificationService
+public interface ICircleValidationService
 {
     Task<CircleMember> TryGetOwnerAsync(string userId, Guid circleId, CancellationToken ct);
     Task<CircleMember> TryGetCircleMemberAsync(string userId, Guid circleId, CancellationToken ct);

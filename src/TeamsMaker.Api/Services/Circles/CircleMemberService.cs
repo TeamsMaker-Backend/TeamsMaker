@@ -8,7 +8,7 @@ using TeamsMaker.Api.Services.Circles.Interfaces;
 namespace TeamsMaker.Api.Services.Circles;
 
 public class CircleMemberService
-    (AppDBContext db, IUserInfo userInfo, ICircleVerificationService verificationService) : ICircleMemberService, IPermissionService
+    (AppDBContext db, IUserInfo userInfo, ICircleValidationService validationService) : ICircleMemberService, IPermissionService
 {
     public async Task AddAsync(Guid circleId, String userId, CancellationToken ct)
     {
@@ -45,7 +45,7 @@ public class CircleMemberService
 
         // Hasnot Permission to remove a circle member
         if (userInfo.UserId != circleMember.UserId &&
-        !verificationService.HasPermission(circleMember, circle, PermissionsEnum.MemberManagement))
+        !validationService.HasPermission(circleMember, circle, PermissionsEnum.MemberManagement))
             throw new ArgumentException("Donot Have The Permission!");
 
         db.CircleMembers.Remove(circleMember);
@@ -64,12 +64,12 @@ public class CircleMemberService
             .SingleOrDefaultAsync(c => c.Id == circleMember.CircleId, ct) ??
             throw new ArgumentException("Invalid Circle ID");
 
-        // Hasnot Permission to remove a circle member
+        // Hasnot Permission to update a circle member
         if (userInfo.UserId != circleMember.UserId &&
-        !verificationService.HasPermission(circleMember, circle, PermissionsEnum.MemberManagement))
+        !validationService.HasPermission(circleMember, circle, PermissionsEnum.MemberManagement))
             throw new ArgumentException("Donot Have The Permission!");
 
-        circleMember.Badge = badge;
+        circleMember.Badge = badge; // Todo: string splitting ','
 
         await db.SaveChangesAsync(ct);
     }
@@ -80,7 +80,10 @@ public class CircleMemberService
             .FindAsync([circleMemberId], ct) ??
             throw new ArgumentException("Not a circle Member");
 
-        await verificationService.TryGetOwnerAsync(userInfo.UserId, circleMember.CircleId, ct);
+        if (circleMember.IsOwner)
+            throw new ArgumentException("Cannot Change Circle Owner Permissions");
+
+        await validationService.TryGetOwnerAsync(userInfo.UserId, circleMember.CircleId, ct);
 
         if (circleMember.ExceptionPermission is not null)
             db.Permissions.Remove(circleMember.ExceptionPermission);

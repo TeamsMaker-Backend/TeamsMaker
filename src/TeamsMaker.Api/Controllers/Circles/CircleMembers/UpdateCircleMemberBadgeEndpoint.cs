@@ -8,8 +8,8 @@ namespace TeamsMaker.Api.Controllers.Circles.CircleMembers;
 [Authorize]
 public class UpdateCircleMemberBadgeEndpoint(ICircleMemberService memberService) : BaseApiController
 {
-    [Tags("circles/circle_members")]
-    [HttpPut("circle_members/{memberID}/badge/{badge}")]
+    [Tags("circles/members")]
+    [HttpPut("members/{memberId}/badge/{badge}")]
     public async Task<IActionResult> CircleMemberBadge(Guid memberId, string? badge, CancellationToken ct)
     {
         try

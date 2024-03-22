@@ -70,7 +70,6 @@ public class CircleConfig : IEntityTypeConfiguration<Circle>
         builder
             .HasOne(x => x.DefaultPermission)
             .WithOne(y => y.Circle)
-            .HasForeignKey<Permission>(y => y.CircleId)
-            .IsRequired();
+            .HasForeignKey<Permission>(y => y.CircleId);
     }
 }

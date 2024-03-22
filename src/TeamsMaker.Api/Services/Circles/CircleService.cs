@@ -15,7 +15,7 @@ using TeamsMaker.Core.Enums;
 namespace TeamsMaker.Api.Services.Circles;
 
 public class CircleService
-    (AppDBContext db, IServiceProvider serviceProvider, IUserInfo userInfo, ICircleVerificationService verificationService) : ICircleService, IPermissionService
+    (AppDBContext db, IServiceProvider serviceProvider, IUserInfo userInfo, ICircleValidationService validationService) : ICircleService, IPermissionService
 {
     private readonly IFileService _fileService = serviceProvider.GetRequiredKeyedService<IFileService>(BaseTypes.Circle);
 
@@ -130,7 +130,7 @@ public class CircleService
     // CircleManagment
     public async Task UpdateInfoAsync(Guid circleId, UpdateCircleInfoRequest request, CancellationToken ct)
     {
-        var circleMember = await verificationService.TryGetCircleMemberAsync(userInfo.UserId, circleId, ct);
+        var circleMember = await validationService.TryGetCircleMemberAsync(userInfo.UserId, circleId, ct);
 
         var circle = await db.Circles
             .Include(c => c.DefaultPermission)
@@ -139,7 +139,7 @@ public class CircleService
             .SingleOrDefaultAsync(c => c.Id == circleId, ct) ??
             throw new ArgumentException("Invalid Circle ID");
 
-        verificationService.HasPermission(circleMember, circle, PermissionsEnum.CircleManagement);
+        validationService.HasPermission(circleMember, circle, PermissionsEnum.CircleManagement);
 
         circle.Name = request.Name;
         circle.Description = request.Description;
@@ -163,7 +163,7 @@ public class CircleService
 
     public async Task UpdateLinksAsync(Guid circleId, UpdateCircleLinksRequest request, CancellationToken ct)
     {
-        var circleMember = await verificationService.TryGetCircleMemberAsync(userInfo.UserId, circleId, ct);
+        var circleMember = await validationService.TryGetCircleMemberAsync(userInfo.UserId, circleId, ct);
 
         var circle = await db.Circles
             .Include(c => c.DefaultPermission)
@@ -171,7 +171,7 @@ public class CircleService
             .SingleOrDefaultAsync(c => c.Id == circleId, ct) ??
             throw new ArgumentException("Invalid Circle ID");
 
-        verificationService.HasPermission(circleMember, circle, PermissionsEnum.CircleManagement);
+        validationService.HasPermission(circleMember, circle, PermissionsEnum.CircleManagement);
 
         db.Links.RemoveRange(circle.Links);
         circle.Links = request.Links?.Select(l => new Link { CircleId = circleId, Url = l.Url, Type = l.Type }).ToList() ?? [];
@@ -181,7 +181,7 @@ public class CircleService
 
     public async Task UpdatePrivacyAsync(Guid circleId, bool isPublic, CancellationToken ct)
     {
-        var circleMember = await verificationService.TryGetCircleMemberAsync(userInfo.UserId, circleId, ct);
+        var circleMember = await validationService.TryGetCircleMemberAsync(userInfo.UserId, circleId, ct);
 
         var circle = await db.Circles
             .Include(c => c.DefaultPermission)
@@ -189,7 +189,7 @@ public class CircleService
             .SingleOrDefaultAsync(c => c.Id == circleId, ct) ??
             throw new ArgumentException("Invalid Circle ID");
 
-        verificationService.HasPermission(circleMember, circle, PermissionsEnum.CircleManagement);
+        validationService.HasPermission(circleMember, circle, PermissionsEnum.CircleManagement);
 
         if (circle.Summary != null)
             circle.Summary.IsPublic = isPublic;
@@ -202,7 +202,7 @@ public class CircleService
     {
         ArgumentNullException.ThrowIfNull(request);
 
-        await verificationService.TryGetOwnerAsync(userInfo.UserId, circleId, ct);
+        await validationService.TryGetOwnerAsync(userInfo.UserId, circleId, ct);
 
         var circle = await db.Circles
             .Include(c => c.DefaultPermission)
@@ -223,19 +223,22 @@ public class CircleService
 
     public async Task ChangeOwnershipAsync(Guid circleId, string newOwnerId, CancellationToken ct)
     {
-        var oldOwner = await verificationService.TryGetOwnerAsync(userInfo.UserId, circleId, ct);
+        var oldOwner = await validationService.TryGetOwnerAsync(userInfo.UserId, circleId, ct);
 
-        var newOwner = await verificationService.TryGetCircleMemberAsync(newOwnerId, circleId, ct);
+        var newOwner = await validationService.TryGetCircleMemberAsync(newOwnerId, circleId, ct);
 
         oldOwner.IsOwner = false;
         newOwner.IsOwner = true;
+
+        if (newOwner.ExceptionPermission is not null)
+            db.Permissions.Remove(newOwner.ExceptionPermission);
 
         await db.SaveChangesAsync(ct);
     }
 
     public async Task ArchiveAsync(Guid circleId, CancellationToken ct)
     {
-        var owner = await verificationService.TryGetOwnerAsync(userInfo.UserId, circleId, ct);
+        var owner = await validationService.TryGetOwnerAsync(userInfo.UserId, circleId, ct);
 
         var circle = await db.Circles.FindAsync([circleId], ct) ??
             throw new ArgumentException("Invalid Circle Id");
@@ -247,7 +250,7 @@ public class CircleService
 
     public async Task DeleteAsync(Guid circleId, CancellationToken ct)
     {
-        var owner = await verificationService.TryGetOwnerAsync(userInfo.UserId, circleId, ct);
+        var owner = await validationService.TryGetOwnerAsync(userInfo.UserId, circleId, ct);
 
         var circle = await db.Circles
             .Include(c => c.CircleMembers)

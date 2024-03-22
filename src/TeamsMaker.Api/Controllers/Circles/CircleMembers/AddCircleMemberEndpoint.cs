@@ -8,8 +8,8 @@ namespace TeamsMaker.Api.Controllers.Circles.CircleMembers;
 [Authorize]
 public class AddCircleMemberEndpoint(ICircleMemberService memberService) : BaseApiController
 {
-    [Tags("circles/circle_members")]
-    [HttpPost("circles/{circleId}/circle_members/{userID}")]
+    [Tags("circles/members")]
+    [HttpPost("circles/{circleId}/members/{userId}")]
     public async Task<IActionResult> CircleMember(Guid circleId, string userId, CancellationToken ct)
     {
         try
