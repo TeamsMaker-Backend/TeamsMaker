@@ -12,7 +12,7 @@ using TeamsMaker.Api.DataAccess.Context;
 namespace TeamsMaker.Api.Migrations
 {
     [DbContext(typeof(AppDBContext))]
-    [Migration("20240320035502_initial_migration")]
+    [Migration("20240322011010_initial_migration")]
     partial class initial_migration
     {
         /// <inheritdoc />
@@ -560,7 +560,7 @@ namespace TeamsMaker.Api.Migrations
                     b.Property<bool>("CircleManagment")
                         .HasColumnType("bit");
 
-                    b.Property<Guid>("CircleMemberId")
+                    b.Property<Guid?>("CircleMemberId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<bool>("FeedManagment")
@@ -578,7 +578,8 @@ namespace TeamsMaker.Api.Migrations
                         .IsUnique();
 
                     b.HasIndex("CircleMemberId")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("[CircleMemberId] IS NOT NULL");
 
                     b.ToTable("Permission", "lookups");
                 });
@@ -1262,9 +1263,7 @@ namespace TeamsMaker.Api.Migrations
 
                     b.HasOne("TeamsMaker.Api.DataAccess.Models.CircleMember", "CircleMember")
                         .WithOne("ExceptionPermission")
-                        .HasForeignKey("TeamsMaker.Api.DataAccess.Models.Permission", "CircleMemberId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .HasForeignKey("TeamsMaker.Api.DataAccess.Models.Permission", "CircleMemberId");
 
                     b.Navigation("Circle");
 

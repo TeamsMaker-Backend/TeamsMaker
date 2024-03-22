@@ -13,15 +13,17 @@ public class AddTodoTaskEndpoint(ITodoTaskService todoTaskService) : BaseApiCont
     [HttpPost("circles/todo_tasks")]
     public async Task<IActionResult> TodoTask(AddTodoTaskRequest request, CancellationToken ct)
     {
+        Guid todoTaskId;
+
         try
         {
-            await todoTaskService.AddAsync(request, ct);
+            todoTaskId = await todoTaskService.AddAsync(request, ct);
         }
         catch (ArgumentException e)
         {
             return NotFound(_response.FailureResponse(e.Message));
         }
 
-        return Created();
+        return Created("", _response.SuccessResponse(new { todoTaskId }));
     }
 }

@@ -11,7 +11,7 @@ public class GetCircleMembersEndpoint(ICircleService circleService) : BaseApiCon
 {
     [Tags("circles")]
     [HttpGet("circles/{circleId}/members")]
-    public async Task<IActionResult> CircleMember(Guid circleId, CancellationToken ct)
+    public async Task<IActionResult> CircleMembers(Guid circleId, CancellationToken ct)
     {
         GetCircleMembersResponse response;
 

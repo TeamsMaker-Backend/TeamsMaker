@@ -13,7 +13,7 @@ using TeamsMaker.Api.Services.JoinRequests.Interfaces;
 namespace TeamsMaker.Api.Services.JoinRequests;
 
 public class JoinRequestService
-    (AppDBContext db, IUserInfo userInfo, ICirclePermissionService permissionService, IServiceProvider serviceProvider) : IJoinRequestService
+    (AppDBContext db, IUserInfo userInfo, ICircleMemberService memberService, ICircleVerificationService verificationService, IServiceProvider serviceProvider) : IJoinRequestService
 {
     private readonly IFileService _fileService = serviceProvider.GetRequiredKeyedService<IFileService>(BaseTypes.Circle);
 
@@ -43,14 +43,14 @@ public class JoinRequestService
         if (joinRequest.Sender == InvitationTypes.Circle)
         {
             // Check wether the circle member have a permission to send an invitition or not
-            var circleMember = await permissionService.TryGetCircleMemberAsync(userInfo.UserId, joinRequest.CircleId, ct);
-            permissionService.HasPermission(circleMember, circle, PermissionsEnum.MemberManagement);
-
-            // Todo: check the reciever not in a circle
+            var circleMember = await verificationService.TryGetCircleMemberAsync(userInfo.UserId, joinRequest.CircleId, ct);
+            verificationService.HasPermission(circleMember, circle, PermissionsEnum.MemberManagement);
         }
 
         // Todo: In case of sender is a student
         // check the student wether in a circle or not
+        else if (await db.CircleMembers.AnyAsync(cm => cm.UserId == joinRequest.StudentId, ct))
+            throw new ArgumentException("Cannot send a join request while you are a circle member");
 
         await db.JoinRequests.AddAsync(joinRequest, ct);
         await db.SaveChangesAsync(ct);
@@ -87,26 +87,26 @@ public class JoinRequestService
         if (joinRequest.Sender != InvitationTypes.Circle)
         {
             // Check wether the circle member have a permission to accept a request or not
-            var circleMember = await permissionService.TryGetCircleMemberAsync(userInfo.UserId, joinRequest.CircleId, ct);
+            var circleMember = await verificationService.TryGetCircleMemberAsync(userInfo.UserId, joinRequest.CircleId, ct);
 
             var circle = await db.Circles
                 .Include(c => c.DefaultPermission)
                 .SingleOrDefaultAsync(c => c.Id == joinRequest.CircleId, ct) ??
                 throw new ArgumentException("Invalid CircleId");
 
-            permissionService.HasPermission(circleMember, circle, PermissionsEnum.MemberManagement);
+            verificationService.HasPermission(circleMember, circle, PermissionsEnum.MemberManagement);
         }
 
         await db.SaveChangesAsync(ct);
 
-        //TODO
-        // Add Cirle Member
+        await memberService.AddAsync(joinRequest.CircleId, joinRequest.StudentId, ct);
     }
 
     public async Task DeleteAsync(Guid id, CancellationToken ct)
     {
         var joinRequest =
-            await db.JoinRequests.FindAsync([id], ct) ??
+            await db.JoinRequests
+            .SingleOrDefaultAsync(jr => jr.Id == id && jr.IsAccepted == false, ct) ??
             throw new ArgumentException("Not found");
 
         db.JoinRequests.Remove(joinRequest);
@@ -115,14 +115,14 @@ public class JoinRequestService
         if (joinRequest.Sender == InvitationTypes.Circle)
         {
             // Check wether the circle member have a permission to delete an invitition or not
-            var circleMember = await permissionService.TryGetCircleMemberAsync(userInfo.UserId, joinRequest.CircleId, ct);
+            var circleMember = await verificationService.TryGetCircleMemberAsync(userInfo.UserId, joinRequest.CircleId, ct);
 
             var circle = await db.Circles
                 .Include(c => c.DefaultPermission)
                 .SingleOrDefaultAsync(c => c.Id == joinRequest.CircleId, ct) ??
                 throw new ArgumentException("Invalid CircleId");
 
-            permissionService.HasPermission(circleMember, circle, PermissionsEnum.MemberManagement);
+            verificationService.HasPermission(circleMember, circle, PermissionsEnum.MemberManagement);
         }
 
         await db.SaveChangesAsync(ct);

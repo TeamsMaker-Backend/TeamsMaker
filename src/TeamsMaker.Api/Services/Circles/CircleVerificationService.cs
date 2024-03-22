@@ -4,7 +4,7 @@ using TeamsMaker.Api.Services.Circles.Interfaces;
 
 namespace TeamsMaker.Api.Services.Circles;
 
-public class CirclePermissionService(AppDBContext db) : ICirclePermissionService
+public class CircleVerificationService(AppDBContext db) : ICircleVerificationService
 {
     public async Task<CircleMember> TryGetOwnerAsync(string userId, Guid circleId, CancellationToken ct)
     {

@@ -13,15 +13,17 @@ public class AddCircleEndpoint(ICircleService circleService) : BaseApiController
     [HttpPost("circles")]
     public async Task<IActionResult> Circle(AddCircleRequest request, CancellationToken ct)
     {
+        Guid circleId;
+
         try
         {
-            await circleService.AddAsync(request, ct);
+            circleId = await circleService.AddAsync(request, ct);
         }
         catch (ArgumentException e)
         {
             return NotFound(_response.FailureResponse(e.Message));
         }
 
-        return Ok();
+        return Created("", _response.SuccessResponse(new { circleId }));
     }
 }

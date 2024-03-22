@@ -11,7 +11,7 @@ public class Permission : BaseEntity<int>
 
     public Guid CircleId { get; set; }
     public Circle Circle { get; set; } = null!;
-    public Guid CircleMemberId { get; set; }
+    public Guid? CircleMemberId { get; set; }
     public virtual CircleMember CircleMember { get; set; } = null!;
 }
 

@@ -4,27 +4,26 @@ using Microsoft.AspNetCore.Mvc;
 using TeamsMaker.Api.Contracts.Requests.JoinRequest;
 using TeamsMaker.Api.Services.JoinRequests.Interfaces;
 
-namespace TeamsMaker.Api.Controllers.JoinRequests
+namespace TeamsMaker.Api.Controllers.JoinRequests;
+
+[Authorize]
+public class AddJoinRequestEndpoint(IJoinRequestService joinRequestService) : BaseApiController
 {
-    [Authorize]
-    public class AddJoinRequestEndPoint(IJoinRequestService joinRequestService) : BaseApiController
+    [Tags("join_request")]
+    [HttpPost("join_request")]
+    public async Task<IActionResult> JoinRequest(AddJoinRequest request, CancellationToken ct)
     {
-        [Tags("join_request")]
-        [HttpPost("join_request")]
-        public async Task<IActionResult> JoinRequest(AddJoinRequest request, CancellationToken ct)
+
+        try
         {
-
-            try
-            {
-                await joinRequestService.AddAsync(request, ct);
-            }
-            catch (ArgumentException e)
-            {
-                return NotFound(_response.FailureResponse(e.Message));
-            }
-
-            return Ok();
+            await joinRequestService.AddAsync(request, ct);
+        }
+        catch (ArgumentException e)
+        {
+            return NotFound(_response.FailureResponse(e.Message));
         }
 
+        return Ok();
     }
+
 }

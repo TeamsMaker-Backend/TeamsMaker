@@ -1,6 +1,6 @@
 ﻿namespace TeamsMaker.Api.Contracts.Requests.Circle;
 
-public class UpdateDeafultPermissionRequest
+public class UpdatePermissionRequest
 {
     public bool MemberManagement { get; init; }
     public bool CircleManagment { get; init; }

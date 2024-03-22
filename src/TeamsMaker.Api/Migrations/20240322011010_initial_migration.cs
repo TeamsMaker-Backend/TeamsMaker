@@ -364,10 +364,10 @@ namespace TeamsMaker.Api.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    CircleId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     IsOwner = table.Column<bool>(type: "bit", nullable: false),
-                    Badge = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Badge = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    CircleId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -521,7 +521,7 @@ namespace TeamsMaker.Api.Migrations
                     ProposalManagment = table.Column<bool>(type: "bit", nullable: false),
                     FeedManagment = table.Column<bool>(type: "bit", nullable: false),
                     CircleId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CircleMemberId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    CircleMemberId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -531,8 +531,7 @@ namespace TeamsMaker.Api.Migrations
                         column: x => x.CircleMemberId,
                         principalSchema: "dbo",
                         principalTable: "CircleMember",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Permission_Circle_CircleId",
                         column: x => x.CircleId,
@@ -861,7 +860,8 @@ namespace TeamsMaker.Api.Migrations
                 schema: "lookups",
                 table: "Permission",
                 column: "CircleMemberId",
-                unique: true);
+                unique: true,
+                filter: "[CircleMemberId] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Project_StudentId",
