@@ -83,8 +83,6 @@ public class StudentProfileService
                 .SingleOrDefaultAsync(st => st.Id == userInfo.UserId, ct) ??
                 throw new ArgumentException("Invalid ID!");
 
-        db.Links.RemoveRange(student.Links);
-
         profileUtilities.UpdateUserDataAsync(student, profileRequest, Path.Combine(host.WebRootPath, BaseTypes.Student), ct);
 
         await db.SaveChangesAsync(ct);
