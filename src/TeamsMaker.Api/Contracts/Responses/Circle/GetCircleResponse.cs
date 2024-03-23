@@ -14,6 +14,7 @@ public class GetCircleResponse
     public long Rate { get; set; }
     public CircleStatusEnum Status { get; set; }
     public int OrganizationId { get; set; }
+    public PermissionsInfo DefaultPermission { get; set; } = null!;
     public ICollection<LinkInfo>? Links { get; set; } = []; // Replace LinkInfo
     public ICollection<string>? Skills { get; set; } = [];
 }

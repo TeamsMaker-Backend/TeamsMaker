@@ -6,4 +6,5 @@ public static class BaseTypes
     public const string Student = "Student";
     public const string Staff = "Staff";
     public const string Circle = "Circle";
+    public const string CircleMember = "CircleMember";
 }

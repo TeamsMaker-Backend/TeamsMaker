@@ -74,7 +74,12 @@ public static class ServiceRegistrationExtensions
         services.AddKeyedScoped<IFileService, StaffFileService>(BaseTypes.Staff);
 
         services.AddScoped<ICircleService, CircleService>();
+        services.AddScoped<ICircleValidationService, CircleValidationService>();
         services.AddKeyedScoped<IFileService, CircleFileService>(BaseTypes.Circle);
+        services.AddKeyedScoped<IPermissionService, CircleService>(BaseTypes.Circle);
+
+        services.AddScoped<ICircleMemberService, CircleMemberService>();
+        services.AddKeyedScoped<IPermissionService, CircleMemberService>(BaseTypes.CircleMember);
 
         services.AddScoped<IJoinRequestService, JoinRequestService>();
 

@@ -24,7 +24,7 @@ public class CircleMemberConfig : IEntityTypeConfiguration<CircleMember>
             .HasForeignKey(x => x.UserId);
 
         builder
-            .HasOne(x => x.Permission)
+            .HasOne(x => x.ExceptionPermission)
             .WithOne(y => y.CircleMember)
             .HasForeignKey<Permission>(x => x.CircleMemberId);
     }

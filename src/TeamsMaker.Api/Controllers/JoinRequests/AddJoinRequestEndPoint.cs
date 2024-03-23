@@ -7,16 +7,16 @@ using TeamsMaker.Api.Services.JoinRequests.Interfaces;
 namespace TeamsMaker.Api.Controllers.JoinRequests;
 
 [Authorize]
-public class AddJoinRequestEndPoint(IJoinRequestService joinRequestService) : BaseApiController
+public class AddJoinRequestEndpoint(IJoinRequestService joinRequestService) : BaseApiController
 {
-    [Tags("join Request")]
+    [Tags("join_request")]
     [HttpPost("join_request")]
     public async Task<IActionResult> JoinRequest(AddJoinRequest request, CancellationToken ct)
     {
 
         try
         {
-            await joinRequestService.AddJoinRequestAsync(request, ct);
+            await joinRequestService.AddAsync(request, ct);
         }
         catch (ArgumentException e)
         {

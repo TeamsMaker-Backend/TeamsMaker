@@ -1,27 +1,12 @@
 using System.Reflection;
 
-using DataAccess.Base.Interfaces;
-
 using TeamsMaker.Api.DataAccess.Interceptors;
 
 namespace TeamsMaker.Api.DataAccess.Context;
 
-public class AppDBContext : IdentityDbContext<User, Role, string>
+public class AppDBContext(DbContextOptions options,
+    EntitySaveChangesInterceptor saveChangesInterceptor) : IdentityDbContext<User, Role, string>(options)
 {
-    private readonly IServiceProvider _serviceProvider;
-    private readonly EntitySaveChangesInterceptor _saveChangesInterceptor;
-
-
-    public AppDBContext(DbContextOptions options,
-        IServiceProvider serviceProvider,
-        EntitySaveChangesInterceptor saveChangesInterceptor) : base(options)
-    {
-        _saveChangesInterceptor = saveChangesInterceptor;
-        _serviceProvider = serviceProvider;
-    }
-
-    private IUserInfo _userInfo => _serviceProvider.GetRequiredService<IUserInfo>();
-
 
     #region DBSets
     public DbSet<Student> Students { get; set; }
@@ -73,6 +58,6 @@ public class AppDBContext : IdentityDbContext<User, Role, string>
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         base.OnConfiguring(optionsBuilder);
-        optionsBuilder.AddInterceptors(_saveChangesInterceptor);
+        optionsBuilder.AddInterceptors(saveChangesInterceptor);
     }
 }

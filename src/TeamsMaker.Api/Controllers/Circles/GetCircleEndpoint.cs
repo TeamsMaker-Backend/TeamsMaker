@@ -10,14 +10,14 @@ namespace TeamsMaker.Api.Controllers.Circles;
 public class GetCircleEndpoint(ICircleService circleService) : BaseApiController
 {
     [Tags("circles")]
-    [HttpGet("circles/{id}")]
-    public async Task<IActionResult> Circle(Guid id, CancellationToken ct)
+    [HttpGet("circles/{circleId}")]
+    public async Task<IActionResult> Circle(Guid circleId, CancellationToken ct)
     {
         GetCircleResponse response;
 
         try
         {
-            response = await circleService.GetAsync(id, ct);
+            response = await circleService.GetAsync(circleId, ct);
         }
         catch (ArgumentException e)
         {

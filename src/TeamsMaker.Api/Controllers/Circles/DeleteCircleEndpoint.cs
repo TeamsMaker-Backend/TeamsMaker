@@ -6,20 +6,21 @@ using TeamsMaker.Api.Services.Circles.Interfaces;
 namespace TeamsMaker.Api.Controllers.Circles;
 
 [Authorize]
-public class UpdateCirclePrivacyEndpoint(ICircleService circleService) : BaseApiController
+public class DeleteCircleEndpoint(ICircleService circleService) : BaseApiController
 {
-    [Tags("circles")]
-    [HttpPut("circles/{circleId}/privacy/{isPublic}")]
-    public async Task<IActionResult> CirclePrivacy(Guid circleId, bool isPublic, CancellationToken ct)
+    [Tags("circles/permissions/danger_zone")]
+    [HttpDelete("circles/{circleId}")]
+    public async Task<IActionResult> Circle(Guid circleId, CancellationToken ct)
     {
         try
         {
-            await circleService.UpdatePrivacyAsync(circleId, isPublic, ct);
+            await circleService.DeleteAsync(circleId, ct);
         }
         catch (ArgumentException e)
         {
             return NotFound(_response.FailureResponse(e.Message));
         }
+
         return Ok();
     }
 }

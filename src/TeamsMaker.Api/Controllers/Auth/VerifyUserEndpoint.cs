@@ -14,7 +14,7 @@ public class VerifyUserEndpoint : BaseApiController
         _authService = authService;
     }
 
-    [Tags("Auth")]
+    [Tags("auth")]
     [HttpPost("users/verify")]
     public async Task<IActionResult> Verify([FromBody] UserVerificationRequset request, CancellationToken ct)
     {
