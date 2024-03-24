@@ -1,5 +1,26 @@
+version: '3'
+
 # Containers
 services:
+  teams-maker-db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    user: root
+    container_name: teams-maker-production-db
+    ports:
+      - 1434:1433
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=P@ssword123
+    restart: always
+    volumes:
+      - sqldata:/var/opt/mssql/data
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P P@ssword123 -Q 'SELECT 1' || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
   teams-maker-api:
     image: teams-maker-api
     build:
@@ -7,38 +28,12 @@ services:
       dockerfile: Dockerfile
     container_name: teams-maker-api
     ports:
-      - 5161:80
-      - 7062:443
-    networks:
-      - teams-maker-network
-    depends_on:
-      - mssql
-    environment:
-      - ConnectionStrings:DefaultConnection:Data Source=172.17.0.2,1433;Initial Catalog=TeamsMakerDB;Persist Security Info=True;User ID=sa;Password=P@ssword123;Encrypt=False;MultipleActiveResultSets=true;
-
-  mssql:
-    image: mcr.microsoft.com/mssql/server:2022-latest
-    container_name: mssql-producation
-    user: root
-    networks:
-      - teams-maker-network
-    hostname: mssql-host
-    environment:
-      - ACCEPT_EULA="Y"
-      - MSSQL_SA_PASSWORD="P@ssword123"
+      - 7000:8080
+      - 7001:443
     restart: always
-    volumes:
-      - sqldata:/var/opt/mssql/data 
-
-
-#Networks
-networks:
-  teams-maker-network:
-    driver: bridge
-
-#volumes
+    depends_on:
+      - teams-maker-db
+# Volumes
 volumes:
   sqldata:
-
-
-
+ 
