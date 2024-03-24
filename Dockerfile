@@ -9,7 +9,7 @@ COPY . .
 RUN dotnet restore
 
 # Build the application
-RUN dotnet publish "TeamsMaker.Api.csproj" -c Release -o /app/publish/
+RUN dotnet publish ".\src\TeamsMaker.Api\TeamsMaker.Api.csproj" -c Release -o /app/publish/
 
 # Use the runtime image for the final image
 FROM mcr.microsoft.com/dotnet/aspnet:8.0-bookworm-slim AS publish

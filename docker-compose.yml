@@ -22,14 +22,14 @@ services:
       start_period: 30s
 
   teams-maker-api:
-    image: teams-maker-api
+    image: teams-maker-base
     build:
       context: .
       dockerfile: Dockerfile
     container_name: teams-maker-api
     ports:
-      - 7000:8080
-      - 7001:443
+      - 7555:8080
+      - 7556:443
     restart: always
     depends_on:
       - teams-maker-db

@@ -8,7 +8,7 @@ namespace TeamsMaker.Api.Controllers.JoinRequests;
 [Authorize]
 public class DeleteJoinRequestEndpoint(IJoinRequestService joinRequestService) : BaseApiController
 {
-    [Tags("join Request")]
+    [Tags("join_request")]
     [HttpDelete("join_request/{id}")]
     public async Task<IActionResult> JoinRequest(Guid id, CancellationToken ct)
     {
