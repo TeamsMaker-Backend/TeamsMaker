@@ -33,6 +33,8 @@ services:
     restart: always
     depends_on:
       - teams-maker-db
+    env_file:
+      - .env
 # Volumes
 volumes:
   sqldata:
