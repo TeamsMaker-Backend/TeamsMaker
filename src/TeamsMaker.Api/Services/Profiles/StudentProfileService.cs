@@ -83,7 +83,7 @@ public class StudentProfileService
                 .SingleOrDefaultAsync(st => st.Id == userInfo.UserId, ct) ??
                 throw new ArgumentException("Invalid ID!");
 
-        profileUtilities.UpdateUserDataAsync(student, profileRequest, Path.Combine(host.WebRootPath, BaseTypes.Student), ct);
+        await profileUtilities.UpdateUserDataAsync(student, profileRequest, Path.Combine(host.WebRootPath, BaseTypes.Student), ct);
 
         await db.SaveChangesAsync(ct);
     }

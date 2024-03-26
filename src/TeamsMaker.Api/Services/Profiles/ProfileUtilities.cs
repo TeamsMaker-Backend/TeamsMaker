@@ -176,7 +176,7 @@ public class ProfileUtilities //TODO: [Refactor] remove dublicates - Urgent
         response.OtherStaffInfo = otherStaffInfo;
     }
 
-    public async void UpdateUserDataAsync(User user, UpdateProfileRequest request, string folder, CancellationToken ct)
+    public async Task UpdateUserDataAsync(User user, UpdateProfileRequest request, string folder, CancellationToken ct)
     {
         user.FirstName = request.FirstName;
         user.LastName = request.LastName;

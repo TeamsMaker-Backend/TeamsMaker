@@ -57,7 +57,7 @@ public class StaffProfileService
             .SingleOrDefaultAsync(st => st.Id == userInfo.UserId, ct) ??
             throw new ArgumentException("Invalid ID!");
 
-        profileUtilities.UpdateUserDataAsync(staff, profileRequest, Path.Combine(host.WebRootPath, BaseTypes.Staff), ct);
+        await profileUtilities.UpdateUserDataAsync(staff, profileRequest, Path.Combine(host.WebRootPath, BaseTypes.Staff), ct);
 
         await db.SaveChangesAsync(ct);
     }
