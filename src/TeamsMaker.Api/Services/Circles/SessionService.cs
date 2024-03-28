@@ -1,20 +1,29 @@
 ﻿using Core.Generics;
 
+using DataAccess.Base.Interfaces;
+
 using TeamsMaker.Api.Contracts.QueryStringParameters;
 using TeamsMaker.Api.Contracts.Requests.Session;
 using TeamsMaker.Api.Contracts.Responses.Session;
+using TeamsMaker.Api.Core.Enums;
 using TeamsMaker.Api.DataAccess.Context;
 using TeamsMaker.Api.Services.Circles.Interfaces;
 
 namespace TeamsMaker.Api.Services.Circles;
 
-public class SessionService(AppDBContext db) : ISessionService
+public class SessionService
+    (AppDBContext db, IUserInfo userInfo, ICircleValidationService validationService) : ISessionService
 {
     public async Task<Guid> AddAsync(Guid circleId, AddSessionRequest request, CancellationToken ct)
     {
         var circle = await db.Circles
-        .FindAsync([circleId], ct) ??
-        throw new ArgumentException("Invalid Circle ID");
+            .Include(c => c.DefaultPermission)
+            .SingleOrDefaultAsync(c => c.Id == circleId, ct) ??
+            throw new ArgumentException("Invalid Circle ID");
+
+        var circleMember = await validationService.TryGetCircleMemberAsync(userInfo.UserId, circleId, ct);
+
+        validationService.CheckPermission(circleMember, circle, PermissionsEnum.SessionManagement);
 
         var session = new Session
         {
@@ -56,8 +65,15 @@ public class SessionService(AppDBContext db) : ISessionService
 
     public async Task UpdateInfoAsync(Guid id, UpdateSessionInfoRequest request, CancellationToken ct)
     {
-        var session = await db.Sessions.FindAsync([id], ct) ??
+        var session = await db.Sessions
+            .Include(s => s.Circle)
+                .ThenInclude(c => c.DefaultPermission)
+            .SingleOrDefaultAsync(s => s.Id == id, ct) ??
             throw new ArgumentException("Invalid Session Id");
+
+        var circleMember = await validationService.TryGetCircleMemberAsync(userInfo.UserId, session.CircleId, ct);
+
+        validationService.CheckPermission(circleMember, session.Circle, PermissionsEnum.SessionManagement);
 
         session.Title = request.Title;
         session.Notes = request.Notes;
@@ -69,8 +85,15 @@ public class SessionService(AppDBContext db) : ISessionService
 
     public async Task UpdateStatusAsync(Guid id, SessionStatus status, CancellationToken ct)
     {
-        var session = await db.Sessions.FindAsync([id], ct) ??
+        var session = await db.Sessions
+            .Include(s => s.Circle)
+                .ThenInclude(c => c.DefaultPermission)
+            .SingleOrDefaultAsync(s => s.Id == id, ct) ??
             throw new ArgumentException("Invalid Session Id");
+
+        var circleMember = await validationService.TryGetCircleMemberAsync(userInfo.UserId, session.CircleId, ct);
+
+        validationService.CheckPermission(circleMember, session.Circle, PermissionsEnum.SessionManagement);
 
         session.Status = status;
 
@@ -80,9 +103,15 @@ public class SessionService(AppDBContext db) : ISessionService
     public async Task DeleteAsync(Guid id, CancellationToken ct)
     {
         var session = await db.Sessions
+            .Include(s => s.Circle)
+                .ThenInclude(c => c.DefaultPermission)
             .Include(s => s.TodoTasks)
             .SingleOrDefaultAsync(s => s.Id == id, ct) ??
             throw new ArgumentException("Invalid Session Id");
+
+        var circleMember = await validationService.TryGetCircleMemberAsync(userInfo.UserId, session.CircleId, ct);
+
+        validationService.CheckPermission(circleMember, session.Circle, PermissionsEnum.SessionManagement);
 
         session.TodoTasks = [];
         db.Sessions.Remove(session);

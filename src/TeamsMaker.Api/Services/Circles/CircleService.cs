@@ -85,7 +85,9 @@ public class CircleService
                 CircleManagment = circle.DefaultPermission.CircleManagment,
                 MemberManagement = circle.DefaultPermission.MemberManagement,
                 ProposalManagment = circle.DefaultPermission.ProposalManagment,
-                FeedManagment = circle.DefaultPermission.FeedManagment
+                FeedManagment = circle.DefaultPermission.FeedManagment,
+                SessionManagment = circle.DefaultPermission.SessionManagment,
+                TodoTaskManagment = circle.DefaultPermission.TodoTaskManagment
             };
         }
 
@@ -114,7 +116,9 @@ public class CircleService
                         CircleManagment = cm.ExceptionPermission.CircleManagment,
                         FeedManagment = cm.ExceptionPermission.FeedManagment,
                         MemberManagement = cm.ExceptionPermission.MemberManagement,
-                        ProposalManagment = cm.ExceptionPermission.ProposalManagment
+                        ProposalManagment = cm.ExceptionPermission.ProposalManagment,
+                        SessionManagment = cm.ExceptionPermission.SessionManagment,
+                        TodoTaskManagment = cm.ExceptionPermission.TodoTaskManagment
                     }
                 }).ToList()
         };
@@ -210,7 +214,9 @@ public class CircleService
             CircleManagment = request.CircleManagment,
             MemberManagement = request.MemberManagement,
             ProposalManagment = request.ProposalManagment,
-            FeedManagment = request.FeedManagment
+            FeedManagment = request.FeedManagment,
+            SessionManagment = request.SessionManagment,
+            TodoTaskManagment = request.TodoTaskManagment
         };
 
         await db.SaveChangesAsync(ct);

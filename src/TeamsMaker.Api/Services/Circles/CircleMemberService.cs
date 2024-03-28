@@ -96,7 +96,9 @@ public class CircleMemberService
             CircleManagment = request.CircleManagment,
             MemberManagement = request.MemberManagement,
             ProposalManagment = request.ProposalManagment,
-            FeedManagment = request.FeedManagment
+            FeedManagment = request.FeedManagment,
+            SessionManagment = request.SessionManagment,
+            TodoTaskManagment = request.TodoTaskManagment
         } : null;
 
         await db.SaveChangesAsync(ct);

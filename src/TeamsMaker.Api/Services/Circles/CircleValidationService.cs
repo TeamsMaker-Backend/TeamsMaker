@@ -43,6 +43,8 @@ public class CircleValidationService(AppDBContext db) : ICircleValidationService
             PermissionsEnum.MemberManagement => userPermission.MemberManagement,
             PermissionsEnum.ProposalManagement => userPermission.ProposalManagment,
             PermissionsEnum.FeedManagement => userPermission.FeedManagment,
+            PermissionsEnum.SessionManagement => userPermission.SessionManagment,
+            PermissionsEnum.TodoTaskManagement => userPermission.TodoTaskManagment,
             _ => false,
         };
 }

@@ -20,4 +20,6 @@ public class PermissionsInfo
     public bool CircleManagment { get; set; }
     public bool ProposalManagment { get; set; }
     public bool FeedManagment { get; set; }
+    public bool SessionManagment { get; set; }
+    public bool TodoTaskManagment { get; set; }
 }
