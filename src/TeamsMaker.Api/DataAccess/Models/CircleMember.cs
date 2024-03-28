@@ -4,7 +4,7 @@ namespace TeamsMaker.Api.DataAccess.Models;
 
 public class CircleMember : BaseEntity<Guid>
 {
-    public bool IsOwner { get; set; }
+    public bool IsOwner { get; set; } = false;
     public string? Badge { get; set; } // add all padges as a string, sepreated by comma ','
 
     public virtual Permission? ExceptionPermission { get; set; }

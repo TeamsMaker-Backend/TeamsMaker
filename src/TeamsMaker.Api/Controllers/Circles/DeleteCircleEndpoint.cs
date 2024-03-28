@@ -8,7 +8,7 @@ namespace TeamsMaker.Api.Controllers.Circles;
 [Authorize]
 public class DeleteCircleEndpoint(ICircleService circleService) : BaseApiController
 {
-    [Tags("circles/permissions/danger_zone")]
+    [Tags("circles/danger_zone")]
     [HttpDelete("circles/{circleId}")]
     public async Task<IActionResult> Circle(Guid circleId, CancellationToken ct)
     {

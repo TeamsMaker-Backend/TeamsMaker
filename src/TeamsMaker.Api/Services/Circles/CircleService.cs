@@ -30,26 +30,19 @@ public class CircleService
             Name = request.Name,
             Description = request.Description,
             Summary = request.Summary,
-            DefaultPermission = new Permission
-            {
-                CircleManagment = request.DefaultPermission.CircleManagment,
-                MemberManagement = request.DefaultPermission.MemberManagement,
-                ProposalManagment = request.DefaultPermission.ProposalManagment,
-                FeedManagment = request.DefaultPermission.FeedManagment
-            },
+            DefaultPermission = new Permission(),
             CircleMembers = [
                 new CircleMember
                 {
                     UserId = userInfo.UserId,
                     IsOwner = true
                 }
-            ]
+            ],
+            Skills = request.Skills?.Select(s => new Skill { Name = s }).ToList() ?? [],
+            Links = request.Links?.Select(l => new Link { Url = l.Url, Type = l.Type }).ToList() ?? []
         };
+
         await db.Circles.AddAsync(circle, ct);
-
-        circle.Skills = request.Skills?.Select(s => new Skill { CircleId = circle.Id, Name = s }).ToList() ?? [];
-        circle.Links = request.Links?.Select(l => new Link { CircleId = circle.Id, Url = l.Url, Type = l.Type }).ToList() ?? [];
-
         await db.SaveChangesAsync(ct);
 
         return circle.Id;
@@ -68,6 +61,7 @@ public class CircleService
 
         var response = new GetCircleResponse
         {
+            Id = circle.Id,
             Name = circle.Name,
             Description = circle.Description,
             IsPublic = circle.Summary?.IsPublic ?? false,
@@ -111,10 +105,11 @@ public class CircleService
             Members = circle.CircleMembers
                 .Select(cm => new CircleMemberInfo
                 {
+                    CircleMemberId = cm.Id,
                     UserId = cm.UserId,
                     IsOwner = cm.IsOwner,
                     Badge = cm.Badge,
-                    Permissions = cm.ExceptionPermission == null ? null : new PermissionsInfo
+                    ExceptionPermissions = cm.ExceptionPermission == null ? null : new PermissionsInfo
                     {
                         CircleManagment = cm.ExceptionPermission.CircleManagment,
                         FeedManagment = cm.ExceptionPermission.FeedManagment,
@@ -139,7 +134,7 @@ public class CircleService
             .SingleOrDefaultAsync(c => c.Id == circleId, ct) ??
             throw new ArgumentException("Invalid Circle ID");
 
-        validationService.HasPermission(circleMember, circle, PermissionsEnum.CircleManagement);
+        validationService.CheckPermission(circleMember, circle, PermissionsEnum.CircleManagement);
 
         circle.Name = request.Name;
         circle.Description = request.Description;
@@ -171,7 +166,7 @@ public class CircleService
             .SingleOrDefaultAsync(c => c.Id == circleId, ct) ??
             throw new ArgumentException("Invalid Circle ID");
 
-        validationService.HasPermission(circleMember, circle, PermissionsEnum.CircleManagement);
+        validationService.CheckPermission(circleMember, circle, PermissionsEnum.CircleManagement);
 
         db.Links.RemoveRange(circle.Links);
         circle.Links = request.Links?.Select(l => new Link { CircleId = circleId, Url = l.Url, Type = l.Type }).ToList() ?? [];
@@ -189,7 +184,7 @@ public class CircleService
             .SingleOrDefaultAsync(c => c.Id == circleId, ct) ??
             throw new ArgumentException("Invalid Circle ID");
 
-        validationService.HasPermission(circleMember, circle, PermissionsEnum.CircleManagement);
+        validationService.CheckPermission(circleMember, circle, PermissionsEnum.CircleManagement);
 
         if (circle.Summary != null)
             circle.Summary.IsPublic = isPublic;
@@ -255,6 +250,7 @@ public class CircleService
         var circle = await db.Circles
             .Include(c => c.CircleMembers)
                 .ThenInclude(cm => cm.ExceptionPermission)
+            .Include(c => c.DefaultPermission)
             .Include(c => c.Links)
             .Include(c => c.Skills)
             .Include(c => c.Invitions)
@@ -269,6 +265,8 @@ public class CircleService
             circle.CircleMembers
                 .Select(cm => cm.ExceptionPermission)
                 .Where(p => p != null)!);
+
+        db.Permissions.Remove(circle.DefaultPermission);
 
         db.CircleMembers.RemoveRange(circle.CircleMembers);
 

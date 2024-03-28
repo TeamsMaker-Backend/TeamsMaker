@@ -13,17 +13,18 @@ public class AddJoinRequestEndpoint(IJoinRequestService joinRequestService) : Ba
     [HttpPost("join_request")]
     public async Task<IActionResult> JoinRequest(AddJoinRequest request, CancellationToken ct)
     {
+        Guid joinRequestId;
 
         try
         {
-            await joinRequestService.AddAsync(request, ct);
+            joinRequestId = await joinRequestService.AddAsync(request, ct);
         }
         catch (ArgumentException e)
         {
             return NotFound(_response.FailureResponse(e.Message));
         }
 
-        return Ok();
+        return Created("", _response.SuccessResponse(new { joinRequestId }));
     }
 
 }

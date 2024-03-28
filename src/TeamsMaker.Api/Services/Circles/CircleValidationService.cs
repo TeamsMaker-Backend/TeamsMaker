@@ -23,10 +23,10 @@ public class CircleValidationService(AppDBContext db) : ICircleValidationService
         return circleMember;
     }
 
-    public bool HasPermission(CircleMember circleMember, Circle circle, PermissionsEnum permission)
+    public void CheckPermission(CircleMember circleMember, Circle circle, PermissionsEnum permission)
     {
         if (circleMember.IsOwner)
-            return true;
+            return;
 
         if (circleMember.ExceptionPermission is not null &&
             !IsOn(circleMember.ExceptionPermission, permission))
@@ -34,8 +34,6 @@ public class CircleValidationService(AppDBContext db) : ICircleValidationService
 
         if (!IsOn(circle.DefaultPermission, permission))
             throw new ArgumentException("Donot Have The Permission");
-
-        return true;
     }
 
     public bool IsOn(Permission userPermission, PermissionsEnum permissionToCheck)

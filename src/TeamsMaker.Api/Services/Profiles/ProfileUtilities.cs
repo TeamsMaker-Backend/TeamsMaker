@@ -1,15 +1,15 @@
-﻿using TeamsMaker.Api.Contracts.Requests.Profile;
+﻿using TeamsMaker.Api.Contracts.Requests.File;
+using TeamsMaker.Api.Contracts.Requests.Profile;
 using TeamsMaker.Api.Contracts.Responses.JoinRequest;
 using TeamsMaker.Api.Contracts.Responses.Profile;
 using TeamsMaker.Api.Core.Consts;
 using TeamsMaker.Api.DataAccess.Context;
 using TeamsMaker.Api.Services.Files.Interfaces;
-using TeamsMaker.Api.Services.Storage.Interfacecs;
 using TeamsMaker.Core.Enums;
 namespace TeamsMaker.Api.Services.Profiles;
 
 public class ProfileUtilities //TODO: [Refactor] remove dublicates - Urgent
-    (AppDBContext db, IStorageService storageService, IServiceProvider serviceProvider)
+    (AppDBContext db, IServiceProvider serviceProvider)
 {
     public void GetUserData(User user, GetProfileResponse response)
     {
@@ -189,19 +189,18 @@ public class ProfileUtilities //TODO: [Refactor] remove dublicates - Urgent
         db.Links.RemoveRange(user.Links);
         user.Links = request.Links?.Select(l => new Link { UserId = user.Id, Url = l.Url, Type = l.Type }).ToList() ?? [];
 
-        user.Avatar = await storageService.UpdateFileAsync(user.Avatar?.Name, request.Avatar, CreateName(FileTypes.Avatar, request.Avatar?.FileName),
-            Path.Combine(folder, user.Id), ct);
+        var fileService = serviceProvider.GetRequiredKeyedService<IFileService>(GetBaseType(user));
 
-        user.Header = await storageService.UpdateFileAsync(user.Header?.Name, request.Header, CreateName(FileTypes.Header, request.Header?.FileName),
-            Path.Combine(folder, user.Id), ct);
+        await fileService
+            .UpdateFileAsync(user.Id, FileTypes.Avatar, new UpdateFileRequest { File = request.Avatar }, ct);
+
+        await fileService
+            .UpdateFileAsync(user.Id, FileTypes.Header, new UpdateFileRequest { File = request.Header }, ct);
 
         if (user is Student student)
-            student.CV = await storageService.UpdateFileAsync(student.CV?.Name, request.CV, CreateName(FileTypes.CV, request.CV?.FileName),
-                Path.Combine(folder, student.Id), ct);
+            await fileService
+                .UpdateFileAsync(student.Id, FileTypes.CV, new UpdateFileRequest { File = request.CV }, ct);
     }
-
-    private static string CreateName(string fileType, string? file)
-        => $"{fileType}{Path.GetExtension(file)}";
 
     private static string? GetBaseType(User user)
         => user is Student ? BaseTypes.Student : BaseTypes.Staff;

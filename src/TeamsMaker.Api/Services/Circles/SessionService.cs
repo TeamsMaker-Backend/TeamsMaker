@@ -10,10 +10,10 @@ namespace TeamsMaker.Api.Services.Circles;
 
 public class SessionService(AppDBContext db) : ISessionService
 {
-    public async Task<Guid> AddAsync(AddSessionRequest request, CancellationToken ct)
+    public async Task<Guid> AddAsync(Guid circleId, AddSessionRequest request, CancellationToken ct)
     {
         var circle = await db.Circles
-        .FindAsync([request.CircleId], ct) ??
+        .FindAsync([circleId], ct) ??
         throw new ArgumentException("Invalid Circle ID");
 
         var session = new Session
@@ -23,8 +23,6 @@ public class SessionService(AppDBContext db) : ISessionService
             Status = request.Status ?? SessionStatus.Upcoming,
             Date = request.Date,
             Time = request.Time,
-
-            CircleId = request.CircleId,
         };
 
         circle.Sessions.Add(session);
@@ -81,9 +79,12 @@ public class SessionService(AppDBContext db) : ISessionService
 
     public async Task DeleteAsync(Guid id, CancellationToken ct)
     {
-        var session = await db.Sessions.FindAsync([id], ct) ??
+        var session = await db.Sessions
+            .Include(s => s.TodoTasks)
+            .SingleOrDefaultAsync(s => s.Id == id, ct) ??
             throw new ArgumentException("Invalid Session Id");
 
+        session.TodoTasks = [];
         db.Sessions.Remove(session);
 
         await db.SaveChangesAsync(ct);

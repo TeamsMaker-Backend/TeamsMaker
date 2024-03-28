@@ -17,7 +17,7 @@ public class JoinRequestService
 {
     private readonly IFileService _fileService = serviceProvider.GetRequiredKeyedService<IFileService>(BaseTypes.Circle);
 
-    public async Task AddAsync(AddJoinRequest request, CancellationToken ct)
+    public async Task<Guid> AddAsync(AddJoinRequest request, CancellationToken ct)
     {
         var studentId = await db.Students.FindAsync([request.StudentId], ct) ??
             throw new ArgumentException("Invalid User Id");
@@ -27,13 +27,13 @@ public class JoinRequestService
             .SingleOrDefaultAsync(c => c.Id == request.CircleId, ct) ??
             throw new ArgumentException("Invalid CircleId");
 
-        if (!request.EntityType.Equals(InvitationTypes.Circle, StringComparison.CurrentCultureIgnoreCase) ||
-            !request.EntityType.Equals(InvitationTypes.Student, StringComparison.CurrentCultureIgnoreCase))
-            throw new ArgumentException("Invalid Entity Type");
+        if (!request.SenderType.Equals(InvitationTypes.Circle, StringComparison.CurrentCultureIgnoreCase) &&
+            !request.SenderType.Equals(InvitationTypes.Student, StringComparison.CurrentCultureIgnoreCase))
+            throw new ArgumentException("Invalid Sender Type");
 
         var joinRequest = new JoinRequest
         {
-            Sender = request.EntityType,
+            Sender = request.SenderType,
             IsAccepted = false,
             StudentId = request.StudentId,
             CircleId = request.CircleId,
@@ -44,16 +44,17 @@ public class JoinRequestService
         {
             // Check wether the circle member have a permission to send an invitition or not
             var circleMember = await validationService.TryGetCircleMemberAsync(userInfo.UserId, joinRequest.CircleId, ct);
-            validationService.HasPermission(circleMember, circle, PermissionsEnum.MemberManagement);
+            validationService.CheckPermission(circleMember, circle, PermissionsEnum.MemberManagement);
         }
 
-        // Todo: In case of sender is a student
         // check the student wether in a circle or not
         else if (await db.CircleMembers.AnyAsync(cm => cm.UserId == joinRequest.StudentId, ct))
             throw new ArgumentException("Cannot send a join request while you are a circle member");
 
         await db.JoinRequests.AddAsync(joinRequest, ct);
         await db.SaveChangesAsync(ct);
+
+        return joinRequest.Id;
     }
 
     public async Task<List<GetCircleJoinRequestResponse>> GetAsync(string id, CancellationToken ct)
@@ -96,7 +97,7 @@ public class JoinRequestService
                 .SingleOrDefaultAsync(c => c.Id == joinRequest.CircleId, ct) ??
                 throw new ArgumentException("Invalid CircleId");
 
-            validationService.HasPermission(circleMember, circle, PermissionsEnum.MemberManagement);
+            validationService.CheckPermission(circleMember, circle, PermissionsEnum.MemberManagement);
         }
 
         await db.SaveChangesAsync(ct);
@@ -126,7 +127,7 @@ public class JoinRequestService
                 .SingleOrDefaultAsync(c => c.Id == joinRequest.CircleId, ct) ??
                 throw new ArgumentException("Invalid CircleId");
 
-            validationService.HasPermission(circleMember, circle, PermissionsEnum.MemberManagement);
+            validationService.CheckPermission(circleMember, circle, PermissionsEnum.MemberManagement);
         }
 
         await db.SaveChangesAsync(ct);

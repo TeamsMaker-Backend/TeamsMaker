@@ -10,11 +10,16 @@ namespace TeamsMaker.Api.Controllers.Circles;
 
 public class TodoTaskSerevice(AppDBContext db) : ITodoTaskService
 {
-    public async Task<Guid> AddAsync(AddTodoTaskRequest request, CancellationToken ct)
+    public async Task<Guid> AddAsync(Guid circleId, AddTodoTaskRequest request, CancellationToken ct)
     {
         var circle = await db.Circles
-            .FindAsync([request.CircleId], ct) ??
+            .Include(c => c.Sessions)
+            .SingleOrDefaultAsync(c => c.Id == circleId, ct) ??
             throw new ArgumentException("Invalid Circle ID");
+
+        if (request.SessionId != null && !circle.Sessions.Any(s => s.Id == request.SessionId))
+            throw new ArgumentException("Invalid Session ID");
+
 
         var todoTask = new TodoTask
         {
@@ -23,7 +28,6 @@ public class TodoTaskSerevice(AppDBContext db) : ITodoTaskService
             Status = request.Status ?? TodoTaskStatus.NotStarted,
             DeadLine = request.DeadLine,
 
-            CircleId = request.CircleId,
             SessionId = request.SessionId
         };
 
