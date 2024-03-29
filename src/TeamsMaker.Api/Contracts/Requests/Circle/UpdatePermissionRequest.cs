@@ -6,4 +6,6 @@ public class UpdatePermissionRequest
     public bool CircleManagment { get; init; }
     public bool ProposalManagment { get; init; }
     public bool FeedManagment { get; init; }
+    public bool SessionManagment { get; init; }
+    public bool TodoTaskManagment { get; init; }
 }

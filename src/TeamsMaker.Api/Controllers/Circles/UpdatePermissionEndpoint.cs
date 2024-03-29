@@ -9,7 +9,7 @@ namespace TeamsMaker.Api.Controllers.Circles;
 [Authorize]
 public class UpdatePermissionEndpoint(IServiceProvider serviceProvider) : BaseApiController
 {
-    [Tags("circles/permissions/danger_zone")]
+    [Tags("circles/danger_zone")]
     [HttpPut("circles/permissions/{baseType}/{entityId}")]
     public async Task<IActionResult> Permission(string baseType, Guid entityId, UpdatePermissionRequest? request, CancellationToken ct)
     {

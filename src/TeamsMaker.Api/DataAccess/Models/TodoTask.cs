@@ -12,6 +12,6 @@ public class TodoTask : TrackedEntity<Guid>
     public Guid? SessionId { get; set; }
     public virtual Session? Session { get; set; }
 
-    public Guid? CircleId { get; set; }
-    public virtual Circle? Circle { get; set; }
+    public Guid CircleId { get; set; }
+    public virtual Circle Circle { get; set; } = null!;
 }

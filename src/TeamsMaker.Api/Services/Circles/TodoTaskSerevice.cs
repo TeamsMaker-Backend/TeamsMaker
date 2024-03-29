@@ -1,20 +1,33 @@
 ﻿using Core.Generics;
 
+using DataAccess.Base.Interfaces;
+
 using TeamsMaker.Api.Contracts.QueryStringParameters;
 using TeamsMaker.Api.Contracts.Requests.TodoTask;
 using TeamsMaker.Api.Contracts.Responses.TodoTask;
+using TeamsMaker.Api.Core.Enums;
 using TeamsMaker.Api.DataAccess.Context;
 using TeamsMaker.Api.Services.Circles.Interfaces;
 
 namespace TeamsMaker.Api.Controllers.Circles;
 
-public class TodoTaskSerevice(AppDBContext db) : ITodoTaskService
+public class TodoTaskSerevice
+    (AppDBContext db, IUserInfo userInfo, ICircleValidationService validationService) : ITodoTaskService
 {
-    public async Task<Guid> AddAsync(AddTodoTaskRequest request, CancellationToken ct)
+    public async Task<Guid> AddAsync(Guid circleId, AddTodoTaskRequest request, CancellationToken ct)
     {
         var circle = await db.Circles
-            .FindAsync([request.CircleId], ct) ??
+            .Include(c => c.DefaultPermission)
+            .Include(c => c.Sessions)
+            .SingleOrDefaultAsync(c => c.Id == circleId, ct) ??
             throw new ArgumentException("Invalid Circle ID");
+
+        if (request.SessionId != null && !circle.Sessions.Any(s => s.Id == request.SessionId))
+            throw new ArgumentException("Invalid Session ID");
+
+        var circleMember = await validationService.TryGetCircleMemberAsync(userInfo.UserId, circleId, ct);
+
+        validationService.CheckPermission(circleMember, circle, PermissionsEnum.TodoTaskManagement);
 
         var todoTask = new TodoTask
         {
@@ -23,7 +36,6 @@ public class TodoTaskSerevice(AppDBContext db) : ITodoTaskService
             Status = request.Status ?? TodoTaskStatus.NotStarted,
             DeadLine = request.DeadLine,
 
-            CircleId = request.CircleId,
             SessionId = request.SessionId
         };
 
@@ -63,8 +75,15 @@ public class TodoTaskSerevice(AppDBContext db) : ITodoTaskService
 
     public async Task UpdateInfoAsync(Guid id, UpdateTodoTaskInfoRequest request, CancellationToken ct)
     {
-        var todoTask = await db.TodoTasks.FindAsync([id], ct) ??
+        var todoTask = await db.TodoTasks
+            .Include(td => td.Circle)
+                .ThenInclude(c => c.DefaultPermission)
+            .SingleOrDefaultAsync(td => td.Id == id, ct) ??
             throw new ArgumentException("Invalid Todo Task Id");
+
+        var circleMember = await validationService.TryGetCircleMemberAsync(userInfo.UserId, todoTask.CircleId, ct);
+
+        validationService.CheckPermission(circleMember, todoTask.Circle, PermissionsEnum.TodoTaskManagement);
 
         todoTask.Title = request.Title;
         todoTask.Notes = request.Notes;
@@ -77,8 +96,14 @@ public class TodoTaskSerevice(AppDBContext db) : ITodoTaskService
     public async Task UpdateStatusAsync(Guid id, TodoTaskStatus status, CancellationToken ct)
     {
         var todoTask = await db.TodoTasks
+            .Include(td => td.Circle)
+                .ThenInclude(c => c.DefaultPermission)
             .SingleOrDefaultAsync(td => td.Id == id, ct) ??
             throw new ArgumentException("Invalid Todo Task Id");
+
+        var circleMember = await validationService.TryGetCircleMemberAsync(userInfo.UserId, todoTask.CircleId, ct);
+
+        validationService.CheckPermission(circleMember, todoTask.Circle, PermissionsEnum.TodoTaskManagement);
 
         todoTask.Status = status;
 
@@ -87,8 +112,15 @@ public class TodoTaskSerevice(AppDBContext db) : ITodoTaskService
 
     public async Task DeleteAsync(Guid id, CancellationToken ct)
     {
-        var todoTask = await db.TodoTasks.FindAsync([id], ct) ??
+        var todoTask = await db.TodoTasks
+            .Include(td => td.Circle)
+                .ThenInclude(c => c.DefaultPermission)
+            .SingleOrDefaultAsync(td => td.Id == id, ct) ??
             throw new ArgumentException("Invalid Todo Task Id");
+
+        var circleMember = await validationService.TryGetCircleMemberAsync(userInfo.UserId, todoTask.CircleId, ct);
+
+        validationService.CheckPermission(circleMember, todoTask.Circle, PermissionsEnum.TodoTaskManagement);
 
         db.TodoTasks.Remove(todoTask);
 

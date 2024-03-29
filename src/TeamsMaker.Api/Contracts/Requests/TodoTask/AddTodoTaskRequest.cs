@@ -6,6 +6,5 @@ public class AddTodoTaskRequest
     public string? Notes { get; init; }
     public TodoTaskStatus? Status { get; init; }
     public required DateOnly DeadLine { get; init; }
-    public required Guid CircleId { get; init; }
     public Guid? SessionId { get; init; }
 }

@@ -15,18 +15,22 @@ public class CircleMemberService
         if (!await db.Users.AnyAsync(s => s.Id == userId, ct))
             throw new ArgumentException("Invalid Student Id");
 
+        var circleMember = await validationService.TryGetCircleMemberAsync(userInfo.UserId, circleId, ct);
+
         var circle = await db.Circles
+            .Include(c => c.DefaultPermission)
             .Include(c => c.CircleMembers)
             .SingleOrDefaultAsync(c => c.Id == circleId, ct) ??
             throw new ArgumentException("Invalid Circle Id");
+
+        validationService.CheckPermission(circleMember, circle, PermissionsEnum.MemberManagement);
 
         if (await db.CircleMembers.AnyAsync(cm => cm.UserId == userId, ct))
             throw new ArgumentException("Student Cannot Be In Two Circles");
 
         circle.CircleMembers.Add(new CircleMember
         {
-            UserId = userId,
-            IsOwner = false,
+            UserId = userId
         });
 
         await db.SaveChangesAsync(ct);
@@ -34,42 +38,41 @@ public class CircleMemberService
 
     public async Task RemoveAsync(Guid circleMemberId, CancellationToken ct)
     {
-        var circleMember = await db.CircleMembers
+        var removedCircleMember = await db.CircleMembers
             .FindAsync([circleMemberId], ct) ??
             throw new ArgumentException("Not a circle Member");
 
+        var currentCircleMember = await validationService.TryGetCircleMemberAsync(userInfo.UserId, removedCircleMember.CircleId, ct);
+
         var circle = await db.Circles
             .Include(c => c.DefaultPermission)
-            .SingleOrDefaultAsync(c => c.Id == circleMember.CircleId, ct) ??
+            .SingleOrDefaultAsync(c => c.Id == removedCircleMember.CircleId, ct) ??
             throw new ArgumentException("Invalid Circle ID");
 
-        // Hasnot Permission to remove a circle member
-        if (userInfo.UserId != circleMember.UserId &&
-        !validationService.HasPermission(circleMember, circle, PermissionsEnum.MemberManagement))
-            throw new ArgumentException("Donot Have The Permission!");
+        if (userInfo.UserId != removedCircleMember.UserId) // leaves (removes himself)
+            validationService.CheckPermission(currentCircleMember, circle, PermissionsEnum.MemberManagement);
 
-        db.CircleMembers.Remove(circleMember);
+        db.CircleMembers.Remove(removedCircleMember);
 
         await db.SaveChangesAsync(ct);
     }
 
     public async Task UpdateBadgeAsync(Guid circleMemberId, string? badge, CancellationToken ct)
     {
-        var circleMember = await db.CircleMembers
+        var updatedCircleMember = await db.CircleMembers
             .FindAsync([circleMemberId], ct) ??
             throw new ArgumentException("Not a circle Member");
 
+        var currentCircleMember = await validationService.TryGetCircleMemberAsync(userInfo.UserId, updatedCircleMember.CircleId, ct);
+
         var circle = await db.Circles
             .Include(c => c.DefaultPermission)
-            .SingleOrDefaultAsync(c => c.Id == circleMember.CircleId, ct) ??
+            .SingleOrDefaultAsync(c => c.Id == updatedCircleMember.CircleId, ct) ??
             throw new ArgumentException("Invalid Circle ID");
 
-        // Hasnot Permission to update a circle member
-        if (userInfo.UserId != circleMember.UserId &&
-        !validationService.HasPermission(circleMember, circle, PermissionsEnum.MemberManagement))
-            throw new ArgumentException("Donot Have The Permission!");
+        validationService.CheckPermission(currentCircleMember, circle, PermissionsEnum.MemberManagement);
 
-        circleMember.Badge = badge; // Todo: string splitting ','
+        updatedCircleMember.Badge = badge; // Todo: string splitting ','
 
         await db.SaveChangesAsync(ct);
     }
@@ -93,7 +96,9 @@ public class CircleMemberService
             CircleManagment = request.CircleManagment,
             MemberManagement = request.MemberManagement,
             ProposalManagment = request.ProposalManagment,
-            FeedManagment = request.FeedManagment
+            FeedManagment = request.FeedManagment,
+            SessionManagment = request.SessionManagment,
+            TodoTaskManagment = request.TodoTaskManagment
         } : null;
 
         await db.SaveChangesAsync(ct);

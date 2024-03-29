@@ -8,6 +8,8 @@ public class Permission : BaseEntity<int>
     public bool CircleManagment { get; set; } = false;
     public bool ProposalManagment { get; set; } = false;
     public bool FeedManagment { get; set; } = false;
+    public bool SessionManagment { get; set; } = false;
+    public bool TodoTaskManagment { get; set; } = false;
 
     public Guid? CircleId { get; set; }
     public virtual Circle? Circle { get; set; } = null!;

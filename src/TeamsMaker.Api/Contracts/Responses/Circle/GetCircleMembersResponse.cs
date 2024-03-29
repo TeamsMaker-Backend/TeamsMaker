@@ -7,10 +7,11 @@ public class GetCircleMembersResponse
 
 public class CircleMemberInfo
 {
+    public Guid CircleMemberId { get; set; }
     public string UserId { get; set; } = null!;
     public bool IsOwner { get; set; }
     public string? Badge { get; set; }
-    public PermissionsInfo? Permissions { get; set; } = null!;
+    public PermissionsInfo? ExceptionPermissions { get; set; } = null!;
 }
 
 public class PermissionsInfo
@@ -19,4 +20,6 @@ public class PermissionsInfo
     public bool CircleManagment { get; set; }
     public bool ProposalManagment { get; set; }
     public bool FeedManagment { get; set; }
+    public bool SessionManagment { get; set; }
+    public bool TodoTaskManagment { get; set; }
 }

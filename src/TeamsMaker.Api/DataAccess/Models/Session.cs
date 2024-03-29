@@ -12,6 +12,6 @@ public class Session : TrackedEntity<Guid>
 
     public virtual ICollection<TodoTask> TodoTasks { get; set; } = [];
 
-    public Guid? CircleId { get; set; }
-    public virtual Circle? Circle { get; set; }
+    public Guid CircleId { get; set; }
+    public virtual Circle Circle { get; set; } = null!;
 }

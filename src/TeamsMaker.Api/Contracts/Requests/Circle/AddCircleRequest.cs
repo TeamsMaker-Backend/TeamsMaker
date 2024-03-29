@@ -1,6 +1,5 @@
 ﻿using Core.ValueObjects;
 
-using TeamsMaker.Api.Contracts.Responses.Circle;
 using TeamsMaker.Api.Contracts.Responses.Profile;
 
 namespace TeamsMaker.Api.Contracts.Requests.Circle;
@@ -12,5 +11,4 @@ public class AddCircleRequest
     public SummaryData? Summary { get; init; }
     public ICollection<LinkInfo>? Links { get; init; }
     public ICollection<string>? Skills { get; init; }
-    public required PermissionsInfo DefaultPermission { get; init; }
 }
