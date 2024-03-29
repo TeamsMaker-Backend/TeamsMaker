@@ -14,7 +14,7 @@ public class UpdateCircleOwnershipEndpoint(ICircleService circleService) : BaseA
     {
         try
         {
-            await circleService.ChangeOwnershipAsync(circleId, newOwnerId, ct);
+            await circleService.TransferOwnershipAsync(circleId, newOwnerId, ct);
         }
         catch (ArgumentException e)
         {

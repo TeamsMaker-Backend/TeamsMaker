@@ -29,7 +29,7 @@ public class CircleService
         {
             Name = request.Name,
             Description = request.Description,
-            Summary = request.Summary,
+            SummaryData = request.Summary,
             DefaultPermission = new Permission(),
             CircleMembers = [
                 new CircleMember
@@ -53,7 +53,7 @@ public class CircleService
         var circle = await db.Circles
             .Include(c => c.DefaultPermission)
             .Include(c => c.Skills)
-            .Include(c => c.Summary)
+            .Include(c => c.SummaryData)
             .Include(c => c.Links)
             .Include(c => c.CircleMembers)
             .SingleOrDefaultAsync(c => c.Id == circleId, ct) ??
@@ -64,7 +64,7 @@ public class CircleService
             Id = circle.Id,
             Name = circle.Name,
             Description = circle.Description,
-            IsPublic = circle.Summary?.IsPublic ?? false,
+            IsPublic = circle.SummaryData?.IsPublic ?? false,
             Rate = circle.Rate,
             Status = circle.Status,
             OrganizationId = circle.OrganizationId,
@@ -78,7 +78,7 @@ public class CircleService
 
         if (circle.CircleMembers.Any(cm => cm.UserId == userInfo.UserId))
         {
-            response.Summary = circle.Summary?.Summary;
+            response.Summary = circle.SummaryData?.Summary;
 
             response.DefaultPermission = new PermissionsInfo
             {
@@ -133,8 +133,9 @@ public class CircleService
 
         var circle = await db.Circles
             .Include(c => c.DefaultPermission)
-            .Include(c => c.Summary)
+            .Include(c => c.SummaryData)
             .Include(c => c.Skills)
+            .Include(c => c.Links)
             .SingleOrDefaultAsync(c => c.Id == circleId, ct) ??
             throw new ArgumentException("Invalid Circle ID");
 
@@ -146,34 +147,19 @@ public class CircleService
         db.Skills.RemoveRange(circle.Skills);
         circle.Skills = request.Skills?.Select(s => new Skill { CircleId = circleId, Name = s }).ToList() ?? [];
 
+        db.Links.RemoveRange(circle.Links);
+        circle.Links = request.Links?.Select(l => new Link { CircleId = circleId, Url = l.Url, Type = l.Type }).ToList() ?? [];
+
         if (request.Summary != null)
         {
             bool isPublic = false;
-            if (circle.Summary != null)
-                isPublic = circle.Summary.IsPublic;
+            if (circle.SummaryData != null)
+                isPublic = circle.SummaryData.IsPublic;
 
-            circle.Summary = new SummaryData { Summary = request.Summary, IsPublic = isPublic };
+            circle.SummaryData = new SummaryData { Summary = request.Summary, IsPublic = isPublic };
         }
         else
-            circle.Summary = null;
-
-        await db.SaveChangesAsync(ct);
-    }
-
-    public async Task UpdateLinksAsync(Guid circleId, UpdateCircleLinksRequest request, CancellationToken ct)
-    {
-        var circleMember = await validationService.TryGetCircleMemberAsync(userInfo.UserId, circleId, ct);
-
-        var circle = await db.Circles
-            .Include(c => c.DefaultPermission)
-            .Include(c => c.Links)
-            .SingleOrDefaultAsync(c => c.Id == circleId, ct) ??
-            throw new ArgumentException("Invalid Circle ID");
-
-        validationService.CheckPermission(circleMember, circle, PermissionsEnum.CircleManagement);
-
-        db.Links.RemoveRange(circle.Links);
-        circle.Links = request.Links?.Select(l => new Link { CircleId = circleId, Url = l.Url, Type = l.Type }).ToList() ?? [];
+            circle.SummaryData = null;
 
         await db.SaveChangesAsync(ct);
     }
@@ -184,14 +170,14 @@ public class CircleService
 
         var circle = await db.Circles
             .Include(c => c.DefaultPermission)
-            .Include(c => c.Summary)
+            .Include(c => c.SummaryData)
             .SingleOrDefaultAsync(c => c.Id == circleId, ct) ??
             throw new ArgumentException("Invalid Circle ID");
 
         validationService.CheckPermission(circleMember, circle, PermissionsEnum.CircleManagement);
 
-        if (circle.Summary != null)
-            circle.Summary.IsPublic = isPublic;
+        if (circle.SummaryData != null)
+            circle.SummaryData.IsPublic = isPublic;
 
         await db.SaveChangesAsync(ct);
     }
@@ -222,7 +208,7 @@ public class CircleService
         await db.SaveChangesAsync(ct);
     }
 
-    public async Task ChangeOwnershipAsync(Guid circleId, string newOwnerId, CancellationToken ct)
+    public async Task TransferOwnershipAsync(Guid circleId, string newOwnerId, CancellationToken ct)
     {
         var oldOwner = await validationService.TryGetOwnerAsync(userInfo.UserId, circleId, ct);
 

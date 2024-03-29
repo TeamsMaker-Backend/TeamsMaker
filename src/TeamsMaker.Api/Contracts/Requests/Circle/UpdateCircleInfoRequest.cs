@@ -1,4 +1,6 @@
-﻿namespace TeamsMaker.Api.Contracts.Requests.Circle;
+﻿using TeamsMaker.Api.Contracts.Responses.Profile;
+
+namespace TeamsMaker.Api.Contracts.Requests.Circle;
 
 public class UpdateCircleInfoRequest
 {
@@ -6,4 +8,5 @@ public class UpdateCircleInfoRequest
     public string? Description { get; init; }
     public string? Summary { get; init; }
     public ICollection<string>? Skills { get; init; }
+    public ICollection<LinkInfo>? Links { get; init; }
 }

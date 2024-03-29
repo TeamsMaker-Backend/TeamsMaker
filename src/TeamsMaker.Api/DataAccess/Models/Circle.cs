@@ -10,7 +10,7 @@ public class Circle : TrackedEntity<Guid>, IReadOnlyOrganizationInfo
 {
     public string Name { get; set; } = null!;
     public string? Description { get; set; }
-    public SummaryData? Summary { get; set; }
+    public SummaryData? SummaryData { get; set; }
     public FileData? Avatar { get; set; }
     public FileData? Header { get; set; } // back ground
     public long Rate { get; set; }
