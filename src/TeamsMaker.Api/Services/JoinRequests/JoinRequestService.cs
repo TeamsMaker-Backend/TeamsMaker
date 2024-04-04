@@ -105,59 +105,59 @@ public class JoinRequestService
         return response;
     }
 
-    public async Task AcceptAsync(Guid id, CancellationToken ct)
+public async Task AcceptAsync(Guid id, CancellationToken ct)
+{
+    using var transaction = await db.Database.BeginTransactionAsync(ct);
+
+    var joinRequest = await db.JoinRequests.FindAsync([id], ct) ??
+        throw new ArgumentException("Invalid Join Request Id");
+
+    joinRequest.IsAccepted = true;
+
+    // In case of reciever is a circle
+    if (joinRequest.Sender != InvitationTypes.Circle)
     {
-        using var transaction = await db.Database.BeginTransactionAsync(ct);
+        // Check wether the circle member have a permission to accept a request or not
+        var circleMember = await validationService.TryGetCircleMemberAsync(userInfo.UserId, joinRequest.CircleId, ct);
 
-        var joinRequest = await db.JoinRequests.FindAsync([id], ct) ??
-            throw new ArgumentException("Invalid Join Request Id");
+        var circle = await db.Circles
+            .Include(c => c.DefaultPermission)
+            .SingleOrDefaultAsync(c => c.Id == joinRequest.CircleId, ct) ??
+            throw new ArgumentException("Invalid CircleId");
 
-        joinRequest.IsAccepted = true;
-
-        // In case of reciever is a circle
-        if (joinRequest.Sender != InvitationTypes.Circle)
-        {
-            // Check wether the circle member have a permission to accept a request or not
-            var circleMember = await validationService.TryGetCircleMemberAsync(userInfo.UserId, joinRequest.CircleId, ct);
-
-            var circle = await db.Circles
-                .Include(c => c.DefaultPermission)
-                .SingleOrDefaultAsync(c => c.Id == joinRequest.CircleId, ct) ??
-                throw new ArgumentException("Invalid CircleId");
-
-            validationService.CheckPermission(circleMember, circle, PermissionsEnum.MemberManagement);
-        }
-
-        await db.SaveChangesAsync(ct);
-
-        await memberService.AddAsync(joinRequest.CircleId, joinRequest.StudentId, ct);
-
-        await transaction.CommitAsync(ct);
+        validationService.CheckPermission(circleMember, circle, PermissionsEnum.MemberManagement);
     }
 
-    public async Task DeleteAsync(Guid id, CancellationToken ct)
+    await db.SaveChangesAsync(ct);
+
+    await memberService.AddAsync(joinRequest.CircleId, joinRequest.StudentId, ct);
+
+    await transaction.CommitAsync(ct);
+}
+
+public async Task DeleteAsync(Guid id, CancellationToken ct)
+{
+    var joinRequest =
+        await db.JoinRequests
+        .SingleOrDefaultAsync(jr => jr.Id == id && jr.IsAccepted == false, ct) ??
+        throw new ArgumentException("Not found");
+
+    db.JoinRequests.Remove(joinRequest);
+
+    // In case of sender is a circle
+    if (joinRequest.Sender == InvitationTypes.Circle)
     {
-        var joinRequest =
-            await db.JoinRequests
-            .SingleOrDefaultAsync(jr => jr.Id == id && jr.IsAccepted == false, ct) ??
-            throw new ArgumentException("Not found");
+        // Check wether the circle member have a permission to delete an invitition or not
+        var circleMember = await validationService.TryGetCircleMemberAsync(userInfo.UserId, joinRequest.CircleId, ct);
 
-        db.JoinRequests.Remove(joinRequest);
+        var circle = await db.Circles
+            .Include(c => c.DefaultPermission)
+            .SingleOrDefaultAsync(c => c.Id == joinRequest.CircleId, ct) ??
+            throw new ArgumentException("Invalid CircleId");
 
-        // In case of sender is a circle
-        if (joinRequest.Sender == InvitationTypes.Circle)
-        {
-            // Check wether the circle member have a permission to delete an invitition or not
-            var circleMember = await validationService.TryGetCircleMemberAsync(userInfo.UserId, joinRequest.CircleId, ct);
-
-            var circle = await db.Circles
-                .Include(c => c.DefaultPermission)
-                .SingleOrDefaultAsync(c => c.Id == joinRequest.CircleId, ct) ??
-                throw new ArgumentException("Invalid CircleId");
-
-            validationService.CheckPermission(circleMember, circle, PermissionsEnum.MemberManagement);
-        }
-
-        await db.SaveChangesAsync(ct);
+        validationService.CheckPermission(circleMember, circle, PermissionsEnum.MemberManagement);
     }
+
+    await db.SaveChangesAsync(ct);
+}
 }
