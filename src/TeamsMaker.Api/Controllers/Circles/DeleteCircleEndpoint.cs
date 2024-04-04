@@ -21,6 +21,6 @@ public class DeleteCircleEndpoint(ICircleService circleService) : BaseApiControl
             return NotFound(_response.FailureResponse(e.Message));
         }
 
-        return Ok();
+        return Ok(_response.SuccessResponse(null));
     }
 }

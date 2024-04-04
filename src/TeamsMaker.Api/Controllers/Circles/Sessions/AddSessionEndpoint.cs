@@ -10,6 +10,7 @@ namespace TeamsMaker.Api.Controllers.Circles.Sessions;
 public class AddSessionEndpoint(ISessionService sessionService) : BaseApiController
 {
     [Tags("circles/sessions")]
+    [Produces<IdResponse<Guid>>]
     [HttpPost("circles/{circleId}/sessions")]
     public async Task<IActionResult> Session(Guid circleId, AddSessionRequest request, CancellationToken ct)
     {
@@ -24,6 +25,6 @@ public class AddSessionEndpoint(ISessionService sessionService) : BaseApiControl
             return NotFound(_response.FailureResponse(e.Message));
         }
 
-        return Created("", _response.SuccessResponse(new { sessionId }));
+        return Created("", _response.SuccessResponse(new IdResponse<Guid>(sessionId)));
     }
 }

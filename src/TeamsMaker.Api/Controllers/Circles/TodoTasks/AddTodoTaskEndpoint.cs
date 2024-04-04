@@ -10,6 +10,7 @@ namespace TeamsMaker.Api.Controllers.Circles.TodoTasks;
 public class AddTodoTaskEndpoint(ITodoTaskService todoTaskService) : BaseApiController
 {
     [Tags("circles/todo_tasks")]
+    [Produces<IdResponse<Guid>>]
     [HttpPost("circles/{circleId}/todo_tasks")]
     public async Task<IActionResult> TodoTask(Guid circleId, AddTodoTaskRequest request, CancellationToken ct)
     {
@@ -24,6 +25,6 @@ public class AddTodoTaskEndpoint(ITodoTaskService todoTaskService) : BaseApiCont
             return NotFound(_response.FailureResponse(e.Message));
         }
 
-        return Created("", _response.SuccessResponse(new { todoTaskId }));
+        return Created("", _response.SuccessResponse(new IdResponse<Guid>(todoTaskId)));
     }
 }

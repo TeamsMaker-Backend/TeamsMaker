@@ -22,11 +22,6 @@ builder.Services.AddCors(options => options.AddPolicy("CorsPolicy",
                         .AllowAnyMethod()
                         .WithHeaders("Content-Type", "Authorization")));
 
-// builder.Services.AddCors(options => options.AddDefaultPolicy(
-//     builder => builder.AllowAnyOrigin()
-//                     .AllowAnyHeader()
-//       
-
 #region JWT & Authorization;
 builder.Services.AddSingleton(builder.Configuration.GetSection("JwtConfig").Get<JwtConfig>()!);
 var key = Encoding.ASCII.GetBytes(builder.Configuration["JwtConfig:Secret"]!);
@@ -127,19 +122,15 @@ builder.Services.AddSwaggerGen(option =>
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+
+app.UseSwagger();
+app.UseSwaggerUI();
 
 await SeedDB.Initialize(app.Services.GetRequiredService<IServiceScopeFactory>().CreateScope().ServiceProvider);
 
 // app.UseExceptionHandler(opt => { });
 
 app.UseCors("CorsPolicy");
-// app.UseCors();
 
 app.UseHttpsRedirection();
 

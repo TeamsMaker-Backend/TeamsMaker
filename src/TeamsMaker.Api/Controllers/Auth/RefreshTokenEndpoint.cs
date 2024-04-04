@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
 using TeamsMaker.Api.Contracts.Requests;
+using TeamsMaker.Api.Contracts.Responses;
 using TeamsMaker.Api.Services.Auth;
 
 
@@ -16,8 +17,9 @@ public class RefreshTokenEndpoint : BaseApiController
     }
 
     [Tags("auth")]
+    [Produces(typeof(TokenResponse))]
     [HttpPost("users/refresh_token")]
-    public async Task<IActionResult> RefreshToken(TokenRequest request, CancellationToken ct)
+    public async Task<IActionResult> RefreshToken([FromBody] TokenRequest request, CancellationToken ct)
     {
         try
         {

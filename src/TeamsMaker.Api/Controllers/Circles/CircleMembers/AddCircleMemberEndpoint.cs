@@ -21,6 +21,6 @@ public class AddCircleMemberEndpoint(ICircleMemberService memberService) : BaseA
             return NotFound(_response.FailureResponse(e.Message));
         }
 
-        return Ok();
+        return Ok(_response.SuccessResponse(null));
     }
 }

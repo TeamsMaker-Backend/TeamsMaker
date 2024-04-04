@@ -22,6 +22,7 @@ public class UpdateExperienceEndpoint(IExperienceService experienceService) : Ba
         {
             return NotFound(_response.FailureResponse(e.Message));
         }
-        return Ok();
+
+        return Ok(_response.SuccessResponse(null));
     }
 }

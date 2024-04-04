@@ -21,6 +21,6 @@ public class ArchiveCircleEndpoint(ICircleService circleService) : BaseApiContro
             return NotFound(_response.FailureResponse(e.Message));
         }
 
-        return Ok();
+        return Ok(_response.SuccessResponse(null));
     }
 }

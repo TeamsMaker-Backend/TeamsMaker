@@ -10,7 +10,7 @@ public class UpdateTodoTaskStatusEndpoint(ITodoTaskService todoTaskService) : Ba
 {
     [Tags("circles/todo_tasks")]
     [HttpPut("circles/todo_tasks/{id}/{status}")]
-    public async Task<IActionResult> TodoTask(Guid id, TodoTaskStatus status, CancellationToken ct)
+    public async Task<IActionResult> TodoTask(Guid id, [FromBody] TodoTaskStatus status, CancellationToken ct)
     {
         try
         {
@@ -21,6 +21,6 @@ public class UpdateTodoTaskStatusEndpoint(ITodoTaskService todoTaskService) : Ba
             return NotFound(_response.FailureResponse(e.Message));
         }
 
-        return Created();
+        return Ok(_response.SuccessResponse(null));
     }
 }

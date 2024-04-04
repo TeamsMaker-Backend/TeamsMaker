@@ -23,5 +23,6 @@ public class User : IdentityUser, IActivable
     public virtual ICollection<RefreshToken> RefreshTokens { get; set; } = [];
     public virtual ICollection<Link> Links { get; set; } = [];
     public virtual ICollection<CircleMember> MemberOn { get; set; } = [];
+    public virtual ICollection<Upvote> Upvotes { get; set; } = [];
 }
 //TODO: Contacts, Circle, Posts, UserLinks, Tags

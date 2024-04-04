@@ -10,6 +10,7 @@ namespace TeamsMaker.Api.Controllers.Circles;
 public class AddCircleEndpoint(ICircleService circleService) : BaseApiController
 {
     [Tags("circles")]
+    [Produces<IdResponse<Guid>>]
     [HttpPost("circles")]
     public async Task<IActionResult> Circle(AddCircleRequest request, CancellationToken ct)
     {
@@ -24,6 +25,6 @@ public class AddCircleEndpoint(ICircleService circleService) : BaseApiController
             return NotFound(_response.FailureResponse(e.Message));
         }
 
-        return Created("", _response.SuccessResponse(new { circleId }));
+        return Created("", _response.SuccessResponse(new IdResponse<Guid>(circleId)));
     }
 }

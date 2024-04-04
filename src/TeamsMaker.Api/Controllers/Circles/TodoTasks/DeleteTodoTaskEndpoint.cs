@@ -22,6 +22,6 @@ public class DeleteTodoTaskEndpoint(ITodoTaskService todoTaskService) : BaseApiC
             return NotFound(_response.FailureResponse(e.Message));
         }
 
-        return Created();
+        return Created("", _response.SuccessResponse(null));
     }
 }

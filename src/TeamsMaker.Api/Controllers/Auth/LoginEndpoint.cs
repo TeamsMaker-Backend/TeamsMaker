@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
+using TeamsMaker.Api.Contracts.Responses;
+
 using TeamsMaker.Api.Services.Auth;
 namespace TeamsMaker.Api.Controllers.Auth;
 
@@ -14,8 +16,9 @@ public class LoginEndpoint : BaseApiController
     }
 
     [Tags("auth")]
+    [Produces(typeof(TokenResponse))]
     [HttpPost("users/login")]
-    public async Task<IActionResult> Login(UserLoginRequest request, CancellationToken ct)
+    public async Task<IActionResult> Login([FromBody] UserLoginRequest request, CancellationToken ct)
     {
         try
         {

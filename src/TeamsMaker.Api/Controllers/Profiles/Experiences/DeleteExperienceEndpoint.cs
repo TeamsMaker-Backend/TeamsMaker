@@ -20,6 +20,7 @@ public class DeleteExperienceEndpoint(IExperienceService experienceService) : Ba
         {
             return NotFound(_response.FailureResponse(e.Message));
         }
-        return Ok();
+        
+        return Ok(_response.SuccessResponse(null));
     }
 }

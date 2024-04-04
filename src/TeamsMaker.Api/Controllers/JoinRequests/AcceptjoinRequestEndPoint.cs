@@ -22,6 +22,6 @@ public class AcceptjoinRequestEndpoint(IJoinRequestService joinRequestService) :
             return NotFound(_response.FailureResponse(e.Message));
         }
 
-        return Ok();
+        return Ok(_response.SuccessResponse(null));
     }
 }

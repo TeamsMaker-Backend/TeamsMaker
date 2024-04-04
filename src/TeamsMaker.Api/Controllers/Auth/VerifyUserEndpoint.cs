@@ -15,6 +15,7 @@ public class VerifyUserEndpoint : BaseApiController
     }
 
     [Tags("auth")]
+    [Produces(typeof(bool))]
     [HttpPost("users/verify")]
     public async Task<IActionResult> Verify([FromBody] UserVerificationRequset request, CancellationToken ct)
     {

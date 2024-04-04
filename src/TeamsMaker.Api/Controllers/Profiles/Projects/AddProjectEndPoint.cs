@@ -21,6 +21,7 @@ public class AddProjectEndpoint(IProjectService projectService) : BaseApiControl
         {
             return NotFound(_response.FailureResponse(e.Message));
         }
-        return Ok();
+
+        return Ok(_response.SuccessResponse(null));
     }
 }

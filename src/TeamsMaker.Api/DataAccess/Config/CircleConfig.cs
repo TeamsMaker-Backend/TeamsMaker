@@ -14,7 +14,7 @@ public class CircleConfig : IEntityTypeConfiguration<Circle>
 
         builder.HasKey(x => x.Id);
 
-        builder.Property(x => x.Description).HasMaxLength(150);
+        builder.Property(x => x.Keywords).HasMaxLength(150);
 
         builder
             .Property(x => x.Status)
@@ -71,5 +71,11 @@ public class CircleConfig : IEntityTypeConfiguration<Circle>
             .HasOne(x => x.DefaultPermission)
             .WithOne(y => y.Circle)
             .HasForeignKey<Permission>(y => y.CircleId);
+
+        
+        builder
+            .HasMany(x => x.Upvotes)
+            .WithOne(y => y.Circle)
+            .HasForeignKey(y => y.CircleId);
     }
 }

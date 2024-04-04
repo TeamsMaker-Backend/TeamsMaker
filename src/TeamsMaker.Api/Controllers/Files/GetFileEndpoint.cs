@@ -9,6 +9,7 @@ namespace TeamsMaker.Api.Controllers.Files;
 public class GetFileEndpoint(IServiceProvider serviceProvider) : BaseApiController
 {
     [Tags("files")]
+    [Produces<FileContentResult>]
     [HttpGet("files/{baseType}/{id}/{fileType}")]
     [ResponseCache(Duration = 60)]
     public async Task<IActionResult> File(string baseType, string id, string fileType, CancellationToken ct)

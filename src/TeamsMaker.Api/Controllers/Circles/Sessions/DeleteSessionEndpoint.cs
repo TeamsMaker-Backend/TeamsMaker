@@ -21,6 +21,6 @@ public class DeleteSessionEndpoint(ISessionService sessionService) : BaseApiCont
             return NotFound(_response.FailureResponse(e.Message));
         }
 
-        return Ok();
+        return Ok(_response.SuccessResponse(null));
     }
 }

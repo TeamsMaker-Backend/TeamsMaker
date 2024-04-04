@@ -4,18 +4,18 @@ using Microsoft.AspNetCore.Mvc;
 using TeamsMaker.Api.Contracts.Requests.Circle;
 using TeamsMaker.Api.Services.Circles.Interfaces;
 
-namespace TeamsMaker.Api.Controllers.Circles;
+namespace TeamsMaker.Api.Controllers.Circles.Upvotes;
 
 [Authorize]
-public class UpdateCircleInfoEndpoint(ICircleService circleService) : BaseApiController
+public class DownvoteEndpoint(ICircleService circleService) : BaseApiController
 {
-    [Tags("circles")]
-    [HttpPut("circles/{circleId}/info")]
-    public async Task<IActionResult> CircleInfo(Guid circleId, UpdateCircleInfoRequest request, CancellationToken ct)
+    [Tags("circles/upvote")]
+    [HttpPost("circles/{circleId}/downvote")]
+    public async Task<IActionResult> Downvote(Guid circleId, CancellationToken ct)
     {
         try
         {
-            await circleService.UpdateInfoAsync(circleId, request, ct);
+            await circleService.DownvoteAsync(circleId, ct);
         }
         catch (ArgumentException e)
         {
