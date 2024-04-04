@@ -9,9 +9,10 @@ public interface ICircleService
     Task<GetCircleResponse> GetAsync(Guid circleId, CancellationToken ct);
     Task<GetCircleMembersResponse> GetMembersAsync(Guid circleId, CancellationToken ct);
     Task UpdateInfoAsync(Guid circleId, UpdateCircleInfoRequest request, CancellationToken ct);
-    Task UpdateLinksAsync(Guid circleId, UpdateCircleLinksRequest request, CancellationToken ct);
     Task UpdatePrivacyAsync(Guid circleId, bool isPublic, CancellationToken ct);
-    Task ChangeOwnershipAsync(Guid circleId, string newOwnerId, CancellationToken ct);
+    Task UpvoteAsync(Guid circleId, CancellationToken ct);
+    Task DownvoteAsync(Guid id, CancellationToken ct);
+    Task TransferOwnershipAsync(Guid circleId, string newOwnerId, CancellationToken ct);
     Task ArchiveAsync(Guid circleId, CancellationToken ct);
     Task DeleteAsync(Guid circleId, CancellationToken ct);
 }

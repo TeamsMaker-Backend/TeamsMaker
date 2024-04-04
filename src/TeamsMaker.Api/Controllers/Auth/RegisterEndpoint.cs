@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
 using TeamsMaker.Api.Contracts.Requests;
+using TeamsMaker.Api.Contracts.Responses;
 using TeamsMaker.Api.Services.Auth;
 
 namespace TeamsMaker.Api.Controllers.Auth;
@@ -15,8 +16,9 @@ public class RegisterEndpoint : BaseApiController
     }
 
     [Tags("auth")]
+    [Produces(typeof(TokenResponse))]
     [HttpPost("users/register")]
-    public async Task<IActionResult> Register(UserRegisterationRequest request, CancellationToken ct)
+    public async Task<IActionResult> Register([FromBody] UserRegisterationRequest request, CancellationToken ct)
     {
         try
         {

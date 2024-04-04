@@ -10,7 +10,7 @@ namespace TeamsMaker.Api.Services.Circles;
 public class CircleMemberService
     (AppDBContext db, IUserInfo userInfo, ICircleValidationService validationService) : ICircleMemberService, IPermissionService
 {
-    public async Task AddAsync(Guid circleId, String userId, CancellationToken ct)
+    public async Task AddAsync(Guid circleId, string userId, CancellationToken ct)
     {
         if (!await db.Users.AnyAsync(s => s.Id == userId, ct))
             throw new ArgumentException("Invalid Student Id");

@@ -11,6 +11,7 @@ namespace TeamsMaker.Api.Controllers.Profiles;
 public class GetOtherProfileEndpoint(IServiceProvider serviceProvider) : BaseApiController
 {
     [Tags("profiles")]
+    [Produces<GetOtherProfileResponse>]
     [HttpGet("profiles/{userEnum}/{id}")]
     public async Task<IActionResult> Profile(UserEnum userEnum, string id, CancellationToken ct)
     {

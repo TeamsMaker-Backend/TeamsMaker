@@ -44,7 +44,8 @@ public class ProfileUtilities //TODO: [Refactor] remove dublicates - Urgent
 
     public void GetStudentData(Student student, GetProfileResponse response)
     {
-        var fileService = serviceProvider.GetRequiredKeyedService<IFileService>(BaseTypes.Student);
+        var studentFileService = serviceProvider.GetRequiredKeyedService<IFileService>(BaseTypes.Student);
+        var circleFileService = serviceProvider.GetRequiredKeyedService<IFileService>(BaseTypes.Circle);
 
         var studentInfo = new StudentInfo
         {
@@ -53,7 +54,7 @@ public class ProfileUtilities //TODO: [Refactor] remove dublicates - Urgent
             GraduationYear = student.GraduationYear,
             Level = student.Level,
             DepartmentName = student.Department?.Name,
-            CV = fileService.GetFileUrl(student.Id, FileTypes.CV),
+            CV = studentFileService.GetFileUrl(student.Id, FileTypes.CV),
 
             Experiences =
                 student.Experiences.Select(ex => new ExperienceInfo
@@ -78,38 +79,40 @@ public class ProfileUtilities //TODO: [Refactor] remove dublicates - Urgent
                     Skills = prj.Skills.Select(s => s.Name).ToList()
                 }).ToList(),
 
-            CircleJoinRequests =
-                student.JoinRequests
-                .Where(jr => jr.Sender == InvitationTypes.Student) // join request from users
-                .OrderByDescending(jr => jr.CreationDate)
-                .Take(3)
-                .Select(jr => new GetCircleJoinRequestResponse
-                {
-                    Id = jr.Id,
-                    CircleId = jr.CircleId,
-                    Name = jr.Circle.Name,
-                    Avatar = fileService.GetFileUrl(jr.CircleId.ToString(), FileTypes.Avatar)
-                })
-                .ToList(),
 
-            Invitations =
-                student.JoinRequests
+            StudentJoinRequests = new()
+            {
+                JoinRequests = student.JoinRequests
+                    .Where(jr => jr.Sender == InvitationTypes.Student) // join request from users
+                    .OrderByDescending(jr => jr.CreationDate)
+                    .Take(3)
+                    .Select(jr => new GetBaseJoinRequestResponse
+                    {
+                        Id = jr.Id,
+                        Sender = jr.Sender,
+                        Name = jr.Circle.Name,
+                        Avatar = circleFileService.GetFileUrl(jr.CircleId.ToString(), FileTypes.Avatar)
+                    })
+                    .ToList(),
+
+                Invitations = student.JoinRequests
                     .Where(jr => jr.Sender == InvitationTypes.Circle) // invitation from circle
                     .OrderByDescending(jr => jr.CreationDate)
                     .Take(3)
-                    .Select(jr => new GetCircleJoinRequestResponse
+                    .Select(jr => new GetBaseJoinRequestResponse
                     {
                         Id = jr.Id,
-                        CircleId = jr.CircleId,
+                        Sender = jr.Sender,
                         Name = jr.Circle.Name,
-                        Avatar = fileService.GetFileUrl(jr.CircleId.ToString(), FileTypes.Avatar)
+                        Avatar = circleFileService.GetFileUrl(jr.CircleId.ToString(), FileTypes.Avatar)
                     })
                     .ToList(),
+            }
         };
 
         response.StudentInfo = studentInfo;
-        response.Avatar = fileService.GetFileUrl(student.Id, FileTypes.Avatar);
-        response.Header = fileService.GetFileUrl(student.Id, FileTypes.Header);
+        response.Avatar = studentFileService.GetFileUrl(student.Id, FileTypes.Avatar);
+        response.Header = studentFileService.GetFileUrl(student.Id, FileTypes.Header);
     }
 
     public void GetOtherStudentData(Student student, GetOtherProfileResponse response)

@@ -10,6 +10,7 @@ namespace TeamsMaker.Api.Controllers.JoinRequests;
 public class AddJoinRequestEndpoint(IJoinRequestService joinRequestService) : BaseApiController
 {
     [Tags("join_request")]
+    [Produces<IdResponse<Guid>>]
     [HttpPost("join_request")]
     public async Task<IActionResult> JoinRequest(AddJoinRequest request, CancellationToken ct)
     {
@@ -24,7 +25,7 @@ public class AddJoinRequestEndpoint(IJoinRequestService joinRequestService) : Ba
             return NotFound(_response.FailureResponse(e.Message));
         }
 
-        return Created("", _response.SuccessResponse(new { joinRequestId }));
+        return Created("", _response.SuccessResponse(new IdResponse<Guid>(joinRequestId)));
     }
 
 }

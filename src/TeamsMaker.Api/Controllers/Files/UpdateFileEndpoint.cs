@@ -24,6 +24,6 @@ public class UpdateFileEndpoint(IServiceProvider serviceProvider) : BaseApiContr
             return NotFound(_response.FailureResponse(e.Message));
         }
 
-        return Ok();
+        return Ok(_response.SuccessResponse(null));
     }
 }

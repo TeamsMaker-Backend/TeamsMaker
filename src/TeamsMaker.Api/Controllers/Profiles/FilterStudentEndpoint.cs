@@ -11,6 +11,7 @@ namespace TeamsMaker.Api.Controllers.Profiles;
 public class FilterStudentEndpoint(IServiceProvider serviceProvider) : BaseApiController
 {
     [Tags("profiles")]
+    [Produces<List<GetStudentAsRowResponse>>]
     [HttpGet("profiles/students")]
     public async Task<IActionResult> FilterStudent([FromQuery] string query, CancellationToken ct)
     {

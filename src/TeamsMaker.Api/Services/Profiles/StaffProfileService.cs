@@ -11,6 +11,8 @@ namespace TeamsMaker.Api.Services.Profiles;
 public class StaffProfileService
     (AppDBContext db, IWebHostEnvironment host, IUserInfo userInfo, ProfileUtilities profileUtilities) : IProfileService
 {
+
+    //TODO: to be implemented
     public Task<List<GetStudentAsRowResponse>> FilterAsync(string query, CancellationToken ct)
     {
         throw new NotImplementedException();

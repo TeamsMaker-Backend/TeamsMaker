@@ -7,7 +7,7 @@ public class GetCircleResponse
 {
     public Guid Id { get; set; }
     public string Name { get; set; } = null!;
-    public string? Description { get; set; }
+    public ICollection<string> Keywords { get; set; } = [];
     public string? Summary { get; set; }
     public bool IsPublic { get; set; }
     public string? Avatar { get; set; }

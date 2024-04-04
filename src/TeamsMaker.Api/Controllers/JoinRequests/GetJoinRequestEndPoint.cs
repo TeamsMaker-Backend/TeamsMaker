@@ -10,14 +10,15 @@ namespace TeamsMaker.Api.Controllers.JoinRequests;
 public class GetJoinRequestEndpoint(IJoinRequestService joinRequestService) : BaseApiController
 {
     [Tags("join_request")]
-    [HttpGet("join_request/{id}")]
-    public async Task<IActionResult> JoinRequest(string id, CancellationToken ct)
+    [Produces<GetJoinRequestResponse>]
+    [HttpGet("join_requests")]
+    public async Task<IActionResult> JoinRequest([FromQuery] string? circleId, CancellationToken ct)
     {
-        List<GetCircleJoinRequestResponse> response;
+        GetJoinRequestResponse response;
 
         try
         {
-            response = await joinRequestService.GetAsync(id, ct);
+            response = await joinRequestService.GetAsync(circleId, ct);
         }
         catch (ArgumentException e)
         {

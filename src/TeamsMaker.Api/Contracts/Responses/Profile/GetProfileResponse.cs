@@ -46,8 +46,7 @@ public class StudentInfo
 
     public ICollection<ExperienceInfo>? Experiences { get; set; } = [];
     public ICollection<ProjectInfo>? Projects { get; set; } = [];
-    public ICollection<GetCircleJoinRequestResponse> CircleJoinRequests { get; set; } = [];
-    public ICollection<GetCircleJoinRequestResponse> Invitations { get; set; } = [];
+    public GetJoinRequestResponse? StudentJoinRequests { get; set; }
 }
 
 public class ProjectInfo

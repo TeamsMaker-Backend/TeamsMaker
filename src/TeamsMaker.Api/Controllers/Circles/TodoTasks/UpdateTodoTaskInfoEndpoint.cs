@@ -11,7 +11,7 @@ public class UpdateTodoTaskInfoEndpoint(ITodoTaskService todoTaskService) : Base
 {
     [Tags("circles/todo_tasks")]
     [HttpPut("circles/todo_tasks/{id}")]
-    public async Task<IActionResult> TodoTask(Guid id, UpdateTodoTaskInfoRequest request, CancellationToken ct)
+    public async Task<IActionResult> TodoTask(Guid id, [FromBody] UpdateTodoTaskInfoRequest request, CancellationToken ct)
     {
         try
         {
@@ -22,6 +22,6 @@ public class UpdateTodoTaskInfoEndpoint(ITodoTaskService todoTaskService) : Base
             return NotFound(_response.FailureResponse(e.Message));
         }
 
-        return Created();
+        return Ok(_response.SuccessResponse(null));
     }
 }

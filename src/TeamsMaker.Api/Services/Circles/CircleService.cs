@@ -3,6 +3,7 @@
 using DataAccess.Base.Interfaces;
 
 using TeamsMaker.Api.Contracts.Requests.Circle;
+using TeamsMaker.Api.Contracts.Requests.JoinRequest;
 using TeamsMaker.Api.Contracts.Responses.Circle;
 using TeamsMaker.Api.Contracts.Responses.Profile;
 using TeamsMaker.Api.Core.Consts;
@@ -10,14 +11,18 @@ using TeamsMaker.Api.Core.Enums;
 using TeamsMaker.Api.DataAccess.Context;
 using TeamsMaker.Api.Services.Circles.Interfaces;
 using TeamsMaker.Api.Services.Files.Interfaces;
+using TeamsMaker.Api.Services.JoinRequests.Interfaces;
 using TeamsMaker.Core.Enums;
 
 namespace TeamsMaker.Api.Services.Circles;
 
 public class CircleService
-    (AppDBContext db, IServiceProvider serviceProvider, IUserInfo userInfo, ICircleValidationService validationService) : ICircleService, IPermissionService
+    (AppDBContext db, IServiceProvider serviceProvider,
+    IUserInfo userInfo, ICircleValidationService validationService,
+    IJoinRequestService joinRequestService) : ICircleService, IPermissionService
 {
     private readonly IFileService _fileService = serviceProvider.GetRequiredKeyedService<IFileService>(BaseTypes.Circle);
+
 
     public async Task<Guid> AddAsync(AddCircleRequest request, CancellationToken ct)
     {
@@ -25,25 +30,35 @@ public class CircleService
             await db.CircleMembers.AnyAsync(cm => cm.UserId == userInfo.UserId, ct))
             throw new ArgumentException("Student Cannot Be In Two Circles");
 
+        using var transaction = await db.Database.BeginTransactionAsync(ct);
+
         var circle = new Circle
         {
             Name = request.Name,
-            Description = request.Description,
-            Summary = request.Summary,
+            SummaryData = request.Summary,
             DefaultPermission = new Permission(),
             CircleMembers = [
                 new CircleMember
                 {
                     UserId = userInfo.UserId,
+                    Badge = MemberBadges.Owner,
                     IsOwner = true
                 }
             ],
-            Skills = request.Skills?.Select(s => new Skill { Name = s }).ToList() ?? [],
-            Links = request.Links?.Select(l => new Link { Url = l.Url, Type = l.Type }).ToList() ?? []
         };
 
         await db.Circles.AddAsync(circle, ct);
         await db.SaveChangesAsync(ct);
+
+        foreach (var studentId in request.InvitedStudents ?? [])
+            await joinRequestService.AddAsync(new AddJoinRequest
+            {
+                CircleId = circle.Id,
+                StudentId = studentId,
+                SenderType = InvitationTypes.Circle
+            }, ct);
+
+        await transaction.CommitAsync(ct);
 
         return circle.Id;
     }
@@ -53,7 +68,7 @@ public class CircleService
         var circle = await db.Circles
             .Include(c => c.DefaultPermission)
             .Include(c => c.Skills)
-            .Include(c => c.Summary)
+            .Include(c => c.SummaryData)
             .Include(c => c.Links)
             .Include(c => c.CircleMembers)
             .SingleOrDefaultAsync(c => c.Id == circleId, ct) ??
@@ -63,8 +78,8 @@ public class CircleService
         {
             Id = circle.Id,
             Name = circle.Name,
-            Description = circle.Description,
-            IsPublic = circle.Summary?.IsPublic ?? false,
+            Keywords = circle.Keywords != null ? circle.Keywords.Split(',') : [],
+            IsPublic = circle.SummaryData?.IsPublic ?? false,
             Rate = circle.Rate,
             Status = circle.Status,
             OrganizationId = circle.OrganizationId,
@@ -78,7 +93,7 @@ public class CircleService
 
         if (circle.CircleMembers.Any(cm => cm.UserId == userInfo.UserId))
         {
-            response.Summary = circle.Summary?.Summary;
+            response.Summary = circle.SummaryData?.Summary;
 
             response.DefaultPermission = new PermissionsInfo
             {
@@ -111,6 +126,7 @@ public class CircleService
                     UserId = cm.UserId,
                     IsOwner = cm.IsOwner,
                     Badge = cm.Badge,
+                    Bio = cm.User.Bio,
                     ExceptionPermissions = cm.ExceptionPermission == null ? null : new PermissionsInfo
                     {
                         CircleManagment = cm.ExceptionPermission.CircleManagment,
@@ -133,47 +149,33 @@ public class CircleService
 
         var circle = await db.Circles
             .Include(c => c.DefaultPermission)
-            .Include(c => c.Summary)
+            .Include(c => c.SummaryData)
             .Include(c => c.Skills)
-            .SingleOrDefaultAsync(c => c.Id == circleId, ct) ??
-            throw new ArgumentException("Invalid Circle ID");
-
-        validationService.CheckPermission(circleMember, circle, PermissionsEnum.CircleManagement);
-
-        circle.Name = request.Name;
-        circle.Description = request.Description;
-
-        db.Skills.RemoveRange(circle.Skills);
-        circle.Skills = request.Skills?.Select(s => new Skill { CircleId = circleId, Name = s }).ToList() ?? [];
-
-        if (request.Summary != null)
-        {
-            bool isPublic = false;
-            if (circle.Summary != null)
-                isPublic = circle.Summary.IsPublic;
-
-            circle.Summary = new SummaryData { Summary = request.Summary, IsPublic = isPublic };
-        }
-        else
-            circle.Summary = null;
-
-        await db.SaveChangesAsync(ct);
-    }
-
-    public async Task UpdateLinksAsync(Guid circleId, UpdateCircleLinksRequest request, CancellationToken ct)
-    {
-        var circleMember = await validationService.TryGetCircleMemberAsync(userInfo.UserId, circleId, ct);
-
-        var circle = await db.Circles
-            .Include(c => c.DefaultPermission)
             .Include(c => c.Links)
             .SingleOrDefaultAsync(c => c.Id == circleId, ct) ??
             throw new ArgumentException("Invalid Circle ID");
 
         validationService.CheckPermission(circleMember, circle, PermissionsEnum.CircleManagement);
 
+        circle.Name = request.Name;
+        circle.Keywords = request.Keywords != null ? string.Join(",", request.Keywords) : null;
+
+        db.Skills.RemoveRange(circle.Skills);
+        circle.Skills = request.Skills?.Select(s => new Skill { CircleId = circleId, Name = s }).ToList() ?? [];
+
         db.Links.RemoveRange(circle.Links);
         circle.Links = request.Links?.Select(l => new Link { CircleId = circleId, Url = l.Url, Type = l.Type }).ToList() ?? [];
+
+        if (request.Summary != null)
+        {
+            bool isPublic = false;
+            if (circle.SummaryData != null)
+                isPublic = circle.SummaryData.IsPublic;
+
+            circle.SummaryData = new SummaryData { Summary = request.Summary, IsPublic = isPublic };
+        }
+        else
+            circle.SummaryData = null;
 
         await db.SaveChangesAsync(ct);
     }
@@ -184,14 +186,14 @@ public class CircleService
 
         var circle = await db.Circles
             .Include(c => c.DefaultPermission)
-            .Include(c => c.Summary)
+            .Include(c => c.SummaryData)
             .SingleOrDefaultAsync(c => c.Id == circleId, ct) ??
             throw new ArgumentException("Invalid Circle ID");
 
         validationService.CheckPermission(circleMember, circle, PermissionsEnum.CircleManagement);
 
-        if (circle.Summary != null)
-            circle.Summary.IsPublic = isPublic;
+        if (circle.SummaryData != null)
+            circle.SummaryData.IsPublic = isPublic;
 
         await db.SaveChangesAsync(ct);
     }
@@ -222,7 +224,7 @@ public class CircleService
         await db.SaveChangesAsync(ct);
     }
 
-    public async Task ChangeOwnershipAsync(Guid circleId, string newOwnerId, CancellationToken ct)
+    public async Task TransferOwnershipAsync(Guid circleId, string newOwnerId, CancellationToken ct)
     {
         var oldOwner = await validationService.TryGetOwnerAsync(userInfo.UserId, circleId, ct);
 
@@ -247,6 +249,57 @@ public class CircleService
         circle.Status = CircleStatusEnum.Archived;
 
         await db.SaveChangesAsync(ct);
+    }
+
+    public async Task UpvoteAsync(Guid circleId, CancellationToken ct)
+    {
+        if (!await db.Circles.AnyAsync(c => c.Id == circleId, ct))
+            throw new ArgumentException();
+
+        if(await db.Upvotes.CountAsync(upvote => upvote.CircleId == circleId && upvote.UserId == userInfo.UserId) > 1)
+            throw new InvalidOperationException();
+
+        using var transaction = await db.Database.BeginTransactionAsync(ct);
+
+
+        Upvote upvote = new()
+        {
+            UserId = userInfo.UserId,
+            CircleId = circleId
+        };
+
+        await db.Upvotes.AddAsync(upvote, ct);
+        await db.SaveChangesAsync(ct);
+
+        await db
+            .Circles
+            .Where(c => c.Id == circleId)
+            .ExecuteUpdateAsync(setters => setters.SetProperty(c => c.Rate, c => c.Rate + 1), cancellationToken: ct);
+
+        await transaction.CommitAsync(ct);
+    }
+
+    public async Task DownvoteAsync(Guid id, CancellationToken ct)
+    {
+        using var transaction = await db.Database.BeginTransactionAsync(ct);
+
+        var upvote = await db.Upvotes.FindAsync([id], ct) ?? throw new NullReferenceException();
+
+        if(await db.Upvotes.CountAsync(upvote => upvote.CircleId == upvote.CircleId && upvote.UserId == userInfo.UserId) == 0)
+            throw new InvalidOperationException();
+
+        var circleId = upvote.CircleId;
+        
+        db.Upvotes.Remove(upvote);
+
+        await db.SaveChangesAsync(ct);
+
+        await db
+            .Circles
+            .Where(c => c.Id == circleId)
+            .ExecuteUpdateAsync(setters => setters.SetProperty(c => c.Rate, c => c.Rate - 1), cancellationToken: ct);
+
+        await transaction.CommitAsync(ct);
     }
 
     public async Task DeleteAsync(Guid circleId, CancellationToken ct)
@@ -291,7 +344,3 @@ public class CircleService
         await db.SaveChangesAsync(ct);
     }
 }
-
-// api/circle/accept
-// api/joinRequest/accept/{id} = true
-// //TODO: filterdBy, 

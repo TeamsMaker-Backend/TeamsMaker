@@ -11,6 +11,7 @@ public class CircleMemberInfo
     public string UserId { get; set; } = null!;
     public bool IsOwner { get; set; }
     public string? Badge { get; set; }
+    public string? Bio { get; set; }
     public PermissionsInfo? ExceptionPermissions { get; set; } = null!;
 }
 
