@@ -351,11 +351,10 @@ public class CircleService
         if (!await db.Circles.AnyAsync(c => c.Id == circleId, ct))
             throw new ArgumentException();
 
-        if(await db.Upvotes.CountAsync(upvote => upvote.CircleId == circleId && upvote.UserId == userInfo.UserId) > 1)
+        if (await db.Upvotes.CountAsync(upvote => upvote.CircleId == circleId && upvote.UserId == userInfo.UserId, ct) > 1)
             throw new InvalidOperationException();
 
         using var transaction = await db.Database.BeginTransactionAsync(ct);
-
 
         Upvote upvote = new()
         {
@@ -369,7 +368,7 @@ public class CircleService
         await db
             .Circles
             .Where(c => c.Id == circleId)
-            .ExecuteUpdateAsync(setters => setters.SetProperty(c => c.Rate, c => c.Rate + 1), cancellationToken: ct);
+            .ExecuteUpdateAsync(setters => setters.SetProperty(c => c.Rate, c => c.Rate + 1), ct);
 
         await transaction.CommitAsync(ct);
     }
@@ -380,11 +379,11 @@ public class CircleService
 
         var upvote = await db.Upvotes.FindAsync([id], ct) ?? throw new NullReferenceException();
 
-        if(await db.Upvotes.CountAsync(upvote => upvote.CircleId == upvote.CircleId && upvote.UserId == userInfo.UserId) == 0)
+        if (await db.Upvotes.CountAsync(upvote => upvote.CircleId == upvote.CircleId && upvote.UserId == userInfo.UserId, ct) == 0)
             throw new InvalidOperationException();
 
         var circleId = upvote.CircleId;
-        
+
         db.Upvotes.Remove(upvote);
 
         await db.SaveChangesAsync(ct);
