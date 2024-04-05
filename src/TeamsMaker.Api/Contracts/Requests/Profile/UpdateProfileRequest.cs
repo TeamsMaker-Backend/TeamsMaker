@@ -13,8 +13,4 @@ public class UpdateProfileRequest
     public string? City { get; init; }
     public string? Phone { get; init; }
     public ICollection<LinkInfo>? Links { get; init; }
-
-    public IFormFile? Avatar { get; init; }
-    public IFormFile? Header { get; init; }
-    public IFormFile? CV { get; init; }
 }

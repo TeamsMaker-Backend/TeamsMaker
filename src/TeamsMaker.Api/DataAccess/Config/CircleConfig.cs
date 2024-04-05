@@ -72,7 +72,7 @@ public class CircleConfig : IEntityTypeConfiguration<Circle>
             .WithOne(y => y.Circle)
             .HasForeignKey<Permission>(y => y.CircleId);
 
-        
+
         builder
             .HasMany(x => x.Upvotes)
             .WithOne(y => y.Circle)

@@ -7,6 +7,9 @@ public class GetCircleMembersResponse
 
 public class CircleMemberInfo
 {
+    public string FirstName { get; set; } = null!;
+    public string LastName { get; set; } = null!;
+    public string? Avatar { get; set; } = null!;
     public Guid CircleMemberId { get; set; }
     public string UserId { get; set; } = null!;
     public bool IsOwner { get; set; }

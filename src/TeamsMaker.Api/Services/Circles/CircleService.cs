@@ -21,9 +21,6 @@ public class CircleService
     IUserInfo userInfo, ICircleValidationService validationService,
     IJoinRequestService joinRequestService) : ICircleService, IPermissionService
 {
-    private readonly IFileService _fileService = serviceProvider.GetRequiredKeyedService<IFileService>(BaseTypes.Circle);
-
-
     public async Task<Guid> AddAsync(AddCircleRequest request, CancellationToken ct)
     {
         if (userInfo.Roles.Contains(AppRoles.Student) &&
@@ -74,6 +71,8 @@ public class CircleService
             .SingleOrDefaultAsync(c => c.Id == circleId, ct) ??
             throw new ArgumentException("Invalid Circle ID");
 
+        IFileService fileService = serviceProvider.GetRequiredKeyedService<IFileService>(BaseTypes.Circle);
+
         var response = new GetCircleResponse
         {
             Id = circle.Id,
@@ -86,8 +85,8 @@ public class CircleService
             Skills = circle.Skills.Select(l => l.Name).ToList(),
             Links = circle.Links.Select(l => new LinkInfo { Type = l.Type, Url = l.Url }).ToList(),
 
-            Avatar = _fileService.GetFileUrl(circleId.ToString(), FileTypes.Avatar),
-            Header = _fileService.GetFileUrl(circleId.ToString(), FileTypes.Header)
+            Avatar = fileService.GetFileUrl(circleId.ToString(), FileTypes.Avatar),
+            Header = fileService.GetFileUrl(circleId.ToString(), FileTypes.Header)
         };
 
 
@@ -114,16 +113,30 @@ public class CircleService
         var circle = await db.Circles
             .Include(c => c.CircleMembers)
                 .ThenInclude(cm => cm.ExceptionPermission)
+            .Include(c => c.CircleMembers)
+                .ThenInclude(cm => cm.User)
             .SingleOrDefaultAsync(c => c.Id == circleId, ct) ??
             throw new ArgumentException("Invalid Circle ID");
 
+        var studentFileService = serviceProvider.GetRequiredKeyedService<IFileService>(BaseTypes.Student);
+        var staffFileService = serviceProvider.GetRequiredKeyedService<IFileService>(BaseTypes.Staff);
+
         var response = new GetCircleMembersResponse
         {
-            Members = circle.CircleMembers
-                .Select(cm => new CircleMemberInfo
+            Members = await Task.WhenAll(circle.CircleMembers
+            .Select(async cm =>
+            {
+                var avatarUrl = await db.Students.AnyAsync(s => s.Id == cm.UserId, ct)
+                    ? studentFileService.GetFileUrl(cm.UserId, FileTypes.Avatar)
+                    : staffFileService.GetFileUrl(cm.UserId, FileTypes.Avatar);
+
+                return new CircleMemberInfo
                 {
                     CircleMemberId = cm.Id,
                     UserId = cm.UserId,
+                    FirstName = cm.User.FirstName,
+                    LastName = cm.User.LastName,
+                    Avatar = avatarUrl,
                     IsOwner = cm.IsOwner,
                     Badge = cm.Badge,
                     Bio = cm.User.Bio,
@@ -136,10 +149,61 @@ public class CircleService
                         SessionManagment = cm.ExceptionPermission.SessionManagment,
                         TodoTaskManagment = cm.ExceptionPermission.TodoTaskManagment
                     }
-                }).ToList()
+                };
+            }).ToList())
         };
 
         return response;
+    }
+
+    public async Task UpvoteAsync(Guid circleId, CancellationToken ct)
+    {
+        if (!await db.Circles.AnyAsync(c => c.Id == circleId, ct))
+            throw new ArgumentException();
+
+        if (await db.Upvotes.CountAsync(upvote => upvote.CircleId == circleId && upvote.UserId == userInfo.UserId, ct) > 1)
+            throw new InvalidOperationException();
+
+        using var transaction = await db.Database.BeginTransactionAsync(ct);
+
+        Upvote upvote = new()
+        {
+            UserId = userInfo.UserId,
+            CircleId = circleId
+        };
+
+        await db.Upvotes.AddAsync(upvote, ct);
+        await db.SaveChangesAsync(ct);
+
+        await db
+            .Circles
+            .Where(c => c.Id == circleId)
+            .ExecuteUpdateAsync(setters => setters.SetProperty(c => c.Rate, c => c.Rate + 1), ct);
+
+        await transaction.CommitAsync(ct);
+    }
+
+    public async Task DownvoteAsync(Guid id, CancellationToken ct)
+    {
+        using var transaction = await db.Database.BeginTransactionAsync(ct);
+
+        var upvote = await db.Upvotes.FindAsync([id], ct) ?? throw new NullReferenceException();
+
+        if (await db.Upvotes.CountAsync(upvote => upvote.CircleId == upvote.CircleId && upvote.UserId == userInfo.UserId, ct) == 0)
+            throw new InvalidOperationException();
+
+        var circleId = upvote.CircleId;
+
+        db.Upvotes.Remove(upvote);
+
+        await db.SaveChangesAsync(ct);
+
+        await db
+            .Circles
+            .Where(c => c.Id == circleId)
+            .ExecuteUpdateAsync(setters => setters.SetProperty(c => c.Rate, c => c.Rate - 1), cancellationToken: ct);
+
+        await transaction.CommitAsync(ct);
     }
 
     // CircleManagment
@@ -251,57 +315,6 @@ public class CircleService
         await db.SaveChangesAsync(ct);
     }
 
-    public async Task UpvoteAsync(Guid circleId, CancellationToken ct)
-    {
-        if (!await db.Circles.AnyAsync(c => c.Id == circleId, ct))
-            throw new ArgumentException();
-
-        if(await db.Upvotes.CountAsync(upvote => upvote.CircleId == circleId && upvote.UserId == userInfo.UserId) > 1)
-            throw new InvalidOperationException();
-
-        using var transaction = await db.Database.BeginTransactionAsync(ct);
-
-
-        Upvote upvote = new()
-        {
-            UserId = userInfo.UserId,
-            CircleId = circleId
-        };
-
-        await db.Upvotes.AddAsync(upvote, ct);
-        await db.SaveChangesAsync(ct);
-
-        await db
-            .Circles
-            .Where(c => c.Id == circleId)
-            .ExecuteUpdateAsync(setters => setters.SetProperty(c => c.Rate, c => c.Rate + 1), cancellationToken: ct);
-
-        await transaction.CommitAsync(ct);
-    }
-
-    public async Task DownvoteAsync(Guid id, CancellationToken ct)
-    {
-        using var transaction = await db.Database.BeginTransactionAsync(ct);
-
-        var upvote = await db.Upvotes.FindAsync([id], ct) ?? throw new NullReferenceException();
-
-        if(await db.Upvotes.CountAsync(upvote => upvote.CircleId == upvote.CircleId && upvote.UserId == userInfo.UserId) == 0)
-            throw new InvalidOperationException();
-
-        var circleId = upvote.CircleId;
-        
-        db.Upvotes.Remove(upvote);
-
-        await db.SaveChangesAsync(ct);
-
-        await db
-            .Circles
-            .Where(c => c.Id == circleId)
-            .ExecuteUpdateAsync(setters => setters.SetProperty(c => c.Rate, c => c.Rate - 1), cancellationToken: ct);
-
-        await transaction.CommitAsync(ct);
-    }
-
     public async Task DeleteAsync(Guid circleId, CancellationToken ct)
     {
         var owner = await validationService.TryGetOwnerAsync(userInfo.UserId, circleId, ct);
@@ -313,6 +326,7 @@ public class CircleService
             .Include(c => c.Links)
             .Include(c => c.Skills)
             .Include(c => c.Invitions)
+            .Include(c => c.Upvotes)
             .Include(c => c.TodoTasks)
             .Include(c => c.Sessions)
             .SingleOrDefaultAsync(c => c.Id == circleId, ct) ??
@@ -334,6 +348,8 @@ public class CircleService
         db.Skills.RemoveRange(circle.Skills);
 
         db.JoinRequests.RemoveRange(circle.Invitions);
+
+        db.Upvotes.RemoveRange(circle.Upvotes);
 
         db.TodoTasks.RemoveRange(circle.TodoTasks);
 

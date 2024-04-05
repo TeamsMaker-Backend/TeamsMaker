@@ -8,6 +8,7 @@ public class GetSessionResponse
 
     public string Title { get; set; } = null!;
     public string? Notes { get; set; }
+    public SessionStatus Status { get; set; }
     public DateOnly Date { get; set; }
     public TimeOnly? Time { get; set; }
 }

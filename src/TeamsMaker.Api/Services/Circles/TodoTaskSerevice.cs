@@ -46,11 +46,12 @@ public class TodoTaskSerevice
         return todoTask.Id;
     }
 
-    public async Task<PagedList<GetTodoTaskResponse>> ListAsync(Guid circleId, TodoTaskStatus? status, TodoTaskQueryString queryString, CancellationToken ct)
+    public async Task<PagedList<GetTodoTaskResponse>> ListAsync(Guid circleId, TodoTaskQueryString queryString, CancellationToken ct)
     {
         var todoTasks = db.TodoTasks
             .Include(td => td.Session)
-            .Where(td => td.CircleId == circleId)
+            .Where(td => td.CircleId == circleId &&
+                (queryString.Status == null || td.Status == queryString.Status))
             .OrderBy(td => td.DeadLine)
             .Select(td => new GetTodoTaskResponse
             {
@@ -65,9 +66,6 @@ public class TodoTaskSerevice
 
                 SessionId = td.SessionId
             });
-
-        if (status is not null)
-            todoTasks = todoTasks.Where(td => td.Status == status);
 
         return await PagedList<GetTodoTaskResponse>
                         .ToPagedListAsync(todoTasks, queryString.PageNumber, queryString.PageSize, ct);

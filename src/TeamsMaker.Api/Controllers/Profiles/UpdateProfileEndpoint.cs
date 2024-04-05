@@ -15,7 +15,7 @@ public class UpdateProfileEndpoint(IServiceProvider serviceProvider, IUserInfo u
 {
     [Tags("profiles")]
     [HttpPut("profiles")]
-    public async Task<IActionResult> Profile([FromForm] UpdateProfileRequest request, CancellationToken ct)
+    public async Task<IActionResult> Profile(UpdateProfileRequest request, CancellationToken ct)
     {
         var profileService = serviceProvider.GetRequiredKeyedService<IProfileService>(GetKey());
 

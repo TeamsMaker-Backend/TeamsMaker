@@ -27,7 +27,7 @@ public class AppDBContext(DbContextOptions options,
     public DbSet<Session> Sessions { get; set; }
     public DbSet<TodoTask> TodoTasks { get; set; }
     public DbSet<Upvote> Upvotes { get; set; }
-    
+
     #endregion
 
 

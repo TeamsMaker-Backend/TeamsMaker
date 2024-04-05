@@ -61,98 +61,103 @@ public class JoinRequestService
 
     public async Task<GetJoinRequestResponse> GetAsync(string? circleId, CancellationToken ct)
     {
-        string entityId = !string.IsNullOrEmpty(circleId) && await db.Circles.AnyAsync(c => c.Id == Guid.Parse(circleId), ct)
-            ? circleId
-            : userInfo.UserId;
+        var isCircle = !string.IsNullOrEmpty(circleId) && await db.Circles.AnyAsync(c => c.Id == Guid.Parse(circleId), ct);
 
-        var fileService = string.IsNullOrEmpty(circleId) ?
-            serviceProvider.GetRequiredKeyedService<IFileService>(BaseTypes.Circle) : serviceProvider.GetRequiredKeyedService<IFileService>(BaseTypes.Student);
+        string entityId = isCircle ? circleId! : userInfo.UserId;
+
+        var fileService = isCircle
+            ? serviceProvider.GetRequiredKeyedService<IFileService>(BaseTypes.Student)
+            : serviceProvider.GetRequiredKeyedService<IFileService>(BaseTypes.Circle);
 
         var response = new GetJoinRequestResponse
         {
             JoinRequests = await db.JoinRequests
                 .Where(jr => jr.Sender == InvitationTypes.Student)
+                .Where(jr => (isCircle && jr.CircleId.ToString() == entityId) || (!isCircle && jr.StudentId == entityId))
                 .OrderByDescending(jr => jr.CreationDate)
                 .Select(jr => new GetBaseJoinRequestResponse
                 {
                     Id = jr.Id,
                     Sender = jr.Sender,
                     Name = jr.Circle.Name,
-                    Avatar = string.IsNullOrEmpty(circleId) ?
-                        fileService.GetFileUrl(jr.CircleId.ToString(), FileTypes.Avatar) : fileService.GetFileUrl(jr.StudentId, FileTypes.Avatar)
+                    Avatar = isCircle
+                        ? fileService.GetFileUrl(jr.StudentId, FileTypes.Avatar)
+                        : fileService.GetFileUrl(jr.CircleId.ToString(), FileTypes.Avatar)
                 })
                 .ToListAsync(cancellationToken: ct),
 
             Invitations = await db.JoinRequests
                 .Where(jr => jr.Sender == InvitationTypes.Circle)
+                .Where(jr => (isCircle && jr.CircleId.ToString() == entityId) || (!isCircle && jr.StudentId == entityId))
                 .OrderByDescending(jr => jr.CreationDate)
                 .Select(jr => new GetBaseJoinRequestResponse
                 {
                     Id = jr.Id,
                     Sender = jr.Sender,
                     Name = jr.Circle.Name,
-                    Avatar = string.IsNullOrEmpty(circleId) ?
-                        fileService.GetFileUrl(jr.CircleId.ToString(), FileTypes.Avatar) : fileService.GetFileUrl(jr.StudentId, FileTypes.Avatar)
-                 })
+                    Avatar = isCircle
+                        ? fileService.GetFileUrl(jr.StudentId, FileTypes.Avatar)
+                        : fileService.GetFileUrl(jr.CircleId.ToString(), FileTypes.Avatar)
+                })
                 .ToListAsync(cancellationToken: ct),
         };
 
         return response;
     }
 
-public async Task AcceptAsync(Guid id, CancellationToken ct)
-{
-    using var transaction = await db.Database.BeginTransactionAsync(ct);
-
-    var joinRequest = await db.JoinRequests.FindAsync([id], ct) ??
-        throw new ArgumentException("Invalid Join Request Id");
-
-    joinRequest.IsAccepted = true;
-
-    // In case of reciever is a circle
-    if (joinRequest.Sender != InvitationTypes.Circle)
+    public async Task AcceptAsync(Guid id, CancellationToken ct)
     {
-        // Check wether the circle member have a permission to accept a request or not
-        var circleMember = await validationService.TryGetCircleMemberAsync(userInfo.UserId, joinRequest.CircleId, ct);
+        using var transaction = await db.Database.BeginTransactionAsync(ct);
 
-        var circle = await db.Circles
-            .Include(c => c.DefaultPermission)
-            .SingleOrDefaultAsync(c => c.Id == joinRequest.CircleId, ct) ??
-            throw new ArgumentException("Invalid CircleId");
+        var joinRequest = await db.JoinRequests.FindAsync([id], ct) ??
+            throw new ArgumentException("Invalid Join Request Id");
 
-        validationService.CheckPermission(circleMember, circle, PermissionsEnum.MemberManagement);
+        joinRequest.IsAccepted = true;
+
+        // In case of reciever is a circle
+        if (joinRequest.Sender != InvitationTypes.Circle)
+        {
+            // Check wether the circle member have a permission to accept a request or not
+            var circleMember = await validationService.TryGetCircleMemberAsync(userInfo.UserId, joinRequest.CircleId, ct);
+
+            var circle = await db.Circles
+                .Include(c => c.DefaultPermission)
+                .SingleOrDefaultAsync(c => c.Id == joinRequest.CircleId, ct) ??
+                throw new ArgumentException("Invalid CircleId");
+
+            validationService.CheckPermission(circleMember, circle, PermissionsEnum.MemberManagement);
+        }
+
+        await db.SaveChangesAsync(ct);
+
+        await memberService.AddAsync(joinRequest.CircleId, joinRequest.StudentId, ct);
+
+        await transaction.CommitAsync(ct);
     }
 
-    await db.SaveChangesAsync(ct);
-
-    await memberService.AddAsync(joinRequest.CircleId, joinRequest.StudentId, ct);
-
-    await transaction.CommitAsync(ct);
-}
-
-public async Task DeleteAsync(Guid id, CancellationToken ct)
-{
-    var joinRequest =
-        await db.JoinRequests
-        .SingleOrDefaultAsync(jr => jr.Id == id && jr.IsAccepted == false, ct) ??
-        throw new ArgumentException("Not found");
-
-    db.JoinRequests.Remove(joinRequest);
-
-    // In case of sender is a circle
-    if (joinRequest.Sender == InvitationTypes.Circle)
+    public async Task DeleteAsync(Guid id, CancellationToken ct)
     {
-        // Check wether the circle member have a permission to delete an invitition or not
-        var circleMember = await validationService.TryGetCircleMemberAsync(userInfo.UserId, joinRequest.CircleId, ct);
+        var joinRequest =
+            await db.JoinRequests
+            .SingleOrDefaultAsync(jr => jr.Id == id && jr.IsAccepted == false, ct) ??
+            throw new ArgumentException("Not found");
 
-        var circle = await db.Circles
-            .Include(c => c.DefaultPermission)
-            .SingleOrDefaultAsync(c => c.Id == joinRequest.CircleId, ct) ??
-            throw new ArgumentException("Invalid CircleId");
+        db.JoinRequests.Remove(joinRequest);
 
-        validationService.CheckPermission(circleMember, circle, PermissionsEnum.MemberManagement);
+        // In case of sender is a circle
+        if (joinRequest.Sender == InvitationTypes.Circle)
+        {
+            // Check wether the circle member have a permission to delete an invitition or not
+            var circleMember = await validationService.TryGetCircleMemberAsync(userInfo.UserId, joinRequest.CircleId, ct);
+
+            var circle = await db.Circles
+                .Include(c => c.DefaultPermission)
+                .SingleOrDefaultAsync(c => c.Id == joinRequest.CircleId, ct) ??
+                throw new ArgumentException("Invalid CircleId");
+
+            validationService.CheckPermission(circleMember, circle, PermissionsEnum.MemberManagement);
+        }
+
+        await db.SaveChangesAsync(ct);
     }
-
-    await db.SaveChangesAsync(ct);
-}
 }
