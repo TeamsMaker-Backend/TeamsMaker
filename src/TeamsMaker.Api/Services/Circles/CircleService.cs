@@ -346,56 +346,6 @@ public class CircleService
         await db.SaveChangesAsync(ct);
     }
 
-    public async Task UpvoteAsync(Guid circleId, CancellationToken ct)
-    {
-        if (!await db.Circles.AnyAsync(c => c.Id == circleId, ct))
-            throw new ArgumentException();
-
-        if (await db.Upvotes.CountAsync(upvote => upvote.CircleId == circleId && upvote.UserId == userInfo.UserId, ct) > 1)
-            throw new InvalidOperationException();
-
-        using var transaction = await db.Database.BeginTransactionAsync(ct);
-
-        Upvote upvote = new()
-        {
-            UserId = userInfo.UserId,
-            CircleId = circleId
-        };
-
-        await db.Upvotes.AddAsync(upvote, ct);
-        await db.SaveChangesAsync(ct);
-
-        await db
-            .Circles
-            .Where(c => c.Id == circleId)
-            .ExecuteUpdateAsync(setters => setters.SetProperty(c => c.Rate, c => c.Rate + 1), ct);
-
-        await transaction.CommitAsync(ct);
-    }
-
-    public async Task DownvoteAsync(Guid id, CancellationToken ct)
-    {
-        using var transaction = await db.Database.BeginTransactionAsync(ct);
-
-        var upvote = await db.Upvotes.FindAsync([id], ct) ?? throw new NullReferenceException();
-
-        if (await db.Upvotes.CountAsync(upvote => upvote.CircleId == upvote.CircleId && upvote.UserId == userInfo.UserId, ct) == 0)
-            throw new InvalidOperationException();
-
-        var circleId = upvote.CircleId;
-
-        db.Upvotes.Remove(upvote);
-
-        await db.SaveChangesAsync(ct);
-
-        await db
-            .Circles
-            .Where(c => c.Id == circleId)
-            .ExecuteUpdateAsync(setters => setters.SetProperty(c => c.Rate, c => c.Rate - 1), cancellationToken: ct);
-
-        await transaction.CommitAsync(ct);
-    }
-
     public async Task DeleteAsync(Guid circleId, CancellationToken ct)
     {
         var owner = await validationService.TryGetOwnerAsync(userInfo.UserId, circleId, ct);
