@@ -16,17 +16,17 @@ public class FilterStudentEndpoint(IServiceProvider serviceProvider) : BaseApiCo
     public async Task<IActionResult> FilterStudent([FromQuery] string query, CancellationToken ct)
     {
         var profileService = serviceProvider.GetRequiredKeyedService<IProfileService>(UserEnum.Student);
-        List<GetStudentAsRowResponse> response = [];
+        List<GetStudentAsRowResponse> profiles = [];
 
         try
         {
-            response = await profileService.FilterAsync(query, ct);
+            profiles = await profileService.FilterAsync(query, ct);
         }
         catch (ArgumentException e)
         {
             return NotFound(_response.FailureResponse(e.Message));
         }
 
-        return Ok(_response.SuccessResponse(null));
+        return Ok(_response.SuccessResponse(profiles));
     }
 }
