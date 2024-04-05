@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 
 using TeamsMaker.Api.Contracts.Requests.Session;
+using TeamsMaker.Api.Contracts.Responses;
 using TeamsMaker.Api.Services.Circles.Interfaces;
 
 namespace TeamsMaker.Api.Controllers.Circles.Sessions;

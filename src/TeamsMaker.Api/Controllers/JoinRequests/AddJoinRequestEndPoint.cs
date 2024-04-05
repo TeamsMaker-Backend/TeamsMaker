@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 
 using TeamsMaker.Api.Contracts.Requests.JoinRequest;
+using TeamsMaker.Api.Contracts.Responses;
 using TeamsMaker.Api.Services.JoinRequests.Interfaces;
 
 namespace TeamsMaker.Api.Controllers.JoinRequests;
