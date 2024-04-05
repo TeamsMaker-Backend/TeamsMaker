@@ -61,38 +61,43 @@ public class JoinRequestService
 
     public async Task<GetJoinRequestResponse> GetAsync(string? circleId, CancellationToken ct)
     {
-        string entityId = !string.IsNullOrEmpty(circleId) && await db.Circles.AnyAsync(c => c.Id == Guid.Parse(circleId), ct)
-            ? circleId
-            : userInfo.UserId;
+        var isCircle = !string.IsNullOrEmpty(circleId) && await db.Circles.AnyAsync(c => c.Id == Guid.Parse(circleId), ct);
 
-        var fileService = string.IsNullOrEmpty(circleId) ?
-            serviceProvider.GetRequiredKeyedService<IFileService>(BaseTypes.Circle) : serviceProvider.GetRequiredKeyedService<IFileService>(BaseTypes.Student);
+        string entityId = isCircle ? circleId! : userInfo.UserId;
+
+        var fileService = isCircle
+            ? serviceProvider.GetRequiredKeyedService<IFileService>(BaseTypes.Student)
+            : serviceProvider.GetRequiredKeyedService<IFileService>(BaseTypes.Circle);
 
         var response = new GetJoinRequestResponse
         {
             JoinRequests = await db.JoinRequests
                 .Where(jr => jr.Sender == InvitationTypes.Student)
+                .Where(jr => (isCircle && jr.CircleId.ToString() == entityId) || (!isCircle && jr.StudentId == entityId))
                 .OrderByDescending(jr => jr.CreationDate)
                 .Select(jr => new GetBaseJoinRequestResponse
                 {
                     Id = jr.Id,
                     Sender = jr.Sender,
                     Name = jr.Circle.Name,
-                    Avatar = string.IsNullOrEmpty(circleId) ?
-                        fileService.GetFileUrl(jr.CircleId.ToString(), FileTypes.Avatar) : fileService.GetFileUrl(jr.StudentId, FileTypes.Avatar)
+                    Avatar = isCircle
+                        ? fileService.GetFileUrl(jr.StudentId, FileTypes.Avatar)
+                        : fileService.GetFileUrl(jr.CircleId.ToString(), FileTypes.Avatar)
                 })
                 .ToListAsync(cancellationToken: ct),
 
             Invitations = await db.JoinRequests
                 .Where(jr => jr.Sender == InvitationTypes.Circle)
+                .Where(jr => (isCircle && jr.CircleId.ToString() == entityId) || (!isCircle && jr.StudentId == entityId))
                 .OrderByDescending(jr => jr.CreationDate)
                 .Select(jr => new GetBaseJoinRequestResponse
                 {
                     Id = jr.Id,
                     Sender = jr.Sender,
                     Name = jr.Circle.Name,
-                    Avatar = string.IsNullOrEmpty(circleId) ?
-                        fileService.GetFileUrl(jr.CircleId.ToString(), FileTypes.Avatar) : fileService.GetFileUrl(jr.StudentId, FileTypes.Avatar)
+                    Avatar = isCircle
+                        ? fileService.GetFileUrl(jr.StudentId, FileTypes.Avatar)
+                        : fileService.GetFileUrl(jr.CircleId.ToString(), FileTypes.Avatar)
                 })
                 .ToListAsync(cancellationToken: ct),
         };

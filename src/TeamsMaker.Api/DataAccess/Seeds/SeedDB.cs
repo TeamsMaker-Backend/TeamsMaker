@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-
-using TeamsMaker.Api.DataAccess.Context;
+﻿using TeamsMaker.Api.DataAccess.Context;
 
 namespace TeamsMaker.Api.DataAccess.Seeds;
 
