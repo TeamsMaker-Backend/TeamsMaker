@@ -38,7 +38,6 @@ public class StudentProfileService
         return students;
     }
 
-
     public async Task<GetProfileResponse> GetAsync(CancellationToken ct)
     {
         var response = new GetProfileResponse { Roles = userInfo.Roles.ToList() };

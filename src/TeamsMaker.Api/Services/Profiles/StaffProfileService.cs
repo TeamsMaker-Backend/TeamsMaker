@@ -10,13 +10,11 @@ namespace TeamsMaker.Api.Services.Profiles;
 public class StaffProfileService
     (AppDBContext db, IUserInfo userInfo, ProfileUtilities profileUtilities) : IProfileService
 {
-
     //TODO: to be implemented
     public Task<List<GetStudentAsRowResponse>> FilterAsync(string query, CancellationToken ct)
     {
         throw new NotImplementedException();
     }
-
 
     public async Task<GetProfileResponse> GetAsync(CancellationToken ct)
     {
