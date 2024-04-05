@@ -41,10 +41,10 @@ public class SessionService
         return session.Id;
     }
 
-    public async Task<PagedList<GetSessionResponse>> ListAsync(Guid circleId, SessionStatus status, SessionsQueryString queryString, CancellationToken ct)
+    public async Task<PagedList<GetSessionResponse>> ListAsync(Guid circleId, SessionsQueryString queryString, CancellationToken ct)
     {
         var sessions = db.Sessions
-            .Where(s => s.CircleId == circleId && s.Status == status)
+            .Where(s => s.CircleId == circleId && (queryString.Status == null || s.Status == queryString.Status))
             .OrderBy(s => s.Date)
             .ThenBy(s => s.Time)
             .Select(s => new GetSessionResponse
@@ -55,6 +55,7 @@ public class SessionService
 
                 Title = s.Title,
                 Notes = s.Notes,
+                Status = s.Status,
                 Date = s.Date,
                 Time = s.Time
             });

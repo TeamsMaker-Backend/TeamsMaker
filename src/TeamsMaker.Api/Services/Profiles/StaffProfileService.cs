@@ -2,14 +2,13 @@
 
 using TeamsMaker.Api.Contracts.Requests.Profile;
 using TeamsMaker.Api.Contracts.Responses.Profile;
-using TeamsMaker.Api.Core.Consts;
 using TeamsMaker.Api.DataAccess.Context;
 using TeamsMaker.Api.Services.Profiles.Interfaces;
 
 namespace TeamsMaker.Api.Services.Profiles;
 
 public class StaffProfileService
-    (AppDBContext db, IWebHostEnvironment host, IUserInfo userInfo, ProfileUtilities profileUtilities) : IProfileService
+    (AppDBContext db, IUserInfo userInfo, ProfileUtilities profileUtilities) : IProfileService
 {
 
     //TODO: to be implemented
@@ -23,8 +22,7 @@ public class StaffProfileService
     {
         var response = new GetProfileResponse { Roles = userInfo.Roles.ToList() };
 
-        var staff =
-            await db.Staff
+        var staff = await db.Staff
             .Include(st => st.Links)
             .SingleOrDefaultAsync(st => st.Id == userInfo.UserId, ct) ??
             throw new ArgumentException("Invalid ID!");
@@ -39,8 +37,7 @@ public class StaffProfileService
     {
         var response = new GetOtherProfileResponse();
 
-        var staff =
-            await db.Staff
+        var staff = await db.Staff
             .Include(st => st.Links)
             .SingleOrDefaultAsync(st => st.Id == id, ct) ??
             throw new ArgumentException("Invalid ID!");
@@ -53,13 +50,12 @@ public class StaffProfileService
 
     public async Task UpdateAsync(UpdateProfileRequest profileRequest, CancellationToken ct)
     {
-        var staff =
-            await db.Staff
+        var staff = await db.Staff
             .Include(st => st.Links)
             .SingleOrDefaultAsync(st => st.Id == userInfo.UserId, ct) ??
             throw new ArgumentException("Invalid ID!");
 
-        await profileUtilities.UpdateUserDataAsync(staff, profileRequest, Path.Combine(host.WebRootPath, BaseTypes.Staff), ct);
+        profileUtilities.UpdateUserData(staff, profileRequest);
 
         await db.SaveChangesAsync(ct);
     }

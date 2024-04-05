@@ -1,5 +1,4 @@
-﻿using TeamsMaker.Api.Contracts.Requests.File;
-using TeamsMaker.Api.Contracts.Requests.Profile;
+﻿using TeamsMaker.Api.Contracts.Requests.Profile;
 using TeamsMaker.Api.Contracts.Responses.JoinRequest;
 using TeamsMaker.Api.Contracts.Responses.Profile;
 using TeamsMaker.Api.Core.Consts;
@@ -179,7 +178,7 @@ public class ProfileUtilities //TODO: [Refactor] remove dublicates - Urgent
         response.OtherStaffInfo = otherStaffInfo;
     }
 
-    public async Task UpdateUserDataAsync(User user, UpdateProfileRequest request, string folder, CancellationToken ct)
+    public void UpdateUserData(User user, UpdateProfileRequest request)
     {
         user.FirstName = request.FirstName;
         user.LastName = request.LastName;
@@ -191,20 +190,5 @@ public class ProfileUtilities //TODO: [Refactor] remove dublicates - Urgent
 
         db.Links.RemoveRange(user.Links);
         user.Links = request.Links?.Select(l => new Link { UserId = user.Id, Url = l.Url, Type = l.Type }).ToList() ?? [];
-
-        var fileService = serviceProvider.GetRequiredKeyedService<IFileService>(GetBaseType(user));
-
-        await fileService
-            .UpdateFileAsync(user.Id, FileTypes.Avatar, new UpdateFileRequest { File = request.Avatar }, ct);
-
-        await fileService
-            .UpdateFileAsync(user.Id, FileTypes.Header, new UpdateFileRequest { File = request.Header }, ct);
-
-        if (user is Student student)
-            await fileService
-                .UpdateFileAsync(student.Id, FileTypes.CV, new UpdateFileRequest { File = request.CV }, ct);
     }
-
-    private static string? GetBaseType(User user)
-        => user is Student ? BaseTypes.Student : BaseTypes.Staff;
 }

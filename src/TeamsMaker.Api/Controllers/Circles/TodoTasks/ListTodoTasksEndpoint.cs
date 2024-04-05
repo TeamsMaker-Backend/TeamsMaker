@@ -14,12 +14,12 @@ public class ListTodoTasksEndpoint(ITodoTaskService todoTaskService) : BaseApiCo
 {
     [Tags("circles/todo_tasks")]
     [Produces(typeof(PagedList<GetTodoTaskResponse>))]
-    [HttpGet("circles/{id}/todo_tasks/{status}")]
-    public async Task<IActionResult> TodoTasks(Guid id, TodoTaskStatus status, [FromQuery] TodoTaskQueryString queryString, CancellationToken ct)
+    [HttpGet("circles/{id}/todo_tasks")]
+    public async Task<IActionResult> TodoTasks(Guid id, [FromQuery] TodoTaskQueryString queryString, CancellationToken ct)
     {
         try
         {
-            var todoTasks = await todoTaskService.ListAsync(id, status, queryString, ct);
+            var todoTasks = await todoTaskService.ListAsync(id, queryString, ct);
             return todoTasks is not null ? Ok(_response.SuccessResponseWithPagination(todoTasks)) : NotFound();
         }
         catch (ArgumentException e)

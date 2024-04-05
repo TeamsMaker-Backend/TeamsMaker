@@ -10,8 +10,8 @@ using TeamsMaker.Api.Services.Profiles.Interfaces;
 namespace TeamsMaker.Api.Services.Profiles;
 
 public class StudentProfileService
-    (AppDBContext db, IWebHostEnvironment host,
-    IUserInfo userInfo, ProfileUtilities profileUtilities, IServiceProvider serviceProvider) : IProfileService
+    (AppDBContext db, IUserInfo userInfo, ProfileUtilities profileUtilities
+    , IServiceProvider serviceProvider) : IProfileService
 {
     private readonly IFileService _fileService = serviceProvider.GetRequiredKeyedService<IFileService>(BaseTypes.Student);
 
@@ -46,6 +46,7 @@ public class StudentProfileService
         var student =
             await db.Students
             .Include(st => st.Links)
+            .Include(st => st.JoinRequests)
             .Include(st => st.Experiences)
             .Include(st => st.Projects)
                 .ThenInclude(p => p.Skills)
@@ -83,7 +84,7 @@ public class StudentProfileService
                 .SingleOrDefaultAsync(st => st.Id == userInfo.UserId, ct) ??
                 throw new ArgumentException("Invalid ID!");
 
-        await profileUtilities.UpdateUserDataAsync(student, profileRequest, Path.Combine(host.WebRootPath, BaseTypes.Student), ct);
+        profileUtilities.UpdateUserData(student, profileRequest);
 
         await db.SaveChangesAsync(ct);
     }

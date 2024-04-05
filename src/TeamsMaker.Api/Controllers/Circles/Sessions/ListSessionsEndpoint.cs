@@ -14,12 +14,12 @@ public class ListSessionsEndpoint(ISessionService sessionService) : BaseApiContr
 {
     [Tags("circles/sessions")]
     [Produces(typeof(PagedList<GetSessionResponse>))]
-    [HttpGet("circles/{id}/sessions/{status}")]
-    public async Task<IActionResult> Sessions(Guid id, SessionStatus status, [FromQuery] SessionsQueryString queryString, CancellationToken ct)
+    [HttpGet("circles/{id}/sessions")]
+    public async Task<IActionResult> Sessions(Guid id, [FromQuery] SessionsQueryString queryString, CancellationToken ct)
     {
         try
         {
-            var sessions = await sessionService.ListAsync(id, status, queryString, ct);
+            var sessions = await sessionService.ListAsync(id, queryString, ct);
             return sessions is not null ? Ok(_response.SuccessResponseWithPagination(sessions)) : NotFound();
         }
         catch (ArgumentException e)
