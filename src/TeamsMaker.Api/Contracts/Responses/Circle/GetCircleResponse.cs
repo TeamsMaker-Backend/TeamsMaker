@@ -1,4 +1,5 @@
-﻿using TeamsMaker.Api.Contracts.Responses.Profile;
+﻿using TeamsMaker.Api.Contracts.Responses.JoinRequest;
+using TeamsMaker.Api.Contracts.Responses.Profile;
 using TeamsMaker.Core.Enums;
 
 namespace TeamsMaker.Api.Contracts.Responses.Circle;
@@ -16,6 +17,7 @@ public class GetCircleResponse
     public CircleStatusEnum Status { get; set; }
     public int OrganizationId { get; set; }
     public PermissionsInfo DefaultPermission { get; set; } = null!;
+    public GetJoinRequestResponse? CircleJoinRequests { get; set; }
     public ICollection<LinkInfo>? Links { get; set; } = []; // Replace LinkInfo
     public ICollection<string>? Skills { get; set; } = [];
 }

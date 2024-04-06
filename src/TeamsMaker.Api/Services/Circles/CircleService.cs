@@ -5,6 +5,7 @@ using DataAccess.Base.Interfaces;
 using TeamsMaker.Api.Contracts.Requests.Circle;
 using TeamsMaker.Api.Contracts.Requests.JoinRequest;
 using TeamsMaker.Api.Contracts.Responses.Circle;
+using TeamsMaker.Api.Contracts.Responses.JoinRequest;
 using TeamsMaker.Api.Contracts.Responses.Profile;
 using TeamsMaker.Api.Core.Consts;
 using TeamsMaker.Api.Core.Enums;
@@ -68,10 +69,12 @@ public class CircleService
             .Include(c => c.SummaryData)
             .Include(c => c.Links)
             .Include(c => c.CircleMembers)
+            .Include(c => c.Invitions)
             .SingleOrDefaultAsync(c => c.Id == circleId, ct) ??
             throw new ArgumentException("Invalid Circle ID");
 
-        IFileService fileService = serviceProvider.GetRequiredKeyedService<IFileService>(BaseTypes.Circle);
+        var studentFileService = serviceProvider.GetRequiredKeyedService<IFileService>(BaseTypes.Student);
+        var circleFileService = serviceProvider.GetRequiredKeyedService<IFileService>(BaseTypes.Circle);
 
         var response = new GetCircleResponse
         {
@@ -84,9 +87,37 @@ public class CircleService
             OrganizationId = circle.OrganizationId,
             Skills = circle.Skills.Select(l => l.Name).ToList(),
             Links = circle.Links.Select(l => new LinkInfo { Type = l.Type, Url = l.Url }).ToList(),
+            CircleJoinRequests = new()
+            {
+                JoinRequests = circle.Invitions
+                    .Where(jr => jr.Sender == InvitationTypes.Student) // join request from users
+                    .OrderByDescending(jr => jr.CreationDate)
+                    .Take(3)
+                    .Select(jr => new GetBaseJoinRequestResponse
+                    {
+                        Id = jr.Id,
+                        Sender = jr.Sender,
+                        Name = jr.Circle.Name,
+                        Avatar = studentFileService.GetFileUrl(jr.StudentId , FileTypes.Avatar)
+                    })
+                    .ToList(),
 
-            Avatar = fileService.GetFileUrl(circleId.ToString(), FileTypes.Avatar),
-            Header = fileService.GetFileUrl(circleId.ToString(), FileTypes.Header)
+                Invitations = circle.Invitions
+                    .Where(jr => jr.Sender == InvitationTypes.Circle) // invitation from circle
+                    .OrderByDescending(jr => jr.CreationDate)
+                    .Take(3)
+                    .Select(jr => new GetBaseJoinRequestResponse
+                    {
+                        Id = jr.Id,
+                        Sender = jr.Sender,
+                        Name = jr.Circle.Name,
+                        Avatar = studentFileService.GetFileUrl(jr.StudentId, FileTypes.Avatar)
+                    })
+                    .ToList(),
+            },
+
+            Avatar = circleFileService.GetFileUrl(circleId.ToString(), FileTypes.Avatar),
+            Header = circleFileService.GetFileUrl(circleId.ToString(), FileTypes.Header)
         };
 
 
