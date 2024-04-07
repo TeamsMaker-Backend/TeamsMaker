@@ -4,6 +4,7 @@ public class Staff : User
 {
     public StaffClassificationsEnum Classification { get; set; }
     public virtual ICollection<DepartmentStaff> DepartmentStaff { get; set; } = [];
+    public virtual ICollection<ApprovalRequest> ApprovalRequests { get; set; } = [];
 }
 
 //TODO: public int Creds { get; set; }
