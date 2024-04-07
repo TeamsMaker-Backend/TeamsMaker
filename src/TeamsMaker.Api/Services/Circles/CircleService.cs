@@ -103,8 +103,8 @@ public class CircleService
                     {
                         Id = jr.Id,
                         Sender = jr.Sender,
-                        Name = jr.Circle.Name,
-                        Avatar = studentFileService.GetFileUrl(jr.StudentId , FileTypes.Avatar)
+                        Name = circle.Name,
+                        Avatar = studentFileService.GetFileUrl(jr.StudentId, FileTypes.Avatar)
                     })
                     .ToList(),
 
@@ -116,7 +116,7 @@ public class CircleService
                     {
                         Id = jr.Id,
                         Sender = jr.Sender,
-                        Name = jr.Circle.Name,
+                        Name = circle.Name,
                         Avatar = studentFileService.GetFileUrl(jr.StudentId, FileTypes.Avatar)
                     })
                     .ToList(),
