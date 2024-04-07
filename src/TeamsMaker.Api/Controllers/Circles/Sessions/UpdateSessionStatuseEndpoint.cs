@@ -9,7 +9,7 @@ namespace TeamsMaker.Api.Controllers.Circles.Sessions;
 public class UpdateSessionStatuseEndpoint(ISessionService sessionService) : BaseApiController
 {
     [Tags("circles/sessions")]
-    [HttpPut("circles/sessions/{id}/{status}")] //patch
+    [HttpPatch("circles/sessions/{id}/{status}")] //patch
     public async Task<IActionResult> Session(Guid id, SessionStatus status, CancellationToken ct)
     {
         try

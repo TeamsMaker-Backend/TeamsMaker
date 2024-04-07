@@ -10,7 +10,7 @@ namespace TeamsMaker.Api.Controllers.Circles;
 public class UpdatePermissionEndpoint(IServiceProvider serviceProvider) : BaseApiController
 {
     [Tags("circles/danger_zone")]
-    [HttpPut("circles/permissions/{baseType}/{entityId}")]
+    [HttpPatch("circles/permissions/{baseType}/{entityId}")]
     public async Task<IActionResult> Permission(string baseType, Guid entityId, UpdatePermissionRequest? request, CancellationToken ct)
     {
         var permissionService = serviceProvider.GetRequiredKeyedService<IPermissionService>(baseType);

@@ -83,9 +83,10 @@ public class TodoTaskSerevice
 
         validationService.CheckPermission(circleMember, todoTask.Circle, PermissionsEnum.TodoTaskManagement);
 
-        todoTask.Title = request.Title;
+        if (!string.IsNullOrEmpty(request.Title)) todoTask.Title = request.Title;
+        if (request.DeadLine.HasValue) todoTask.DeadLine = request.DeadLine.Value;
+        
         todoTask.Notes = request.Notes;
-        todoTask.DeadLine = request.DeadLine;
         todoTask.SessionId = request.SessionId;
 
         await db.SaveChangesAsync(ct);

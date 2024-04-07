@@ -9,7 +9,7 @@ namespace TeamsMaker.Api.Controllers.Circles;
 public class ArchiveCircleEndpoint(ICircleService circleService) : BaseApiController
 {
     [Tags("circles/danger_zone")]
-    [HttpPut("circles/{circleId}/archive")]
+    [HttpPatch("circles/{circleId}/archive")]
     public async Task<IActionResult> ArchiveCircle(Guid circleId, CancellationToken ct)
     {
         try

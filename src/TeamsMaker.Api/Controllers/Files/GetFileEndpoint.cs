@@ -5,7 +5,7 @@ using TeamsMaker.Api.Services.Files.Interfaces;
 
 namespace TeamsMaker.Api.Controllers.Files;
 
-[Authorize]
+//TODO: to be authorized
 public class GetFileEndpoint(IServiceProvider serviceProvider) : BaseApiController
 {
     [Tags("files")]

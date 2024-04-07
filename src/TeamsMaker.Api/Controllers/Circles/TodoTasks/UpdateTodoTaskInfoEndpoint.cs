@@ -10,7 +10,7 @@ namespace TeamsMaker.Api.Controllers.Circles.TodoTasks;
 public class UpdateTodoTaskInfoEndpoint(ITodoTaskService todoTaskService) : BaseApiController
 {
     [Tags("circles/todo_tasks")]
-    [HttpPut("circles/todo_tasks/{id}")]
+    [HttpPatch("circles/todo_tasks/{id}")]
     public async Task<IActionResult> TodoTask(Guid id, [FromBody] UpdateTodoTaskInfoRequest request, CancellationToken ct)
     {
         try

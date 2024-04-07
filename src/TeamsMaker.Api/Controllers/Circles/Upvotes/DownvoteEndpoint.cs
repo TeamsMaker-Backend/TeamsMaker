@@ -9,7 +9,7 @@ namespace TeamsMaker.Api.Controllers.Circles.Upvotes;
 public class DownvoteEndpoint(ICircleService circleService) : BaseApiController
 {
     [Tags("circles/upvote")]
-    [HttpPost("circles/{circleId}/downvote")]
+    [HttpDelete("circles/{circleId}/downvote")]
     public async Task<IActionResult> Downvote(Guid circleId, CancellationToken ct)
     {
         try

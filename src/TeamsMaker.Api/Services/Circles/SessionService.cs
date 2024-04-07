@@ -76,9 +76,10 @@ public class SessionService
 
         validationService.CheckPermission(circleMember, session.Circle, PermissionsEnum.SessionManagement);
 
-        session.Title = request.Title;
+        if (!string.IsNullOrEmpty(request.Title)) session.Title = request.Title;
+        if (request.Date.HasValue) session.Date = request.Date.Value;
+        
         session.Notes = request.Notes;
-        session.Date = request.Date;
         session.Time = request.Time;
 
         await db.SaveChangesAsync(ct);

@@ -2,10 +2,10 @@
 
 public class UpdatePermissionRequest
 {
-    public bool MemberManagement { get; init; }
-    public bool CircleManagment { get; init; }
-    public bool ProposalManagment { get; init; }
-    public bool FeedManagment { get; init; }
-    public bool SessionManagment { get; init; }
-    public bool TodoTaskManagment { get; init; }
+    public bool? MemberManagement { get; init; }
+    public bool? CircleManagment { get; init; }
+    public bool? ProposalManagment { get; init; }
+    public bool? FeedManagment { get; init; }
+    public bool? SessionManagment { get; init; }
+    public bool? TodoTaskManagment { get; init; }
 }

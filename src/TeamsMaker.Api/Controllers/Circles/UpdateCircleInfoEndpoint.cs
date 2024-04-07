@@ -10,7 +10,7 @@ namespace TeamsMaker.Api.Controllers.Circles;
 public class UpdateCircleInfoEndpoint(ICircleService circleService) : BaseApiController
 {
     [Tags("circles")]
-    [HttpPut("circles/{circleId}/info")]
+    [HttpPatch("circles/{circleId}/info")]
     public async Task<IActionResult> CircleInfo(Guid circleId, UpdateCircleInfoRequest request, CancellationToken ct)
     {
         try
