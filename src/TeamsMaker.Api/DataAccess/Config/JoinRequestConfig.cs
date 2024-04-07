@@ -18,7 +18,7 @@ public class JoinRequestConfig : IEntityTypeConfiguration<JoinRequest>
 
         builder
             .Property(x => x.Sender)
-            .HasMaxLength(6);
+            .HasMaxLength(7);
 
         builder
            .HasOne(x => x.Circle)

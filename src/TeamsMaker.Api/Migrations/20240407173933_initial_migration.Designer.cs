@@ -12,7 +12,7 @@ using TeamsMaker.Api.DataAccess.Context;
 namespace TeamsMaker.Api.Migrations
 {
     [DbContext(typeof(AppDBContext))]
-    [Migration("20240322224433_initial_migration")]
+    [Migration("20240407173933_initial_migration")]
     partial class initial_migration
     {
         /// <inheritdoc />
@@ -143,7 +143,7 @@ namespace TeamsMaker.Api.Migrations
                     b.Property<DateTime?>("CreationDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Description")
+                    b.Property<string>("Keywords")
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)");
 
@@ -453,8 +453,8 @@ namespace TeamsMaker.Api.Migrations
 
                     b.Property<string>("Sender")
                         .IsRequired()
-                        .HasMaxLength(6)
-                        .HasColumnType("nvarchar(6)");
+                        .HasMaxLength(7)
+                        .HasColumnType("nvarchar(7)");
 
                     b.Property<string>("StudentId")
                         .IsRequired()
@@ -570,6 +570,12 @@ namespace TeamsMaker.Api.Migrations
                         .HasColumnType("bit");
 
                     b.Property<bool>("ProposalManagment")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("SessionManagment")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("TodoTaskManagment")
                         .HasColumnType("bit");
 
                     b.HasKey("Id");
@@ -704,8 +710,7 @@ namespace TeamsMaker.Api.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("CircleId")
-                        .IsRequired()
+                    b.Property<Guid>("CircleId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("CreatedBy")
@@ -779,8 +784,7 @@ namespace TeamsMaker.Api.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("CircleId")
-                        .IsRequired()
+                    b.Property<Guid>("CircleId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("CreatedBy")
@@ -821,6 +825,28 @@ namespace TeamsMaker.Api.Migrations
                     b.HasIndex("SessionId");
 
                     b.ToTable("TodoTask", "dbo");
+                });
+
+            modelBuilder.Entity("TeamsMaker.Api.DataAccess.Models.Upvote", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CircleId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CircleId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Upvote", "dbo");
                 });
 
             modelBuilder.Entity("TeamsMaker.Api.DataAccess.Models.User", b =>
@@ -1029,7 +1055,7 @@ namespace TeamsMaker.Api.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.OwnsOne("Core.ValueObjects.SummaryData", "Summary", b1 =>
+                    b.OwnsOne("Core.ValueObjects.SummaryData", "SummaryData", b1 =>
                         {
                             b1.Property<Guid>("CircleId")
                                 .HasColumnType("uniqueidentifier");
@@ -1099,7 +1125,7 @@ namespace TeamsMaker.Api.Migrations
 
                     b.Navigation("Organization");
 
-                    b.Navigation("Summary");
+                    b.Navigation("SummaryData");
                 });
 
             modelBuilder.Entity("TeamsMaker.Api.DataAccess.Models.CircleMember", b =>
@@ -1345,6 +1371,25 @@ namespace TeamsMaker.Api.Migrations
                     b.Navigation("Session");
                 });
 
+            modelBuilder.Entity("TeamsMaker.Api.DataAccess.Models.Upvote", b =>
+                {
+                    b.HasOne("TeamsMaker.Api.DataAccess.Models.Circle", "Circle")
+                        .WithMany("Upvotes")
+                        .HasForeignKey("CircleId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("TeamsMaker.Api.DataAccess.Models.User", "User")
+                        .WithMany("Upvotes")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Circle");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("TeamsMaker.Api.DataAccess.Models.User", b =>
                 {
                     b.HasOne("TeamsMaker.Api.DataAccess.Models.Organization", "Organization")
@@ -1467,6 +1512,8 @@ namespace TeamsMaker.Api.Migrations
                     b.Navigation("Skills");
 
                     b.Navigation("TodoTasks");
+
+                    b.Navigation("Upvotes");
                 });
 
             modelBuilder.Entity("TeamsMaker.Api.DataAccess.Models.CircleMember", b =>
@@ -1509,6 +1556,8 @@ namespace TeamsMaker.Api.Migrations
                     b.Navigation("MemberOn");
 
                     b.Navigation("RefreshTokens");
+
+                    b.Navigation("Upvotes");
                 });
 
             modelBuilder.Entity("TeamsMaker.Api.DataAccess.Models.Staff", b =>

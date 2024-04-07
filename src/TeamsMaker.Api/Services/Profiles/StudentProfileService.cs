@@ -46,6 +46,7 @@ public class StudentProfileService
             await db.Students
             .Include(st => st.Links)
             .Include(st => st.JoinRequests)
+                .ThenInclude(jr => jr.Circle)
             .Include(st => st.Experiences)
             .Include(st => st.Projects)
                 .ThenInclude(p => p.Skills)

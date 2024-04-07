@@ -450,8 +450,8 @@ namespace TeamsMaker.Api.Migrations
 
                     b.Property<string>("Sender")
                         .IsRequired()
-                        .HasMaxLength(6)
-                        .HasColumnType("nvarchar(6)");
+                        .HasMaxLength(7)
+                        .HasColumnType("nvarchar(7)");
 
                     b.Property<string>("StudentId")
                         .IsRequired()

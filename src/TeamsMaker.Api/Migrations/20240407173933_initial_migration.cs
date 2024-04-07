@@ -152,7 +152,7 @@ namespace TeamsMaker.Api.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: true),
+                    Keywords = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: true),
                     Summary = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsSummaryPublic = table.Column<bool>(type: "bit", nullable: true),
                     Avatar_Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -445,6 +445,33 @@ namespace TeamsMaker.Api.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Upvote",
+                schema: "dbo",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    CircleId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Upvote", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Upvote_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Upvote_Circle_CircleId",
+                        column: x => x.CircleId,
+                        principalSchema: "dbo",
+                        principalTable: "Circle",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Student",
                 schema: "dbo",
                 columns: table => new
@@ -520,6 +547,8 @@ namespace TeamsMaker.Api.Migrations
                     CircleManagment = table.Column<bool>(type: "bit", nullable: false),
                     ProposalManagment = table.Column<bool>(type: "bit", nullable: false),
                     FeedManagment = table.Column<bool>(type: "bit", nullable: false),
+                    SessionManagment = table.Column<bool>(type: "bit", nullable: false),
+                    TodoTaskManagment = table.Column<bool>(type: "bit", nullable: false),
                     CircleId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CircleMemberId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
@@ -608,7 +637,7 @@ namespace TeamsMaker.Api.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Sender = table.Column<string>(type: "nvarchar(6)", maxLength: 6, nullable: false),
+                    Sender = table.Column<string>(type: "nvarchar(7)", maxLength: 7, nullable: false),
                     IsAccepted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
                     StudentId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     CircleId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -910,6 +939,18 @@ namespace TeamsMaker.Api.Migrations
                 schema: "dbo",
                 table: "TodoTask",
                 column: "SessionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Upvote_CircleId",
+                schema: "dbo",
+                table: "Upvote",
+                column: "CircleId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Upvote_UserId",
+                schema: "dbo",
+                table: "Upvote",
+                column: "UserId");
         }
 
         /// <inheritdoc />
@@ -968,6 +1009,10 @@ namespace TeamsMaker.Api.Migrations
 
             migrationBuilder.DropTable(
                 name: "TodoTask",
+                schema: "dbo");
+
+            migrationBuilder.DropTable(
+                name: "Upvote",
                 schema: "dbo");
 
             migrationBuilder.DropTable(
