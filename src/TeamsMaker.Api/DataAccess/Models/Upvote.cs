@@ -1,4 +1,4 @@
-﻿using TeamsMaker.Api.DataAccess.Base;
+using TeamsMaker.Api.DataAccess.Base;
 
 namespace TeamsMaker.Api.DataAccess.Models;
 

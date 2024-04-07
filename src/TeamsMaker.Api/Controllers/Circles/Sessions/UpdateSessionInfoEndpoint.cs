@@ -10,7 +10,7 @@ namespace TeamsMaker.Api.Controllers.Circles.Sessions;
 public class UpdateSessionInfoEndpoint(ISessionService sessionService) : BaseApiController
 {
     [Tags("circles/sessions")]
-    [HttpPut("circles/sessions/{id}")]
+    [HttpPatch("circles/sessions/{id}")]
     public async Task<IActionResult> Session(Guid id, UpdateSessionInfoRequest request, CancellationToken ct)
     {
         try

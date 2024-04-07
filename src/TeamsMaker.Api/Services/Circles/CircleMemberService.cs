@@ -93,12 +93,12 @@ public class CircleMemberService
 
         circleMember.ExceptionPermission = request is not null ? new Permission
         {
-            CircleManagment = request.CircleManagment,
-            MemberManagement = request.MemberManagement,
-            ProposalManagment = request.ProposalManagment,
-            FeedManagment = request.FeedManagment,
-            SessionManagment = request.SessionManagment,
-            TodoTaskManagment = request.TodoTaskManagment
+            CircleManagment = request.CircleManagment ?? default,
+            MemberManagement = request.MemberManagement ?? default,
+            ProposalManagment = request.ProposalManagment ?? default,
+            FeedManagment = request.FeedManagment ?? default,
+            SessionManagment = request.SessionManagment ?? default,
+            TodoTaskManagment = request.TodoTaskManagment ?? default
         } : null;
 
         await db.SaveChangesAsync(ct);

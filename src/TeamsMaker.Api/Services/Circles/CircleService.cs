@@ -258,14 +258,7 @@ public class CircleService
 
         validationService.CheckPermission(circleMember, circle, PermissionsEnum.CircleManagement);
 
-        circle.Name = request.Name;
-        circle.Keywords = request.Keywords != null ? string.Join(",", request.Keywords) : null;
-
-        db.Skills.RemoveRange(circle.Skills);
-        circle.Skills = request.Skills?.Select(s => new Skill { CircleId = circleId, Name = s }).ToList() ?? [];
-
-        db.Links.RemoveRange(circle.Links);
-        circle.Links = request.Links?.Select(l => new Link { CircleId = circleId, Url = l.Url, Type = l.Type }).ToList() ?? [];
+        if (!string.IsNullOrEmpty(request.Name)) circle.Name = request.Name;
 
         if (request.Summary != null)
         {
@@ -275,8 +268,15 @@ public class CircleService
 
             circle.SummaryData = new SummaryData { Summary = request.Summary, IsPublic = isPublic };
         }
-        else
-            circle.SummaryData = null;
+
+        circle.Keywords = request.Keywords != null ? string.Join(",", request.Keywords) : null;
+
+        db.Skills.RemoveRange(circle.Skills);
+        circle.Skills = request.Skills?.Select(s => new Skill { CircleId = circleId, Name = s }).ToList() ?? [];
+
+        db.Links.RemoveRange(circle.Links);
+        circle.Links = request.Links?.Select(l => new Link { CircleId = circleId, Url = l.Url, Type = l.Type }).ToList() ?? [];
+
 
         await db.SaveChangesAsync(ct);
     }
@@ -311,16 +311,12 @@ public class CircleService
             .SingleOrDefaultAsync(c => c.Id == circleId, ct) ??
             throw new ArgumentException("Invalid Circle Id");
 
-        db.Permissions.Remove(circle.DefaultPermission);
-        circle.DefaultPermission = new Permission
-        {
-            CircleManagment = request.CircleManagment,
-            MemberManagement = request.MemberManagement,
-            ProposalManagment = request.ProposalManagment,
-            FeedManagment = request.FeedManagment,
-            SessionManagment = request.SessionManagment,
-            TodoTaskManagment = request.TodoTaskManagment
-        };
+        if (request.MemberManagement.HasValue) circle.DefaultPermission.MemberManagement = request.MemberManagement.Value;
+        if (request.CircleManagment.HasValue) circle.DefaultPermission.CircleManagment = request.CircleManagment.Value;
+        if (request.FeedManagment.HasValue) circle.DefaultPermission.FeedManagment = request.FeedManagment.Value;
+        if (request.ProposalManagment.HasValue) circle.DefaultPermission.ProposalManagment = request.ProposalManagment.Value;
+        if (request.SessionManagment.HasValue) circle.DefaultPermission.SessionManagment = request.SessionManagment.Value;
+        if (request.TodoTaskManagment.HasValue) circle.DefaultPermission.TodoTaskManagment = request.TodoTaskManagment.Value;
 
         await db.SaveChangesAsync(ct);
     }
@@ -342,10 +338,10 @@ public class CircleService
 
     public async Task ArchiveAsync(Guid circleId, CancellationToken ct)
     {
-        var owner = await validationService.TryGetOwnerAsync(userInfo.UserId, circleId, ct);
-
         var circle = await db.Circles.FindAsync([circleId], ct) ??
             throw new ArgumentException("Invalid Circle Id");
+
+        await validationService.TryGetOwnerAsync(userInfo.UserId, circleId, ct);
 
         circle.Status = CircleStatusEnum.Archived;
 

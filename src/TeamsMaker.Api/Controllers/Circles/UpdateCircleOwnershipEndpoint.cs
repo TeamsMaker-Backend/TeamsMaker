@@ -9,7 +9,7 @@ namespace TeamsMaker.Api.Controllers.Circles;
 public class UpdateCircleOwnershipEndpoint(ICircleService circleService) : BaseApiController
 {
     [Tags("circles/danger_zone")]
-    [HttpPut("circles/{circleId}/ownership/{newOwnerId}")]
+    [HttpPatch("circles/{circleId}/ownership/{newOwnerId}")]
     public async Task<IActionResult> CircleOwnership(Guid circleId, string newOwnerId, CancellationToken ct)
     {
         try

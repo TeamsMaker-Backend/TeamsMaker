@@ -9,7 +9,7 @@ namespace TeamsMaker.Api.Controllers.Circles;
 public class UpdateCirclePrivacyEndpoint(ICircleService circleService) : BaseApiController
 {
     [Tags("circles")]
-    [HttpPut("circles/{circleId}/privacy/{isPublic}")]
+    [HttpPatch("circles/{circleId}/privacy/{isPublic}")]
     public async Task<IActionResult> CirclePrivacy(Guid circleId, bool isPublic, CancellationToken ct)
     {
         try
