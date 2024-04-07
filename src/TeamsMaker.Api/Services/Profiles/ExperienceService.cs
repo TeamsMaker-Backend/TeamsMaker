@@ -8,7 +8,7 @@ namespace TeamsMaker.Api.Services.Profiles;
 
 public class ExperienceService(AppDBContext db, IUserInfo userInfo) : IExperienceService
 {
-    public async Task AddAsync(AddExperienceRequest experienceRequest, CancellationToken ct)
+    public async Task<int> AddAsync(AddExperienceRequest experienceRequest, CancellationToken ct)
     {
         var experience = new Experience
         {
@@ -23,6 +23,8 @@ public class ExperienceService(AppDBContext db, IUserInfo userInfo) : IExperienc
 
         await db.Experiences.AddAsync(experience, ct);
         await db.SaveChangesAsync(ct);
+
+        return experience.Id;
     }
 
     public async Task DeleteAsync(int experienceId, CancellationToken ct)

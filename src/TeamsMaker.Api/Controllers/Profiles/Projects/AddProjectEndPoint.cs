@@ -13,15 +13,17 @@ public class AddProjectEndpoint(IProjectService projectService) : BaseApiControl
     [HttpPost("profiles/projects")]
     public async Task<IActionResult> Project(AddProjectRequest request, CancellationToken ct)
     {
+        int id;
+
         try
         {
-            await projectService.AddAsync(request, ct);
+            id = await projectService.AddAsync(request, ct);
         }
         catch (ArgumentException e)
         {
             return NotFound(_response.FailureResponse(e.Message));
         }
 
-        return Ok(_response.SuccessResponse(null));
+        return Created("", _response.SuccessResponse(new { id }));
     }
 }

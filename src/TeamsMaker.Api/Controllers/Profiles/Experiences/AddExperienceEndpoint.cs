@@ -13,14 +13,17 @@ public class AddExperiencEndpoint(IExperienceService experienceService) : BaseAp
     [HttpPost("profiles/experiences")]
     public async Task<IActionResult> Experience(AddExperienceRequest request, CancellationToken ct)
     {
+        int id;
+
         try
         {
-            await experienceService.AddAsync(request, ct);
+            id = await experienceService.AddAsync(request, ct);
         }
         catch (ArgumentException e)
         {
             return NotFound(_response.FailureResponse(e.Message));
         }
-        return Ok(_response.SuccessResponse(null));
+
+        return Created("", _response.SuccessResponse(new { id }));
     }
 }

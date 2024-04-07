@@ -48,12 +48,18 @@ public class CircleService
         await db.SaveChangesAsync(ct);
 
         foreach (var studentId in request.InvitedStudents ?? [])
+        {
+            // check whether student id is valid
+            if (await db.Students.AnyAsync(s => s.Id == studentId, ct) == false)
+                throw new ArgumentException("Invalid Student ID!");
+
             await joinRequestService.AddAsync(new AddJoinRequest
             {
                 CircleId = circle.Id,
                 StudentId = studentId,
                 SenderType = InvitationTypes.Circle
             }, ct);
+        }
 
         await transaction.CommitAsync(ct);
 

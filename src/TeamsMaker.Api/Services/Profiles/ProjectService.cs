@@ -8,7 +8,7 @@ namespace TeamsMaker.Api.Services.Profiles;
 
 public class ProjectService(AppDBContext db, IUserInfo userInfo) : IProjectService
 {
-    public async Task AddAsync(AddProjectRequest projectRequest, CancellationToken ct)
+    public async Task<int> AddAsync(AddProjectRequest projectRequest, CancellationToken ct)
     {
         var project = new Project
         {
@@ -23,6 +23,8 @@ public class ProjectService(AppDBContext db, IUserInfo userInfo) : IProjectServi
 
         await db.Projects.AddAsync(project, ct);
         await db.SaveChangesAsync(ct);
+
+        return project.Id;
     }
 
     public async Task DeleteAsync(int projectId, CancellationToken ct)
