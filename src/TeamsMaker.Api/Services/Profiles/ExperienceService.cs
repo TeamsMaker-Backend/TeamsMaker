@@ -12,7 +12,6 @@ public class ExperienceService(AppDBContext db, IUserInfo userInfo) : IExperienc
     {
         var experience = new Experience
         {
-            Title = experienceRequest.Title,
             Organization = experienceRequest.Organization,
             Role = experienceRequest.Role,
             StartDate = experienceRequest.StartDate,
@@ -44,7 +43,6 @@ public class ExperienceService(AppDBContext db, IUserInfo userInfo) : IExperienc
             await db.Experiences.SingleOrDefaultAsync(ex => ex.Id == experienceId, ct) ??
             throw new ArgumentException("Invalid ID!");
 
-        experience.Title = updateExperienceRequest.Title;
         experience.Organization = updateExperienceRequest.Organization;
         experience.Role = updateExperienceRequest.Role;
         experience.StartDate = updateExperienceRequest.StartDate;

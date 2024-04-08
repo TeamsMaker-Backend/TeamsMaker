@@ -5,7 +5,7 @@ namespace TeamsMaker.Api.DataAccess.Models;
 public class Project : BaseEntity<int>
 {
     public string Name { get; set; } = null!;
-    public string Url { get; set; } = null!;
+    public string? Url { get; set; }
     public string? Description { get; set; }
     public DateOnly? StartDate { get; set; }
     public DateOnly? EndDate { get; set; }
