@@ -57,26 +57,6 @@ public class CircleMemberService
         await db.SaveChangesAsync(ct);
     }
 
-    public async Task UpdateBadgeAsync(Guid circleMemberId, string? badge, CancellationToken ct)
-    {
-        var updatedCircleMember = await db.CircleMembers
-            .FindAsync([circleMemberId], ct) ??
-            throw new ArgumentException("Not a circle Member");
-
-        var currentCircleMember = await validationService.TryGetCircleMemberAsync(userInfo.UserId, updatedCircleMember.CircleId, ct);
-
-        var circle = await db.Circles
-            .Include(c => c.DefaultPermission)
-            .SingleOrDefaultAsync(c => c.Id == updatedCircleMember.CircleId, ct) ??
-            throw new ArgumentException("Invalid Circle ID");
-
-        validationService.CheckPermission(currentCircleMember, circle, PermissionsEnum.MemberManagement);
-
-        updatedCircleMember.Badge = badge; // Todo: string splitting ','
-
-        await db.SaveChangesAsync(ct);
-    }
-
     public async Task UpdatePermissionAsync(Guid circleMemberId, UpdatePermissionRequest? request, CancellationToken ct)
     {
         var circleMember = await db.CircleMembers
