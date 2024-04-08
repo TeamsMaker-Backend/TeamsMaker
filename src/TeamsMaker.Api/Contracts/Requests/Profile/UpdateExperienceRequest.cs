@@ -2,7 +2,6 @@ namespace TeamsMaker.Api.Contracts.Requests.Profile;
 
 public class UpdateExperienceRequest
 {
-    public required string Title { get; init; }
     public required string Organization { get; init; }
     public required string Role { get; init; }
     public DateOnly? StartDate { get; init; }
