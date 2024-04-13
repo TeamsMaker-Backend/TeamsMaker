@@ -47,13 +47,22 @@ public class StudentInfo
     public ICollection<ExperienceInfo>? Experiences { get; set; } = [];
     public ICollection<ProjectInfo>? Projects { get; set; } = [];
     public GetJoinRequestResponse? StudentJoinRequests { get; set; }
+    public CircleInfo? CircleInfo { get; set; }
+}
+
+public class CircleInfo
+{
+    public Guid Id { get; set; }
+    public string? Avatar { get; set; } = null!;
+    public string Name { get; set; } = null!;
+    public string OwnerName { get; set; } = null!;
 }
 
 public class ProjectInfo
 {
     public int Id { get; set; }
     public string Name { get; set; } = null!;
-    public string Url { get; set; } = null!;
+    public string? Url { get; set; }
     public string? Description { get; set; }
     public DateOnly? StartDate { get; set; }
     public DateOnly? EndDate { get; set; }

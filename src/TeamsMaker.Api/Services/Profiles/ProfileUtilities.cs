@@ -1,4 +1,6 @@
-﻿using TeamsMaker.Api.Contracts.Requests.Profile;
+﻿using Microsoft.IdentityModel.Tokens;
+
+using TeamsMaker.Api.Contracts.Requests.Profile;
 using TeamsMaker.Api.Contracts.Responses.JoinRequest;
 using TeamsMaker.Api.Contracts.Responses.Profile;
 using TeamsMaker.Api.Core.Consts;
@@ -87,9 +89,10 @@ public class ProfileUtilities //TODO: [Refactor] remove dublicates - Urgent
                     .Take(3)
                     .Select(jr => new GetBaseJoinRequestResponse
                     {
-                        Id = jr.Id,
+                        JoinRequestId = jr.Id,
                         Sender = jr.Sender,
-                        Name = jr.Circle.Name,
+                        OtherSideId = jr.CircleId.ToString(),
+                        OtherSideName = jr.Circle.Name,
                         Avatar = circleFileService.GetFileUrl(jr.CircleId.ToString(), FileTypes.Avatar)
                     })
                     .ToList(),
@@ -100,13 +103,25 @@ public class ProfileUtilities //TODO: [Refactor] remove dublicates - Urgent
                     .Take(3)
                     .Select(jr => new GetBaseJoinRequestResponse
                     {
-                        Id = jr.Id,
+                        JoinRequestId = jr.Id,
                         Sender = jr.Sender,
-                        Name = jr.Circle.Name,
+                        OtherSideId = jr.CircleId.ToString(),
+                        OtherSideName = jr.Circle.Name,
                         Avatar = circleFileService.GetFileUrl(jr.CircleId.ToString(), FileTypes.Avatar)
                     })
                     .ToList(),
-            }
+            },
+
+            CircleInfo = student.MemberOn.IsNullOrEmpty() == false ? new()
+            {
+                Id = student.MemberOn.ElementAt(0).CircleId,
+                Name = student.MemberOn.ElementAt(0).Circle.Name,
+                OwnerName = student.MemberOn.ElementAt(0).Circle.CircleMembers
+                    .Where(cm => cm.IsOwner)
+                    .Select(cm => $"{cm.User.FirstName} {cm.User.LastName}")
+                    .First(),
+                Avatar = circleFileService.GetFileUrl(student.MemberOn.ElementAt(0).CircleId.ToString(), FileTypes.Avatar)
+            } : null
         };
 
         response.StudentInfo = studentInfo;

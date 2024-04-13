@@ -32,13 +32,13 @@ public class StorageService : IStorageService
 
         Directory.CreateDirectory(folder);
 
-        var newFilePath = Path.Combine(folder, newFileName);
+        var newFilePath = Path.Combine(folder, newFileName.ToLower());
 
         using (var stream = new FileStream(newFilePath, FileMode.Create))
         {
             await newFile.CopyToAsync(stream, ct);
         }
 
-        return new FileData { Name = newFileName, ContentType = newFile.ContentType };
+        return new FileData { Name = newFileName.ToLower(), ContentType = newFile.ContentType };
     }
 }

@@ -58,7 +58,7 @@ public class CircleFileService
             httpContext: httpContextAccessor.HttpContext,
             action: nameof(GetFileEndpoint.File),
             controller: nameof(GetFileEndpoint),
-            values: new { baseType = BaseType, id, fileType });
+            values: new { baseType = BaseType, id = id.ToUpper(), fileType });
 
         return url;
     }
