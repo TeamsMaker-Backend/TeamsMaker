@@ -9,7 +9,7 @@ namespace TeamsMaker.Api.Controllers.JoinRequests;
 public class AcceptjoinRequestEndpoint(IJoinRequestService joinRequestService) : BaseApiController
 {
     [Tags("join_request")]
-    [HttpPut("join_request/{id}")]
+    [HttpPatch("join_request/{id}")]
     public async Task<IActionResult> JoinRequest(Guid id, CancellationToken ct)
     {
 

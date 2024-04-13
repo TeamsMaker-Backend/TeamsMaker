@@ -330,7 +330,9 @@ public class CircleService
         var newOwner = await validationService.TryGetCircleMemberAsync(newOwnerId, circleId, ct);
 
         oldOwner.IsOwner = false;
+        
         newOwner.IsOwner = true;
+        newOwner.Badge = MemberBadges.Owner;
 
         if (newOwner.ExceptionPermission is not null)
             db.Permissions.Remove(newOwner.ExceptionPermission);
