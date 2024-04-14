@@ -21,7 +21,7 @@ public class JoinRequestService
 
     public async Task<Guid> AddAsync(AddJoinRequest request, CancellationToken ct)
     {
-        var studentId = await db.Students.FindAsync([request.StudentId], ct) ??
+        var student = await db.Students.FindAsync([request.StudentId], ct) ??
             throw new ArgumentException("Invalid User Id");
 
         var circle = await db.Circles
@@ -40,6 +40,9 @@ public class JoinRequestService
             // Check wether the circle member have a permission to send an invitition or not
             var circleMember = await validationService.TryGetCircleMemberAsync(userInfo.UserId, request.CircleId, ct);
             validationService.CheckPermission(circleMember, circle, PermissionsEnum.MemberManagement);
+
+            if (circleMember.CircleId == request.CircleId)
+                throw new ArgumentException("Already Member in this circle!");
         }
         // check the student wether in a circle or not
         else if (await db.CircleMembers.AnyAsync(cm => cm.UserId == request.StudentId, ct))
@@ -61,7 +64,10 @@ public class JoinRequestService
 
     public async Task<GetJoinRequestResponse> GetAsync(string? circleId, CancellationToken ct)
     {
-        var isCircle = !string.IsNullOrEmpty(circleId) && await db.Circles.AnyAsync(c => c.Id == Guid.Parse(circleId), ct);
+        var isCircle = !string.IsNullOrEmpty(circleId);
+
+        if (isCircle && await db.Circles.AnyAsync(c => c.Id == Guid.Parse(circleId!), ct) == false)
+            throw new ArgumentException("Invalid Circle ID!");
 
         string entityId = isCircle ? circleId! : userInfo.UserId;
 
@@ -77,9 +83,14 @@ public class JoinRequestService
                 .OrderByDescending(jr => jr.CreationDate)
                 .Select(jr => new GetBaseJoinRequestResponse
                 {
-                    Id = jr.Id,
+                    JoinRequestId = jr.Id,
                     Sender = jr.Sender,
-                    Name = jr.Circle.Name,
+                    OtherSideId = isCircle
+                        ? jr.StudentId
+                        : jr.CircleId.ToString(),
+                    OtherSideName = isCircle
+                        ? jr.Student.FirstName + " " + jr.Student.LastName
+                        : jr.Circle.Name,
                     Avatar = isCircle
                         ? fileService.GetFileUrl(jr.StudentId, FileTypes.Avatar)
                         : fileService.GetFileUrl(jr.CircleId.ToString(), FileTypes.Avatar)
@@ -92,9 +103,14 @@ public class JoinRequestService
                 .OrderByDescending(jr => jr.CreationDate)
                 .Select(jr => new GetBaseJoinRequestResponse
                 {
-                    Id = jr.Id,
+                    JoinRequestId = jr.Id,
                     Sender = jr.Sender,
-                    Name = jr.Circle.Name,
+                    OtherSideId = isCircle
+                        ? jr.StudentId
+                        : jr.CircleId.ToString(),
+                    OtherSideName = isCircle
+                        ? jr.Student.FirstName + " " + jr.Student.LastName
+                        : jr.Circle.Name,
                     Avatar = isCircle
                         ? fileService.GetFileUrl(jr.StudentId, FileTypes.Avatar)
                         : fileService.GetFileUrl(jr.CircleId.ToString(), FileTypes.Avatar)
@@ -127,6 +143,11 @@ public class JoinRequestService
 
             validationService.CheckPermission(circleMember, circle, PermissionsEnum.MemberManagement);
         }
+
+        var oldJoinRequest = db.JoinRequests
+            .Where(jr => jr.StudentId == joinRequest.StudentId);
+
+        db.JoinRequests.RemoveRange(oldJoinRequest);
 
         await db.SaveChangesAsync(ct);
 

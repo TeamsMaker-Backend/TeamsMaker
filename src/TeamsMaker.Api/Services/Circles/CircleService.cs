@@ -76,6 +76,7 @@ public class CircleService
             .Include(c => c.Links)
             .Include(c => c.CircleMembers)
             .Include(c => c.Invitions)
+                .ThenInclude(i => i.Student)
             .SingleOrDefaultAsync(c => c.Id == circleId, ct) ??
             throw new ArgumentException("Invalid Circle ID");
 
@@ -93,7 +94,15 @@ public class CircleService
             OrganizationId = circle.OrganizationId,
             Skills = circle.Skills.Select(l => l.Name).ToList(),
             Links = circle.Links.Select(l => new LinkInfo { Type = l.Type, Url = l.Url }).ToList(),
-            CircleJoinRequests = new()
+
+            Avatar = circleFileService.GetFileUrl(circleId.ToString(), FileTypes.Avatar),
+            Header = circleFileService.GetFileUrl(circleId.ToString(), FileTypes.Header)
+        };
+
+
+        if (circle.CircleMembers.Any(cm => cm.UserId == userInfo.UserId))
+        {
+            response.CircleJoinRequests = new()
             {
                 JoinRequests = circle.Invitions
                     .Where(jr => jr.Sender == InvitationTypes.Student) // join request from users
@@ -101,9 +110,9 @@ public class CircleService
                     .Take(3)
                     .Select(jr => new GetBaseJoinRequestResponse
                     {
-                        Id = jr.Id,
+                        JoinRequestId = jr.Id,
                         Sender = jr.Sender,
-                        Name = circle.Name,
+                        OtherSideName = jr.Student.FirstName + " " + jr.Student.LastName,
                         Avatar = studentFileService.GetFileUrl(jr.StudentId, FileTypes.Avatar)
                     })
                     .ToList(),
@@ -114,21 +123,14 @@ public class CircleService
                     .Take(3)
                     .Select(jr => new GetBaseJoinRequestResponse
                     {
-                        Id = jr.Id,
+                        JoinRequestId = jr.Id,
                         Sender = jr.Sender,
-                        Name = circle.Name,
+                        OtherSideName = jr.Student.FirstName + " " + jr.Student.LastName,
                         Avatar = studentFileService.GetFileUrl(jr.StudentId, FileTypes.Avatar)
                     })
                     .ToList(),
-            },
+            };
 
-            Avatar = circleFileService.GetFileUrl(circleId.ToString(), FileTypes.Avatar),
-            Header = circleFileService.GetFileUrl(circleId.ToString(), FileTypes.Header)
-        };
-
-
-        if (circle.CircleMembers.Any(cm => cm.UserId == userInfo.UserId))
-        {
             response.Summary = circle.SummaryData?.Summary;
 
             response.DefaultPermission = new PermissionsInfo
