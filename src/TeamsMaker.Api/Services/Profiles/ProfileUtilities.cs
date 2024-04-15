@@ -85,6 +85,7 @@ public class ProfileUtilities //TODO: [Refactor] remove dublicates - Urgent
             {
                 JoinRequests = student.JoinRequests
                     .Where(jr => jr.Sender == InvitationTypes.Student) // join request from users
+                    .Where(jr => jr.IsAccepted == false)
                     .OrderByDescending(jr => jr.CreationDate)
                     .Take(3)
                     .Select(jr => new GetBaseJoinRequestResponse
@@ -99,6 +100,7 @@ public class ProfileUtilities //TODO: [Refactor] remove dublicates - Urgent
 
                 Invitations = student.JoinRequests
                     .Where(jr => jr.Sender == InvitationTypes.Circle) // invitation from circle
+                    .Where(jr => jr.IsAccepted == false)
                     .OrderByDescending(jr => jr.CreationDate)
                     .Take(3)
                     .Select(jr => new GetBaseJoinRequestResponse
@@ -114,13 +116,15 @@ public class ProfileUtilities //TODO: [Refactor] remove dublicates - Urgent
 
             CircleInfo = student.MemberOn.IsNullOrEmpty() == false ? new()
             {
-                Id = student.MemberOn.ElementAt(0).CircleId,
-                Name = student.MemberOn.ElementAt(0).Circle.Name,
-                OwnerName = student.MemberOn.ElementAt(0).Circle.CircleMembers
+                Id = student.MemberOn.Single().CircleId,
+                Name = student.MemberOn.Single().Circle.Name,
+                OwnerName = db.CircleMembers
+                    .Include(cm => cm.User)
+                    .Where(cm => cm.CircleId == student.MemberOn.Single().CircleId)
                     .Where(cm => cm.IsOwner)
                     .Select(cm => $"{cm.User.FirstName} {cm.User.LastName}")
-                    .First(),
-                Avatar = circleFileService.GetFileUrl(student.MemberOn.ElementAt(0).CircleId.ToString(), FileTypes.Avatar)
+                    .Single(),
+                Avatar = circleFileService.GetFileUrl(student.MemberOn.Single().CircleId.ToString(), FileTypes.Avatar)
             } : null
         };
 

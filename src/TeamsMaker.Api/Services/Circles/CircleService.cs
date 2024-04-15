@@ -106,6 +106,7 @@ public class CircleService
             {
                 JoinRequests = circle.Invitions
                     .Where(jr => jr.Sender == InvitationTypes.Student) // join request from users
+                    .Where(jr => jr.IsAccepted == false)
                     .OrderByDescending(jr => jr.CreationDate)
                     .Take(3)
                     .Select(jr => new GetBaseJoinRequestResponse
@@ -119,6 +120,7 @@ public class CircleService
 
                 Invitations = circle.Invitions
                     .Where(jr => jr.Sender == InvitationTypes.Circle) // invitation from circle
+                    .Where(jr => jr.IsAccepted == false)
                     .OrderByDescending(jr => jr.CreationDate)
                     .Take(3)
                     .Select(jr => new GetBaseJoinRequestResponse
@@ -330,7 +332,7 @@ public class CircleService
         var newOwner = await validationService.TryGetCircleMemberAsync(newOwnerId, circleId, ct);
 
         oldOwner.IsOwner = false;
-        
+
         newOwner.IsOwner = true;
         newOwner.Badge = MemberBadges.Owner;
 
