@@ -52,8 +52,6 @@ public class StudentProfileService
                 .ThenInclude(p => p.Skills)
             .Include(st => st.MemberOn)
                 .ThenInclude(m => m.Circle)
-                    .ThenInclude(c => c.CircleMembers)
-                        .ThenInclude(cm => cm.User)
             .SingleOrDefaultAsync(st => st.Id == userInfo.UserId, ct) ??
             throw new ArgumentException("Invalid ID!");
 

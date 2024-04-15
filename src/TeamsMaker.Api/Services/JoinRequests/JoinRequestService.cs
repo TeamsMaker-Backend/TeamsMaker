@@ -21,6 +21,11 @@ public class JoinRequestService
 
     public async Task<Guid> AddAsync(AddJoinRequest request, CancellationToken ct)
     {
+        if (await db.JoinRequests.AnyAsync(jr =>
+            jr.CircleId == request.CircleId &&
+            jr.StudentId == request.StudentId, ct))
+            throw new ArgumentException("There is already a sent request");
+
         var student = await db.Students.FindAsync([request.StudentId], ct) ??
             throw new ArgumentException("Invalid User Id");
 
@@ -29,8 +34,7 @@ public class JoinRequestService
             .SingleOrDefaultAsync(c => c.Id == request.CircleId, ct) ??
             throw new ArgumentException("Invalid CircleId");
 
-        if (!request.SenderType.Equals(InvitationTypes.Circle, StringComparison.CurrentCultureIgnoreCase) &&
-            !request.SenderType.Equals(InvitationTypes.Student, StringComparison.CurrentCultureIgnoreCase))
+        if (request.SenderType != InvitationTypes.Circle && request.SenderType != InvitationTypes.Student)
             throw new ArgumentException("Invalid Sender Type");
 
 
@@ -80,6 +84,7 @@ public class JoinRequestService
             JoinRequests = await db.JoinRequests
                 .Where(jr => jr.Sender == InvitationTypes.Student)
                 .Where(jr => (isCircle && jr.CircleId.ToString() == entityId) || (!isCircle && jr.StudentId == entityId))
+                .Where(jr => jr.IsAccepted == false)
                 .OrderByDescending(jr => jr.CreationDate)
                 .Select(jr => new GetBaseJoinRequestResponse
                 {
@@ -100,6 +105,7 @@ public class JoinRequestService
             Invitations = await db.JoinRequests
                 .Where(jr => jr.Sender == InvitationTypes.Circle)
                 .Where(jr => (isCircle && jr.CircleId.ToString() == entityId) || (!isCircle && jr.StudentId == entityId))
+                .Where(jr => jr.IsAccepted == false)
                 .OrderByDescending(jr => jr.CreationDate)
                 .Select(jr => new GetBaseJoinRequestResponse
                 {
@@ -145,7 +151,9 @@ public class JoinRequestService
         }
 
         var oldJoinRequest = db.JoinRequests
-            .Where(jr => jr.StudentId == joinRequest.StudentId);
+            .Where(jr => jr.StudentId == joinRequest.StudentId)
+            .Where(jr => jr.Sender == InvitationTypes.Student)
+            .Where(jr => jr.IsAccepted == false);
 
         db.JoinRequests.RemoveRange(oldJoinRequest);
 
