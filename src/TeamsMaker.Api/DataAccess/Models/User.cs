@@ -19,7 +19,9 @@ public class User : IdentityUser, IActivable
     public string? City { get; set; }
     public bool IsActive { get; set; } = true;
     public int OrganizationId { get; set; }
+
     public virtual Organization Organization { get; set; } = null!;
+    public virtual Author? Author { get; set; }
     public virtual ICollection<RefreshToken> RefreshTokens { get; set; } = [];
     public virtual ICollection<Link> Links { get; set; } = [];
     public virtual ICollection<CircleMember> MemberOn { get; set; } = [];

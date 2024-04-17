@@ -65,6 +65,12 @@ public class UserConfig : IEntityTypeConfiguration<User>
             .WithOne(y => y.User)
             .HasForeignKey(y => y.UserId);
 
+        builder
+            .HasOne(x => x.Author)
+            .WithOne(y => y.User)
+            .HasForeignKey<Author>(y => y.UserId)
+            .IsRequired(false);
+
         // Enums
         builder.Property(x => x.Gender)
             .HasConversion<int>(); // Update the conversion method

@@ -27,7 +27,8 @@ public class AppDBContext(DbContextOptions options,
     public DbSet<Session> Sessions { get; set; }
     public DbSet<TodoTask> TodoTasks { get; set; }
     public DbSet<Upvote> Upvotes { get; set; }
-
+    public DbSet<Post> Posts { get; set; }
+    public DbSet<Author> Authors { get; set; }
     #endregion
 
 
