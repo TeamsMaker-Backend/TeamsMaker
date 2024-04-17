@@ -128,6 +128,31 @@ namespace TeamsMaker.Api.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("TeamsMaker.Api.DataAccess.Models.Author", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("CircleId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CircleId")
+                        .IsUnique()
+                        .HasFilter("[CircleId] IS NOT NULL");
+
+                    b.HasIndex("UserId")
+                        .IsUnique()
+                        .HasFilter("[UserId] IS NOT NULL");
+
+                    b.ToTable("Author", "dbo");
+                });
+
             modelBuilder.Entity("TeamsMaker.Api.DataAccess.Models.ApprovalRequest", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1179,6 +1204,21 @@ namespace TeamsMaker.Api.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("TeamsMaker.Api.DataAccess.Models.Author", b =>
+                {
+                    b.HasOne("TeamsMaker.Api.DataAccess.Models.Circle", "Circle")
+                        .WithOne("Author")
+                        .HasForeignKey("TeamsMaker.Api.DataAccess.Models.Author", "CircleId");
+
+                    b.HasOne("TeamsMaker.Api.DataAccess.Models.User", "User")
+                        .WithOne("Author")
+                        .HasForeignKey("TeamsMaker.Api.DataAccess.Models.Author", "UserId");
+
+                    b.Navigation("Circle");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("TeamsMaker.Api.DataAccess.Models.ApprovalRequest", b =>
