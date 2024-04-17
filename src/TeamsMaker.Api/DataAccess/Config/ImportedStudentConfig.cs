@@ -20,7 +20,7 @@ public class ImportedStudentConfig : IEntityTypeConfiguration<ImportedStudent>
             {
                 Id = Guid.Parse("5cba5edb-d6f0-4dee-85df-7f23fcbf86d3"),
                 SSN = "600-68-1014",
-                CollegeId = "College-123",
+                CollegeId = "01HVK5SHDAA4NG1AJHJDY3MFDW",
                 GPA = 3.5f,
                 GraduationYear = DateOnly.FromDateTime(new DateTime(2026, 02, 17)),
                 Department = "CS",
@@ -30,7 +30,7 @@ public class ImportedStudentConfig : IEntityTypeConfiguration<ImportedStudent>
             {
                 Id = Guid.Parse("86281c15-127d-4c91-9dff-dcc24164f79b"),
                 SSN = "776-11-4808",
-                CollegeId = "College-456",
+                CollegeId = "01HVK5SHD9JFNX853XW06NAD4W",
                 GPA = 3.3f,
                 GraduationYear = DateOnly.FromDateTime(new DateTime(2024, 02, 17)),
                 Department = "IS",

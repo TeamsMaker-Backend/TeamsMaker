@@ -13,6 +13,10 @@ public class ProposalConfig : IEntityTypeConfiguration<Proposal>
         builder.ToTable(nameof(Proposal), DatabaseSchemas.Dbo);
 
         builder
+            .OwnsOne(x => x.File);
+
+
+        builder
             .HasMany(x => x.ApprovalRequests)
             .WithOne(y => y.Proposal)
             .HasForeignKey(y => y.ProposalId);
