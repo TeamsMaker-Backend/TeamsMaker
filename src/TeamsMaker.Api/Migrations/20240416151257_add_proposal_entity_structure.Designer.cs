@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TeamsMaker.Api.DataAccess.Context;
 
@@ -11,9 +12,11 @@ using TeamsMaker.Api.DataAccess.Context;
 namespace TeamsMaker.Api.Migrations
 {
     [DbContext(typeof(AppDBContext))]
-    partial class AppDBContextModelSnapshot : ModelSnapshot
+    [Migration("20240416151257_add_proposal_entity_structure")]
+    partial class add_proposal_entity_structure
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -151,31 +154,6 @@ namespace TeamsMaker.Api.Migrations
                     b.HasIndex("StaffId");
 
                     b.ToTable("ApprovalRequest", "dbo");
-                });
-
-            modelBuilder.Entity("TeamsMaker.Api.DataAccess.Models.Author", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("CircleId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CircleId")
-                        .IsUnique()
-                        .HasFilter("[CircleId] IS NOT NULL");
-
-                    b.HasIndex("UserId")
-                        .IsUnique()
-                        .HasFilter("[UserId] IS NOT NULL");
-
-                    b.ToTable("Author", "dbo");
                 });
 
             modelBuilder.Entity("TeamsMaker.Api.DataAccess.Models.Circle", b =>
@@ -635,46 +613,6 @@ namespace TeamsMaker.Api.Migrations
                         .HasFilter("[CircleMemberId] IS NOT NULL");
 
                     b.ToTable("Permission", "lookups");
-                });
-
-            modelBuilder.Entity("TeamsMaker.Api.DataAccess.Models.Post", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("AuthorId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Content")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("CreationDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("LastModificationDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<long>("Likes")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("ModifiedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid?>("ParentPostId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AuthorId");
-
-                    b.HasIndex("ParentPostId");
-
-                    b.ToTable("Post", "dbo");
                 });
 
             modelBuilder.Entity("TeamsMaker.Api.DataAccess.Models.Project", b =>
@@ -1186,21 +1124,6 @@ namespace TeamsMaker.Api.Migrations
                     b.Navigation("Staff");
                 });
 
-            modelBuilder.Entity("TeamsMaker.Api.DataAccess.Models.Author", b =>
-                {
-                    b.HasOne("TeamsMaker.Api.DataAccess.Models.Circle", "Circle")
-                        .WithOne("Author")
-                        .HasForeignKey("TeamsMaker.Api.DataAccess.Models.Author", "CircleId");
-
-                    b.HasOne("TeamsMaker.Api.DataAccess.Models.User", "User")
-                        .WithOne("Author")
-                        .HasForeignKey("TeamsMaker.Api.DataAccess.Models.Author", "UserId");
-
-                    b.Navigation("Circle");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("TeamsMaker.Api.DataAccess.Models.Circle", b =>
                 {
                     b.HasOne("TeamsMaker.Api.DataAccess.Models.Organization", "Organization")
@@ -1449,24 +1372,6 @@ namespace TeamsMaker.Api.Migrations
                     b.Navigation("CircleMember");
                 });
 
-            modelBuilder.Entity("TeamsMaker.Api.DataAccess.Models.Post", b =>
-                {
-                    b.HasOne("TeamsMaker.Api.DataAccess.Models.Author", "Author")
-                        .WithMany("Posts")
-                        .HasForeignKey("AuthorId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("TeamsMaker.Api.DataAccess.Models.Post", "ParentPost")
-                        .WithMany("Comments")
-                        .HasForeignKey("ParentPostId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("Author");
-
-                    b.Navigation("ParentPost");
-                });
-
             modelBuilder.Entity("TeamsMaker.Api.DataAccess.Models.Project", b =>
                 {
                     b.HasOne("TeamsMaker.Api.DataAccess.Models.Student", "Student")
@@ -1702,15 +1607,8 @@ namespace TeamsMaker.Api.Migrations
                     b.Navigation("Department");
                 });
 
-            modelBuilder.Entity("TeamsMaker.Api.DataAccess.Models.Author", b =>
-                {
-                    b.Navigation("Posts");
-                });
-
             modelBuilder.Entity("TeamsMaker.Api.DataAccess.Models.Circle", b =>
                 {
-                    b.Navigation("Author");
-
                     b.Navigation("CircleMembers");
 
                     b.Navigation("DefaultPermission")
@@ -1755,11 +1653,6 @@ namespace TeamsMaker.Api.Migrations
                     b.Navigation("Users");
                 });
 
-            modelBuilder.Entity("TeamsMaker.Api.DataAccess.Models.Post", b =>
-                {
-                    b.Navigation("Comments");
-                });
-
             modelBuilder.Entity("TeamsMaker.Api.DataAccess.Models.Project", b =>
                 {
                     b.Navigation("Skills");
@@ -1777,8 +1670,6 @@ namespace TeamsMaker.Api.Migrations
 
             modelBuilder.Entity("TeamsMaker.Api.DataAccess.Models.User", b =>
                 {
-                    b.Navigation("Author");
-
                     b.Navigation("Links");
 
                     b.Navigation("MemberOn");
