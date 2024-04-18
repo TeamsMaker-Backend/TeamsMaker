@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TeamsMaker.Api.DataAccess.Context;
 
@@ -11,9 +12,11 @@ using TeamsMaker.Api.DataAccess.Context;
 namespace TeamsMaker.Api.Migrations
 {
     [DbContext(typeof(AppDBContext))]
-    partial class AppDBContextModelSnapshot : ModelSnapshot
+    [Migration("20240417205251_add_post_entity_structure")]
+    partial class add_post_entity_structure
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -126,31 +129,6 @@ namespace TeamsMaker.Api.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
-                });
-
-            modelBuilder.Entity("TeamsMaker.Api.DataAccess.Models.ApprovalRequest", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<bool>("IsAccepted")
-                        .HasColumnType("bit");
-
-                    b.Property<Guid>("ProposalId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("StaffId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProposalId");
-
-                    b.HasIndex("StaffId");
-
-                    b.ToTable("ApprovalRequest", "dbo");
                 });
 
             modelBuilder.Entity("TeamsMaker.Api.DataAccess.Models.Author", b =>
@@ -388,9 +366,6 @@ namespace TeamsMaker.Api.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int?>("Classification")
-                        .HasColumnType("int");
-
                     b.Property<int>("OrganizationId")
                         .HasColumnType("int");
 
@@ -406,14 +381,12 @@ namespace TeamsMaker.Api.Migrations
                         new
                         {
                             Id = new Guid("3e9f4430-2927-41eb-a8a5-099248d1e6ba"),
-                            Classification = 2,
                             OrganizationId = 1,
                             SSN = "553-35-8652"
                         },
                         new
                         {
                             Id = new Guid("9266966b-fa8e-461a-bd61-0a1a15d5c234"),
-                            Classification = 2,
                             OrganizationId = 1,
                             SSN = "622-45-0646"
                         });
@@ -454,7 +427,7 @@ namespace TeamsMaker.Api.Migrations
                         new
                         {
                             Id = new Guid("5cba5edb-d6f0-4dee-85df-7f23fcbf86d3"),
-                            CollegeId = "01HVK5SHDAA4NG1AJHJDY3MFDW",
+                            CollegeId = "College-123",
                             Department = "CS",
                             GPA = 3.5f,
                             GraduationYear = new DateOnly(2026, 2, 17),
@@ -464,7 +437,7 @@ namespace TeamsMaker.Api.Migrations
                         new
                         {
                             Id = new Guid("86281c15-127d-4c91-9dff-dcc24164f79b"),
-                            CollegeId = "01HVK5SHD9JFNX853XW06NAD4W",
+                            CollegeId = "College-456",
                             Department = "IS",
                             GPA = 3.3f,
                             GraduationYear = new DateOnly(2024, 2, 17),
@@ -713,52 +686,6 @@ namespace TeamsMaker.Api.Migrations
                     b.HasIndex("StudentId");
 
                     b.ToTable("Project", "dbo");
-                });
-
-            modelBuilder.Entity("TeamsMaker.Api.DataAccess.Models.Proposal", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("CircleId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("CreationDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("LastModificationDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("ModifiedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Objectives")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Overview")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Status")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasDefaultValue(0);
-
-                    b.Property<string>("TeckStack")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CircleId")
-                        .IsUnique();
-
-                    b.ToTable("Proposal", "dbo");
                 });
 
             modelBuilder.Entity("TeamsMaker.Api.DataAccess.Models.RefreshToken", b =>
@@ -1196,25 +1123,6 @@ namespace TeamsMaker.Api.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("TeamsMaker.Api.DataAccess.Models.ApprovalRequest", b =>
-                {
-                    b.HasOne("TeamsMaker.Api.DataAccess.Models.Proposal", "Proposal")
-                        .WithMany("ApprovalRequests")
-                        .HasForeignKey("ProposalId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("TeamsMaker.Api.DataAccess.Models.Staff", "Staff")
-                        .WithMany("ApprovalRequests")
-                        .HasForeignKey("StaffId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Proposal");
-
-                    b.Navigation("Staff");
-                });
-
             modelBuilder.Entity("TeamsMaker.Api.DataAccess.Models.Circle", b =>
                 {
                     b.HasOne("TeamsMaker.Api.DataAccess.Models.Organization", "Organization")
@@ -1492,17 +1400,6 @@ namespace TeamsMaker.Api.Migrations
                     b.Navigation("Student");
                 });
 
-            modelBuilder.Entity("TeamsMaker.Api.DataAccess.Models.Proposal", b =>
-                {
-                    b.HasOne("TeamsMaker.Api.DataAccess.Models.Circle", "Circle")
-                        .WithOne("Proposal")
-                        .HasForeignKey("TeamsMaker.Api.DataAccess.Models.Proposal", "CircleId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Circle");
-                });
-
             modelBuilder.Entity("TeamsMaker.Api.DataAccess.Models.RefreshToken", b =>
                 {
                     b.HasOne("TeamsMaker.Api.DataAccess.Models.User", "User")
@@ -1711,9 +1608,6 @@ namespace TeamsMaker.Api.Migrations
 
                     b.Navigation("Links");
 
-                    b.Navigation("Proposal")
-                        .IsRequired();
-
                     b.Navigation("Sessions");
 
                     b.Navigation("Skills");
@@ -1756,11 +1650,6 @@ namespace TeamsMaker.Api.Migrations
                     b.Navigation("Skills");
                 });
 
-            modelBuilder.Entity("TeamsMaker.Api.DataAccess.Models.Proposal", b =>
-                {
-                    b.Navigation("ApprovalRequests");
-                });
-
             modelBuilder.Entity("TeamsMaker.Api.DataAccess.Models.Session", b =>
                 {
                     b.Navigation("TodoTasks");
@@ -1781,8 +1670,6 @@ namespace TeamsMaker.Api.Migrations
 
             modelBuilder.Entity("TeamsMaker.Api.DataAccess.Models.Staff", b =>
                 {
-                    b.Navigation("ApprovalRequests");
-
                     b.Navigation("DepartmentStaff");
                 });
 

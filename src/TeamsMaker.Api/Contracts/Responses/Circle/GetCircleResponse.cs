@@ -21,3 +21,4 @@ public class GetCircleResponse
     public ICollection<LinkInfo>? Links { get; set; } = []; // Replace LinkInfo
     public ICollection<string>? Skills { get; set; } = [];
 }
+//TODO: Owner name
