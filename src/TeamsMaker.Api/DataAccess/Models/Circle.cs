@@ -20,6 +20,7 @@ public class Circle : TrackedEntity<Guid>, IReadOnlyOrganizationInfo
     public virtual Organization Organization { get; set; } = null!;
     public virtual Permission DefaultPermission { get; set; } = null!;
     public virtual Proposal Proposal { get; set; } = null!;
+    public virtual Author? Author { get; set; }
     public virtual ICollection<CircleMember> CircleMembers { get; set; } = null!;
     public virtual ICollection<Link> Links { get; set; } = [];
     public virtual ICollection<Skill> Skills { get; set; } = []; // tech stack
