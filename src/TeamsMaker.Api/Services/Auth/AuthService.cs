@@ -60,6 +60,8 @@ public class AuthService : IAuthService
         await _userManager.AddToRoleAsync(user, role);
 
         var tokenResponse = await GenerateJwtTokenAsync(user, ct);
+        tokenResponse.UserId = user!.Id;
+
         return tokenResponse;
     }
 
@@ -87,6 +89,7 @@ public class AuthService : IAuthService
         if (!isCorrectPassword) throw new SecurityException("Invalid password.");
 
         var jwtToken = await GenerateJwtTokenAsync(existedUser!, ct);
+        jwtToken.UserId = existedUser!.Id;
 
         return jwtToken;
     }
@@ -104,6 +107,7 @@ public class AuthService : IAuthService
         Guard.Against.Null(user, nameof(user));
 
         var token = await GenerateJwtTokenAsync(user!, ct);
+        token.UserId = user!.Id;
 
         return token;
     }
