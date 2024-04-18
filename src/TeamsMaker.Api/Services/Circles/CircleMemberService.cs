@@ -1,6 +1,7 @@
 ﻿using DataAccess.Base.Interfaces;
 
 using TeamsMaker.Api.Contracts.Requests.Circle;
+using TeamsMaker.Api.Core.Consts;
 using TeamsMaker.Api.Core.Enums;
 using TeamsMaker.Api.DataAccess.Context;
 using TeamsMaker.Api.Services.Circles.Interfaces;
@@ -8,14 +9,12 @@ using TeamsMaker.Api.Services.Circles.Interfaces;
 namespace TeamsMaker.Api.Services.Circles;
 
 public class CircleMemberService
-    (AppDBContext db, IUserInfo userInfo, ICircleValidationService validationService) : ICircleMemberService, IPermissionService
+    (AppDBContext db, IUserInfo userInfo, ICircleValidationService validationService, IServiceProvider serviceProvider) : ICircleMemberService, IPermissionService
 {
-    public async Task AddAsync(Guid circleId, string userId, CancellationToken ct)
+    public async Task AddAsync(Guid circleId, string userId, string reciever, CancellationToken ct)
     {
-        if (!await db.Users.AnyAsync(s => s.Id == userId, ct))
+        if (!await db.Students.AnyAsync(s => s.Id == userId, ct))
             throw new ArgumentException("Invalid Student Id");
-
-        var circleMember = await validationService.TryGetCircleMemberAsync(userInfo.UserId, circleId, ct);
 
         var circle = await db.Circles
             .Include(c => c.DefaultPermission)
@@ -23,7 +22,12 @@ public class CircleMemberService
             .SingleOrDefaultAsync(c => c.Id == circleId, ct) ??
             throw new ArgumentException("Invalid Circle Id");
 
-        validationService.CheckPermission(circleMember, circle, PermissionsEnum.MemberManagement);
+        if (reciever == InvitationTypes.Circle)
+        {
+            var circleMember = await validationService.TryGetCircleMemberAsync(userInfo.UserId, circleId, ct);
+
+            validationService.CheckPermission(circleMember, circle, PermissionsEnum.MemberManagement);
+        }
 
         if (await db.CircleMembers.AnyAsync(cm => cm.UserId == userId, ct))
             throw new ArgumentException("Student Cannot Be In Two Circles");
@@ -46,13 +50,28 @@ public class CircleMemberService
 
         var circle = await db.Circles
             .Include(c => c.DefaultPermission)
+            .Include(c => c.CircleMembers)
             .SingleOrDefaultAsync(c => c.Id == removedCircleMember.CircleId, ct) ??
             throw new ArgumentException("Invalid Circle ID");
 
-        if (userInfo.UserId != removedCircleMember.UserId) // leaves (removes himself)
-            validationService.CheckPermission(currentCircleMember, circle, PermissionsEnum.MemberManagement);
+        bool isCircleDeleted = false;
 
-        db.CircleMembers.Remove(removedCircleMember);
+        if (userInfo.UserId != removedCircleMember.UserId)
+            validationService.CheckPermission(currentCircleMember, circle, PermissionsEnum.MemberManagement);
+        else if (currentCircleMember.IsOwner) // leaves (removes himself)
+        {
+            if (circle.CircleMembers.Count > 1)
+                throw new ArgumentException("Transfer Ownership First");
+            else
+            {
+                var circleService = serviceProvider.GetRequiredService<ICircleService>();
+                await circleService.DeleteAsync(circle.Id, ct);
+                isCircleDeleted = true;
+            }
+        }
+
+        if (!isCircleDeleted)
+            db.CircleMembers.Remove(removedCircleMember);
 
         await db.SaveChangesAsync(ct);
     }

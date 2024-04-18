@@ -138,9 +138,12 @@ public class JoinRequestService
 
         joinRequest.IsAccepted = true;
 
+        string reciever;
+
         // In case of reciever is a circle
         if (joinRequest.Sender != InvitationTypes.Circle)
         {
+            reciever = InvitationTypes.Circle;
             // Check wether the circle member have a permission to accept a request or not
             var circleMember = await validationService.TryGetCircleMemberAsync(userInfo.UserId, joinRequest.CircleId, ct);
 
@@ -151,6 +154,8 @@ public class JoinRequestService
 
             validationService.CheckPermission(circleMember, circle, PermissionsEnum.MemberManagement);
         }
+        else
+            reciever = InvitationTypes.Student;
 
         var oldJoinRequest = db.JoinRequests
             .Where(jr => jr.StudentId == joinRequest.StudentId)
@@ -161,7 +166,7 @@ public class JoinRequestService
 
         await db.SaveChangesAsync(ct);
 
-        await memberService.AddAsync(joinRequest.CircleId, joinRequest.StudentId, ct);
+        await memberService.AddAsync(joinRequest.CircleId, joinRequest.StudentId, reciever, ct);
 
         await transaction.CommitAsync(ct);
     }
