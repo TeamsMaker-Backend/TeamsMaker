@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TeamsMaker.Api.DataAccess.Context;
 
@@ -11,9 +12,11 @@ using TeamsMaker.Api.DataAccess.Context;
 namespace TeamsMaker.Api.Migrations
 {
     [DbContext(typeof(AppDBContext))]
-    partial class AppDBContextModelSnapshot : ModelSnapshot
+    [Migration("20240416151257_add_proposal_entity_structure")]
+    partial class add_proposal_entity_structure
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -381,14 +384,12 @@ namespace TeamsMaker.Api.Migrations
                         new
                         {
                             Id = new Guid("3e9f4430-2927-41eb-a8a5-099248d1e6ba"),
-                            Classification = 2,
                             OrganizationId = 1,
                             SSN = "553-35-8652"
                         },
                         new
                         {
                             Id = new Guid("9266966b-fa8e-461a-bd61-0a1a15d5c234"),
-                            Classification = 2,
                             OrganizationId = 1,
                             SSN = "622-45-0646"
                         });
@@ -671,22 +672,10 @@ namespace TeamsMaker.Api.Migrations
                     b.Property<string>("ModifiedBy")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Objectives")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Overview")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int>("Status")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasDefaultValue(0);
-
-                    b.Property<string>("TeckStack")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -1402,7 +1391,30 @@ namespace TeamsMaker.Api.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.OwnsOne("Core.ValueObjects.FileData", "File", b1 =>
+                        {
+                            b1.Property<Guid>("ProposalId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<string>("ContentType")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("Name")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.HasKey("ProposalId");
+
+                            b1.ToTable("Proposal", "dbo");
+
+                            b1.WithOwner()
+                                .HasForeignKey("ProposalId");
+                        });
+
                     b.Navigation("Circle");
+
+                    b.Navigation("File");
                 });
 
             modelBuilder.Entity("TeamsMaker.Api.DataAccess.Models.RefreshToken", b =>

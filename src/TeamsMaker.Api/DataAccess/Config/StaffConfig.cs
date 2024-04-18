@@ -14,5 +14,9 @@ public class StaffConfig : IEntityTypeConfiguration<Staff>
             .HasMany(x => x.DepartmentStaff)
             .WithOne(y => y.Staff)
             .HasForeignKey(y => y.StaffId);
+
+        // Enums
+        builder.Property(x => x.Classification)
+            .HasConversion<int>();
     }
 }
