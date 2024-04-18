@@ -37,6 +37,8 @@ public class JoinRequestService
         if (request.SenderType != InvitationTypes.Circle && request.SenderType != InvitationTypes.Student)
             throw new ArgumentException("Invalid Sender Type");
 
+        var invitedCircleMember = await db.CircleMembers
+            .SingleOrDefaultAsync(cm => cm.UserId == request.StudentId, ct);
 
         // In case of sender is a circle
         if (request.SenderType == InvitationTypes.Circle)
@@ -45,11 +47,11 @@ public class JoinRequestService
             var circleMember = await validationService.TryGetCircleMemberAsync(userInfo.UserId, request.CircleId, ct);
             validationService.CheckPermission(circleMember, circle, PermissionsEnum.MemberManagement);
 
-            if (circleMember.CircleId == request.CircleId)
+            if (invitedCircleMember is not null && invitedCircleMember.CircleId == request.CircleId)
                 throw new ArgumentException("Already Member in this circle!");
         }
         // check the student wether in a circle or not
-        else if (await db.CircleMembers.AnyAsync(cm => cm.UserId == request.StudentId, ct))
+        else if (invitedCircleMember is not null)
             throw new ArgumentException("Cannot send a join request while you are a circle member");
 
         var joinRequest = new JoinRequest
