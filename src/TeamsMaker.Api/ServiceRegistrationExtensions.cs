@@ -13,8 +13,12 @@ using TeamsMaker.Api.Services.Files.Interfaces;
 using TeamsMaker.Api.Services.JoinRequests;
 using TeamsMaker.Api.Services.JoinRequests.Interfaces;
 using TeamsMaker.Api.Services.Organizations;
+using TeamsMaker.Api.Services.Posts;
+using TeamsMaker.Api.Services.Posts.Interfaces;
 using TeamsMaker.Api.Services.Profiles;
 using TeamsMaker.Api.Services.Profiles.Interfaces;
+using TeamsMaker.Api.Services.Proposals;
+using TeamsMaker.Api.Services.Proposals.Interfaces;
 using TeamsMaker.Api.Services.Storage;
 using TeamsMaker.Api.Services.Storage.Interfacecs;
 using TeamsMaker.Core.Enums;
@@ -86,6 +90,10 @@ public static class ServiceRegistrationExtensions
         services.AddScoped<ISessionService, SessionService>();
 
         services.AddScoped<ITodoTaskService, TodoTaskSerevice>();
+
+        services.AddScoped<IProposalService, ProposalService>();
+
+        services.AddScoped<IPostService, PostService>();
 
         return services;
     }
