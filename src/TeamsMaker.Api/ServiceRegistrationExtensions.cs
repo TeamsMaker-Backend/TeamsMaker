@@ -5,6 +5,8 @@ using TeamsMaker.Api.Controllers.Circles;
 using TeamsMaker.Api.Core.Consts;
 using TeamsMaker.Api.DataAccess.Context;
 using TeamsMaker.Api.DataAccess.Interceptors;
+using TeamsMaker.Api.Services.ApprovalRequests;
+using TeamsMaker.Api.Services.ApprovalRequests.Interfaces;
 using TeamsMaker.Api.Services.Auth;
 using TeamsMaker.Api.Services.Circles;
 using TeamsMaker.Api.Services.Circles.Interfaces;
@@ -92,6 +94,8 @@ public static class ServiceRegistrationExtensions
         services.AddScoped<ITodoTaskService, TodoTaskSerevice>();
 
         services.AddScoped<IProposalService, ProposalService>();
+
+        services.AddScoped<IApprovalRequestService, ApprovalRequestService>();
 
         services.AddScoped<IPostService, PostService>();
 
