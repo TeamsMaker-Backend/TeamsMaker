@@ -164,35 +164,34 @@ public class CircleService
 
         var response = new GetCircleMembersResponse
         {
-            Members = await Task.WhenAll(circle.CircleMembers
-            .Select(async cm =>
+            Members = circle.CircleMembers
+            .Select(cm => new CircleMemberInfo
             {
-                var avatarUrl = await db.Students.AnyAsync(s => s.Id == cm.UserId, ct)
-                    ? studentFileService.GetFileUrl(cm.UserId, FileTypes.Avatar)
-                    : staffFileService.GetFileUrl(cm.UserId, FileTypes.Avatar);
-
-                return new CircleMemberInfo
+                CircleMemberId = cm.Id,
+                UserId = cm.UserId,
+                FirstName = cm.User.FirstName,
+                LastName = cm.User.LastName,
+                IsOwner = cm.IsOwner,
+                Badge = cm.Badge,
+                Bio = cm.User.Bio,
+                ExceptionPermissions = cm.ExceptionPermission == null ? null : new PermissionsInfo
                 {
-                    CircleMemberId = cm.Id,
-                    UserId = cm.UserId,
-                    FirstName = cm.User.FirstName,
-                    LastName = cm.User.LastName,
-                    Avatar = avatarUrl,
-                    IsOwner = cm.IsOwner,
-                    Badge = cm.Badge,
-                    Bio = cm.User.Bio,
-                    ExceptionPermissions = cm.ExceptionPermission == null ? null : new PermissionsInfo
-                    {
-                        CircleManagment = cm.ExceptionPermission.CircleManagment,
-                        FeedManagment = cm.ExceptionPermission.FeedManagment,
-                        MemberManagement = cm.ExceptionPermission.MemberManagement,
-                        ProposalManagment = cm.ExceptionPermission.ProposalManagment,
-                        SessionManagment = cm.ExceptionPermission.SessionManagment,
-                        TodoTaskManagment = cm.ExceptionPermission.TodoTaskManagment
-                    }
-                };
-            }).ToList())
+                    CircleManagment = cm.ExceptionPermission.CircleManagment,
+                    FeedManagment = cm.ExceptionPermission.FeedManagment,
+                    MemberManagement = cm.ExceptionPermission.MemberManagement,
+                    ProposalManagment = cm.ExceptionPermission.ProposalManagment,
+                    SessionManagment = cm.ExceptionPermission.SessionManagment,
+                    TodoTaskManagment = cm.ExceptionPermission.TodoTaskManagment
+                }
+            }).ToList()
         };
+
+        foreach (var info in response.Members)
+        {
+            info.Avatar = await db.Students.AnyAsync(s => s.Id == info.UserId, ct)
+                    ? studentFileService.GetFileUrl(info.UserId, FileTypes.Avatar)
+                    : staffFileService.GetFileUrl(info.UserId, FileTypes.Avatar);
+        }
 
         return response;
     }
