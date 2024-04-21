@@ -12,13 +12,19 @@ public class ProposalConfig : IEntityTypeConfiguration<Proposal>
     {
         builder.ToTable(nameof(Proposal), DatabaseSchemas.Dbo);
 
+        builder.Property(x => x.Status)
+            .HasConversion<int>()
+            .HasDefaultValue(ProposalStatusEnum.NoApproval);
+        
+        builder
+            .HasOne(x => x.Circle)
+            .WithOne(y => y.Proposal)
+            .HasForeignKey<Proposal>(x => x.CircleId)
+            .IsRequired(true);
+
         builder
             .HasMany(x => x.ApprovalRequests)
             .WithOne(y => y.Proposal)
             .HasForeignKey(y => y.ProposalId);
-
-        builder.Property(x => x.Status)
-            .HasConversion<int>()
-            .HasDefaultValue(ProposalStatusEnum.NoApproval);
     }
 }

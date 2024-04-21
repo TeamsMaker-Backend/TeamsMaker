@@ -7,3 +7,8 @@ public enum ProposalStatusEnum
     SecondApproval = 2,
     ThirdApproval = 3
 }
+
+// headOfDept  1
+// supervisor  2
+// proposal + supervisor = 3
+//

@@ -12,4 +12,4 @@ public class Post : TrackedEntity<Guid>
     public virtual Author Author { get; set; } = null!;
     public virtual Post? ParentPost { get; set; }
     public virtual ICollection<Post> Comments { get; set; } = [];
-}  
+}

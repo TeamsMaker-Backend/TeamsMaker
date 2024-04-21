@@ -76,6 +76,7 @@ public class CircleMemberService
         await db.SaveChangesAsync(ct);
     }
 
+    //TODO: edit member role 
     public async Task UpdatePermissionAsync(Guid circleMemberId, UpdatePermissionRequest? request, CancellationToken ct)
     {
         var circleMember = await db.CircleMembers

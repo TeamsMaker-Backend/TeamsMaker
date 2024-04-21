@@ -29,6 +29,8 @@ public class AppDBContext(DbContextOptions options,
     public DbSet<Upvote> Upvotes { get; set; }
     public DbSet<Post> Posts { get; set; }
     public DbSet<Author> Authors { get; set; }
+    public DbSet<Proposal> Proposals { get; set; }
+    public DbSet<ApprovalRequest> ApprovalRequests { get; set; }
     #endregion
 
 
