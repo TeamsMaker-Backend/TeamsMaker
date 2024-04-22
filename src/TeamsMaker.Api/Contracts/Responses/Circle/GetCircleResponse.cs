@@ -14,6 +14,7 @@ public class GetCircleResponse
     public string? Avatar { get; set; }
     public string? Header { get; set; }
     public long Rate { get; set; }
+    public bool IsUpvoted { get; set; }
     public CircleStatusEnum Status { get; set; }
     public int OrganizationId { get; set; }
     public PermissionsInfo DefaultPermission { get; set; } = null!;
