@@ -18,14 +18,14 @@ public class ProposalService(AppDBContext db, IUserInfo userInfo,
             .Include(c => c.Proposal)
             .SingleOrDefaultAsync(c => c.Id == circleId, ct) ??
             throw new InvalidDataException("Circle Id is not valid");
-        
+
         var proposal = new GetProposalResponse
         {
             Id = circle.Proposal.Id,
             CircleId = circle.Id,
             Overview = circle.Proposal.Overview,
             Objectives = circle.Proposal.Objectives,
-            TechStack = circle.Proposal.TechStack,  
+            TechStack = circle.Proposal.TechStack,
             Status = circle.Proposal.Status,
         };
 
@@ -65,7 +65,6 @@ public class ProposalService(AppDBContext db, IUserInfo userInfo,
     }
 
 
-    //TODO: somehow supervisor should know new updated!!?
     public async Task UpdateAsync(Guid id, UpdateProposalRequest request, CancellationToken ct)
     {
         var proposal = await db.Proposals
@@ -76,12 +75,48 @@ public class ProposalService(AppDBContext db, IUserInfo userInfo,
 
         circleValidationService.CheckPermission(proposal.Circle.CircleMembers.First(), proposal.Circle, PermissionsEnum.ProposalManagement);
 
+        if (proposal.Status != ProposalStatusEnum.NoApproval)
+            throw new InvalidOperationException("Reset your proposal approval status to update it");
+
         if (!string.IsNullOrEmpty(request.Overview)) proposal.Overview = request.Overview;
 
         if (!string.IsNullOrEmpty(request.Objectives)) proposal.Objectives = request.Objectives;
 
         if (!string.IsNullOrEmpty(request.TechStack)) proposal.TechStack = request.TechStack;
 
+
+        await db.SaveChangesAsync(ct);
+    }
+
+    // notifications
+    public async Task ResetAsync(Guid id, CancellationToken ct)
+    {
+        var proposal = await db.Proposals
+            .Include(p => p.Circle)
+                .ThenInclude(c => c.CircleMembers.FirstOrDefault(cm => cm.UserId == userInfo.UserId))
+            .Include(p => p.ApprovalRequests)
+                .ThenInclude(ar => ar.Supervisor)
+            .SingleOrDefaultAsync(p => p.Id == id, ct)
+            ?? throw new InvalidDataException("Proposal not found");
+
+        circleValidationService.CheckPermission(proposal.Circle.CircleMembers.First(), proposal.Circle, PermissionsEnum.ProposalManagement);
+
+        //TODO: 1st, 2nd approval
+        if (proposal.Status != ProposalStatusEnum.FirstApproval && proposal.Status != ProposalStatusEnum.SecondApproval)
+            throw new InvalidOperationException("Reset your proposal approval status to update it");
+
+        foreach (var approval in proposal.ApprovalRequests.Where(ar => ar.IsAccepted))
+        {
+            approval.IsAccepted = false;
+
+            if (approval.Supervisor is not null)
+            {
+                approval.Supervisor = null;
+                approval.SupervisorId = null;
+            }
+
+            approval.IsReseted = true;
+        }
 
         await db.SaveChangesAsync(ct);
     }

@@ -10,10 +10,8 @@ public class ApprovalRequest : BaseEntity<Guid>
     public Guid ProposalId { get; set; }
     public string StaffId { get; set; } = null!;
     public string? SupervisorId { get; set; }
-
-    //TODO: head | supervisor | co-supervisor
-    public PositionEnum Destination { get; set; }
-    //TODO: Position: approval request as a co-supervisor or supervisor
+    public bool IsReseted { get; set; }
+    public PositionEnum Destination { get; set; }  //head | supervisor | co-supervisor
     public PositionEnum Position { get; set; } // co-supervisor or supervisor
 
     public virtual Proposal Proposal { get; set; } = null!;
