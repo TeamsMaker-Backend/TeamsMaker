@@ -11,12 +11,12 @@ namespace TeamsMaker.Api.Controllers.Profiles;
 public class FilterStudentEndpoint(IServiceProvider serviceProvider) : BaseApiController
 {
     [Tags("profiles")]
-    [Produces<List<GetStudentAsRowResponse>>]
+    [Produces<List<GetUserAsRowResponse>>]
     [HttpGet("profiles/students")]
     public async Task<IActionResult> FilterStudent([FromQuery] string query, CancellationToken ct)
     {
         var profileService = serviceProvider.GetRequiredKeyedService<IProfileService>(UserEnum.Student);
-        List<GetStudentAsRowResponse> profiles = [];
+        List<GetUserAsRowResponse> profiles = [];
 
         try
         {

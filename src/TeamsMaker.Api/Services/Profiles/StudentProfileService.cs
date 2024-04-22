@@ -15,7 +15,7 @@ public class StudentProfileService
 {
     private readonly IFileService _fileService = serviceProvider.GetRequiredKeyedService<IFileService>(BaseTypes.Student);
 
-    public async Task<List<GetStudentAsRowResponse>> FilterAsync(string query, CancellationToken ct)
+    public async Task<List<GetUserAsRowResponse>> FilterAsync(string query, CancellationToken ct)
     {
         var studentsQuery = db.Students.AsQueryable();
 
@@ -25,7 +25,7 @@ public class StudentProfileService
                         || (std.Email != null && std.Email.Contains(query)));
 
         var students = await studentsQuery
-            .Select(std => new GetStudentAsRowResponse
+            .Select(std => new GetUserAsRowResponse
             {
                 Id = std.Id,
                 FirstName = std.FirstName,

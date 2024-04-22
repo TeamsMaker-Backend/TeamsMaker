@@ -1,4 +1,5 @@
-﻿using TeamsMaker.Api.Core.Enums;
+﻿using TeamsMaker.Api.Contracts.Responses.Profile;
+using TeamsMaker.Api.Core.Enums;
 
 namespace TeamsMaker.Api.Contracts.Responses.Proposal;
 
@@ -9,6 +10,5 @@ public class GetProposalResponse
     public string Objectives { get; set; } = null!;
     public string TechStack { get; set; } = null!;
     public ProposalStatusEnum Status { get; set; } = ProposalStatusEnum.NoApproval;
-
     public Guid CircleId { get; set; }
 }

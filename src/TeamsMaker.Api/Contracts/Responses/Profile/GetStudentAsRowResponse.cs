@@ -1,6 +1,6 @@
 namespace TeamsMaker.Api.Contracts.Responses.Profile;
 
-public class GetStudentAsRowResponse
+public class GetUserAsRowResponse
 {
     public string Id { get; set; } = null!;
     public string? Avatar { get; set; }
