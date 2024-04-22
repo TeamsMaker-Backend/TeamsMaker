@@ -30,10 +30,10 @@ public class CircleValidationService(AppDBContext db) : ICircleValidationService
 
         if (circleMember.ExceptionPermission is not null &&
             !IsOn(circleMember.ExceptionPermission, permission))
-            throw new ArgumentException("Donot Have The Permission");
+            throw new ArgumentException("Don't Have The Permission");
 
         if (!IsOn(circle.DefaultPermission, permission))
-            throw new ArgumentException("Donot Have The Permission");
+            throw new ArgumentException("Don't Have The Permission");
     }
 
     public bool IsOn(Permission userPermission, PermissionsEnum permissionToCheck)

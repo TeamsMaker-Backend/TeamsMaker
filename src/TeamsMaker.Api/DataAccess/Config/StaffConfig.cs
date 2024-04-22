@@ -10,13 +10,25 @@ public class StaffConfig : IEntityTypeConfiguration<Staff>
     {
         builder.ToTable(nameof(Staff), DatabaseSchemas.Dbo);
 
+        // Enums
+        builder.Property(x => x.Classification)
+            .HasConversion<int>();
+        
         builder
             .HasMany(x => x.DepartmentStaff)
             .WithOne(y => y.Staff)
             .HasForeignKey(y => y.StaffId);
 
-        // Enums
-        builder.Property(x => x.Classification)
-            .HasConversion<int>();
+        builder
+            .HasMany(x => x.ApprovalRequests)
+            .WithOne(y => y.Staff)
+            .HasForeignKey(y => y.StaffId)
+            .IsRequired(true);
+
+        builder
+            .HasMany(x => x.AcceptedApprovalRequests)
+            .WithOne(y => y.Supervisor)
+            .HasForeignKey(y => y.SupervisorId)
+            .IsRequired(false);
     }
 }
