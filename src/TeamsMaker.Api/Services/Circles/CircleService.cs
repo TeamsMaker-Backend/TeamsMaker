@@ -75,6 +75,7 @@ public class CircleService
             .Include(c => c.SummaryData)
             .Include(c => c.Links)
             .Include(c => c.CircleMembers)
+            .Include(c => c.Upvotes)
             .Include(c => c.Invitions)
                 .ThenInclude(i => i.Student)
             .SingleOrDefaultAsync(c => c.Id == circleId, ct) ??
@@ -90,6 +91,7 @@ public class CircleService
             Keywords = circle.Keywords != null ? circle.Keywords.Split(',') : [],
             IsPublic = circle.SummaryData?.IsPublic ?? false,
             Rate = circle.Rate,
+            IsUpvoted = circle.Upvotes.Any(up => up.UserId == userInfo.UserId),
             Status = circle.Status,
             OrganizationId = circle.OrganizationId,
             Skills = circle.Skills.Select(l => l.Name).ToList(),
@@ -199,10 +201,10 @@ public class CircleService
     public async Task UpvoteAsync(Guid circleId, CancellationToken ct)
     {
         if (!await db.Circles.AnyAsync(c => c.Id == circleId, ct))
-            throw new ArgumentException();
+            throw new ArgumentException("Invalid Circle ID!");
 
-        if (await db.Upvotes.CountAsync(upvote => upvote.CircleId == circleId && upvote.UserId == userInfo.UserId, ct) > 1)
-            throw new InvalidOperationException();
+        if (await db.Upvotes.CountAsync(upvote => upvote.CircleId == circleId && upvote.UserId == userInfo.UserId, ct) >= 1)
+            throw new ArgumentException("Already upvoted");
 
         using var transaction = await db.Database.BeginTransactionAsync(ct);
 
@@ -213,13 +215,13 @@ public class CircleService
         };
 
         await db.Upvotes.AddAsync(upvote, ct);
-        await db.SaveChangesAsync(ct);
 
         await db
             .Circles
             .Where(c => c.Id == circleId)
             .ExecuteUpdateAsync(setters => setters.SetProperty(c => c.Rate, c => c.Rate + 1), ct);
 
+        await db.SaveChangesAsync(ct);
         await transaction.CommitAsync(ct);
     }
 

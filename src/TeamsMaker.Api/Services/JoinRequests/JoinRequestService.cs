@@ -12,8 +12,6 @@ using TeamsMaker.Api.Services.JoinRequests.Interfaces;
 
 namespace TeamsMaker.Api.Services.JoinRequests;
 
-//TODO: get joins/invitations from student prespective
-//TODO: get joins/invitations from circle prespective
 public class JoinRequestService
     (AppDBContext db, IUserInfo userInfo, ICircleMemberService memberService, ICircleValidationService validationService, IServiceProvider serviceProvider) : IJoinRequestService
 {
@@ -23,7 +21,8 @@ public class JoinRequestService
     {
         if (await db.JoinRequests.AnyAsync(jr =>
             jr.CircleId == request.CircleId &&
-            jr.StudentId == request.StudentId, ct))
+            jr.StudentId == request.StudentId &&
+            jr.IsAccepted == false, ct))
             throw new ArgumentException("There is already a sent request");
 
         var student = await db.Students.FindAsync([request.StudentId], ct) ??
