@@ -29,8 +29,7 @@ public class ProposalService(AppDBContext db, IUserInfo userInfo,
             Status = circle.Proposal.Status,
         };
 
-
-        throw new NotImplementedException();
+        return proposal;
     }
 
     public async Task<Guid> AddAsync(AddProposalRequest request, CancellationToken ct)
@@ -101,9 +100,8 @@ public class ProposalService(AppDBContext db, IUserInfo userInfo,
 
         circleValidationService.CheckPermission(proposal.Circle.CircleMembers.First(), proposal.Circle, PermissionsEnum.ProposalManagement);
 
-        //TODO: 1st, 2nd approval
         if (proposal.Status != ProposalStatusEnum.FirstApproval && proposal.Status != ProposalStatusEnum.SecondApproval)
-            throw new InvalidOperationException("Reset your proposal approval status to update it");
+            throw new InvalidOperationException("");
 
         foreach (var approval in proposal.ApprovalRequests.Where(ar => ar.IsAccepted))
         {
