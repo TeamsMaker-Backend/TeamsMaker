@@ -15,6 +15,7 @@ public class GetCircleResponse
     public string? Header { get; set; }
     public long Rate { get; set; }
     public bool IsUpvoted { get; set; }
+    public string OwnerName { get; set; } = null!;
     public CircleStatusEnum Status { get; set; }
     public int OrganizationId { get; set; }
     public PermissionsInfo DefaultPermission { get; set; } = null!;
@@ -22,4 +23,3 @@ public class GetCircleResponse
     public ICollection<LinkInfo>? Links { get; set; } = []; // Replace LinkInfo
     public ICollection<string>? Skills { get; set; } = [];
 }
-//TODO: Owner name

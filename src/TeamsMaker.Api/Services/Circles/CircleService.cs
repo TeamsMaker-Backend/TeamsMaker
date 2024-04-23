@@ -75,6 +75,7 @@ public class CircleService
             .Include(c => c.SummaryData)
             .Include(c => c.Links)
             .Include(c => c.CircleMembers)
+                .ThenInclude(cm => cm.User)
             .Include(c => c.Upvotes)
             .Include(c => c.Invitions)
                 .ThenInclude(i => i.Student)
@@ -91,6 +92,10 @@ public class CircleService
             Keywords = circle.Keywords != null ? circle.Keywords.Split(',') : [],
             IsPublic = circle.SummaryData?.IsPublic ?? false,
             Rate = circle.Rate,
+            OwnerName = circle.CircleMembers
+                .Where(cm => cm.IsOwner)
+                .Select(cm => $"{cm.User.FirstName} {cm.User.FirstName}")
+                .Single(),
             IsUpvoted = circle.Upvotes.Any(up => up.UserId == userInfo.UserId),
             Status = circle.Status,
             OrganizationId = circle.OrganizationId,
