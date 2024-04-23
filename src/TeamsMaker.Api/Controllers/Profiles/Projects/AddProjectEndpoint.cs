@@ -19,7 +19,7 @@ public class AddProjectEndpoint(IProjectService projectService) : BaseApiControl
         {
             id = await projectService.AddAsync(request, ct);
         }
-        catch (ArgumentException e)
+        catch (Exception e)
         {
             return NotFound(_response.FailureResponse(e.Message));
         }

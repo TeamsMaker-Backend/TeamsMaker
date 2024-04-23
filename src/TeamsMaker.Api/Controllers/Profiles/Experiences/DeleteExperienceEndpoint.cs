@@ -16,7 +16,7 @@ public class DeleteExperienceEndpoint(IExperienceService experienceService) : Ba
         {
             await experienceService.DeleteAsync(id, ct);
         }
-        catch (ArgumentException e)
+        catch (Exception e)
         {
             return NotFound(_response.FailureResponse(e.Message));
         }

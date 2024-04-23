@@ -17,7 +17,7 @@ public class UpdateCircleInfoEndpoint(ICircleService circleService) : BaseApiCon
         {
             await circleService.UpdateInfoAsync(circleId, request, ct);
         }
-        catch (ArgumentException e)
+        catch (Exception e)
         {
             return NotFound(_response.FailureResponse(e.Message));
         }

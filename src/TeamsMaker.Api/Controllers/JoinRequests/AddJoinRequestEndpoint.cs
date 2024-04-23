@@ -21,7 +21,7 @@ public class AddJoinRequestEndpoint(IJoinRequestService joinRequestService) : Ba
         {
             joinRequestId = await joinRequestService.AddAsync(request, ct);
         }
-        catch (ArgumentException e)
+        catch (Exception e)
         {
             return NotFound(_response.FailureResponse(e.Message));
         }

@@ -16,7 +16,7 @@ public class UpdateTodoTaskStatusEndpoint(ITodoTaskService todoTaskService) : Ba
         {
             await todoTaskService.UpdateStatusAsync(id, status, ct);
         }
-        catch (ArgumentException e)
+        catch (Exception e)
         {
             return NotFound(_response.FailureResponse(e.Message));
         }

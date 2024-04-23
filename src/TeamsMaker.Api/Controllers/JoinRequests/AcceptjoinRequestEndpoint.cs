@@ -17,7 +17,7 @@ public class AcceptjoinRequestEndpoint(IJoinRequestService joinRequestService) :
         {
             await joinRequestService.AcceptAsync(id, ct);
         }
-        catch (ArgumentException e)
+        catch (Exception e)
         {
             return NotFound(_response.FailureResponse(e.Message));
         }

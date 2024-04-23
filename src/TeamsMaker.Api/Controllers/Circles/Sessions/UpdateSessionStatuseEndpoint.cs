@@ -16,7 +16,7 @@ public class UpdateSessionStatuseEndpoint(ISessionService sessionService) : Base
         {
             await sessionService.UpdateStatusAsync(id, status, ct);
         }
-        catch (ArgumentException e)
+        catch (Exception e)
         {
             return NotFound(_response.FailureResponse(e.Message));
         }

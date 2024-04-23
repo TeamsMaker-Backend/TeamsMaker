@@ -21,7 +21,7 @@ public class GetFileEndpoint(IServiceProvider serviceProvider) : BaseApiControll
             var result = await fileService.GetFileContentAsync(id, fileType, ct);
             return result is not null ? result : NotFound();
         }
-        catch (ArgumentException e)
+        catch (Exception e)
         {
             return NotFound(_response.FailureResponse(e.Message));
         }

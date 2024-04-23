@@ -21,7 +21,7 @@ public class AddSessionEndpoint(ISessionService sessionService) : BaseApiControl
         {
             sessionId = await sessionService.AddAsync(circleId, request, ct);
         }
-        catch (ArgumentException e)
+        catch (Exception e)
         {
             return NotFound(_response.FailureResponse(e.Message));
         }

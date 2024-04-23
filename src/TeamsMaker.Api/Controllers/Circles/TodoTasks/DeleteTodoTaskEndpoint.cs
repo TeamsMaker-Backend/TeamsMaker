@@ -17,7 +17,7 @@ public class DeleteTodoTaskEndpoint(ITodoTaskService todoTaskService) : BaseApiC
         {
             await todoTaskService.DeleteAsync(id, ct);
         }
-        catch (ArgumentException e)
+        catch (Exception e)
         {
             return NotFound(_response.FailureResponse(e.Message));
         }

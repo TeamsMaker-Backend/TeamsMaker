@@ -16,7 +16,7 @@ public class RemoveCircleMemberEndpoint(ICircleMemberService memberService) : Ba
         {
             await memberService.RemoveAsync(memberId, ct);
         }
-        catch (ArgumentException e)
+        catch (Exception e)
         {
             return NotFound(_response.FailureResponse(e.Message));
         }

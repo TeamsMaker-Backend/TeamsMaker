@@ -20,7 +20,7 @@ public class GetJoinRequestEndpoint(IJoinRequestService joinRequestService) : Ba
         {
             response = await joinRequestService.GetAsync(circleId, ct);
         }
-        catch (ArgumentException e)
+        catch (Exception e)
         {
             return NotFound(_response.FailureResponse(e.Message));
         }

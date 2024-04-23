@@ -19,7 +19,7 @@ public class AddExperiencEndpoint(IExperienceService experienceService) : BaseAp
         {
             id = await experienceService.AddAsync(request, ct);
         }
-        catch (ArgumentException e)
+        catch (Exception e)
         {
             return NotFound(_response.FailureResponse(e.Message));
         }

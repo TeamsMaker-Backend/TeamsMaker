@@ -16,7 +16,7 @@ public class DeleteJoinRequestEndpoint(IJoinRequestService joinRequestService) :
         {
             await joinRequestService.DeleteAsync(id, ct);
         }
-        catch (ArgumentException e)
+        catch (Exception e)
         {
             return NotFound(_response.FailureResponse(e.Message));
         }

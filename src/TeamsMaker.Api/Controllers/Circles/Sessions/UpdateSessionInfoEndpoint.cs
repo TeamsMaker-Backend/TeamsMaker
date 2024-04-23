@@ -17,7 +17,7 @@ public class UpdateSessionInfoEndpoint(ISessionService sessionService) : BaseApi
         {
             await sessionService.UpdateInfoAsync(id, request, ct);
         }
-        catch (ArgumentException e)
+        catch (Exception e)
         {
             return NotFound(_response.FailureResponse(e.Message));
         }

@@ -17,7 +17,7 @@ public class UpdateProjectEndpoint(IProjectService projectService) : BaseApiCont
         {
             await projectService.UpdateAsync(id, request, ct);
         }
-        catch (ArgumentException e)
+        catch (Exception e)
         {
             return NotFound(_response.FailureResponse(e.Message));
         }

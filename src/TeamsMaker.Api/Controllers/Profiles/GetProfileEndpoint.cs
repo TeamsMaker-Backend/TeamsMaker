@@ -26,7 +26,7 @@ public class GetProfileEndpoint(IServiceProvider serviceProvider, IUserInfo user
         {
             response = await profileService.GetAsync(ct);
         }
-        catch (ArgumentException ae)
+        catch (Exception ae)
         {
             return NotFound(_response.FailureResponse(ae.Message));
         }

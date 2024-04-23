@@ -16,7 +16,7 @@ public class DeleteProjectEndpoint(IProjectService projectService) : BaseApiCont
         {
             await projectService.DeleteAsync(id, ct);
         }
-        catch (ArgumentException e)
+        catch (Exception e)
         {
             return NotFound(_response.FailureResponse(e.Message));
         }

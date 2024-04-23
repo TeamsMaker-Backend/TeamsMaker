@@ -20,7 +20,7 @@ public class GetCircleEndpoint(ICircleService circleService) : BaseApiController
         {
             response = await circleService.GetAsync(circleId, ct);
         }
-        catch (ArgumentException e)
+        catch (Exception e)
         {
             return NotFound(_response.FailureResponse(e.Message));
         }

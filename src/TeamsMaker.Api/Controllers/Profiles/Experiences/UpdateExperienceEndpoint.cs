@@ -18,7 +18,7 @@ public class UpdateExperienceEndpoint(IExperienceService experienceService) : Ba
         {
             await experienceService.UpdateAsync(id, updateExperienceRequest, ct);
         }
-        catch (ArgumentException e)
+        catch (Exception e)
         {
             return NotFound(_response.FailureResponse(e.Message));
         }

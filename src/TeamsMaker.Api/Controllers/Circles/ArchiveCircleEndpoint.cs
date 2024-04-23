@@ -16,7 +16,7 @@ public class ArchiveCircleEndpoint(ICircleService circleService) : BaseApiContro
         {
             await circleService.ArchiveAsync(circleId, ct);
         }
-        catch (ArgumentException e)
+        catch (Exception e)
         {
             return NotFound(_response.FailureResponse(e.Message));
         }

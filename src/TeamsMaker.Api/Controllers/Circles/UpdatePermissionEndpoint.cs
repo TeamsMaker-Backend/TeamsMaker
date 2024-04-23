@@ -19,7 +19,7 @@ public class UpdatePermissionEndpoint(IServiceProvider serviceProvider) : BaseAp
         {
             await permissionService.UpdatePermissionAsync(entityId, request, ct);
         }
-        catch (ArgumentException e)
+        catch (Exception e)
         {
             return NotFound(_response.FailureResponse(e.Message));
         }

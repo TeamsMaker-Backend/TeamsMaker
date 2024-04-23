@@ -16,7 +16,7 @@ public class DeleteCircleEndpoint(ICircleService circleService) : BaseApiControl
         {
             await circleService.DeleteAsync(circleId, ct);
         }
-        catch (ArgumentException e)
+        catch (Exception e)
         {
             return NotFound(_response.FailureResponse(e.Message));
         }

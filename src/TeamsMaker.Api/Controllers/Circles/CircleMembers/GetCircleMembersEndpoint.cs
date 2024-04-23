@@ -20,7 +20,7 @@ public class GetCircleMembersEndpoint(ICircleService circleService) : BaseApiCon
         {
             response = await circleService.GetMembersAsync(circleId, ct);
         }
-        catch (ArgumentException e)
+        catch (Exception e)
         {
             return NotFound(_response.FailureResponse(e.Message));
         }

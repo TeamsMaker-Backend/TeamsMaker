@@ -23,7 +23,7 @@ public class UpdateProfileEndpoint(IServiceProvider serviceProvider, IUserInfo u
         {
             await profileService.UpdateAsync(request, ct);
         }
-        catch (ArgumentException e)
+        catch (Exception e)
         {
             return NotFound(_response.FailureResponse(e.Message));
         }

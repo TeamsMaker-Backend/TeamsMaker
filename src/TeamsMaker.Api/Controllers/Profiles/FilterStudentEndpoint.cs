@@ -22,7 +22,7 @@ public class FilterStudentEndpoint(IServiceProvider serviceProvider) : BaseApiCo
         {
             profiles = await profileService.FilterAsync(query, ct);
         }
-        catch (ArgumentException e)
+        catch (Exception e)
         {
             return NotFound(_response.FailureResponse(e.Message));
         }

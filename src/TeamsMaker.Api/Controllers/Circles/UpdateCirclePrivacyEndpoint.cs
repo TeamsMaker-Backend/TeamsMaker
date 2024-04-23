@@ -16,7 +16,7 @@ public class UpdateCirclePrivacyEndpoint(ICircleService circleService) : BaseApi
         {
             await circleService.UpdatePrivacyAsync(circleId, isPublic, ct);
         }
-        catch (ArgumentException e)
+        catch (Exception e)
         {
             return NotFound(_response.FailureResponse(e.Message));
         }

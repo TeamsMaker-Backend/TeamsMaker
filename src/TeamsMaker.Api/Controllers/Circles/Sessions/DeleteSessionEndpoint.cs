@@ -16,7 +16,7 @@ public class DeleteSessionEndpoint(ISessionService sessionService) : BaseApiCont
         {
             await sessionService.DeleteAsync(id, ct);
         }
-        catch (ArgumentException e)
+        catch (Exception e)
         {
             return NotFound(_response.FailureResponse(e.Message));
         }

@@ -21,7 +21,7 @@ public class AddTodoTaskEndpoint(ITodoTaskService todoTaskService) : BaseApiCont
         {
             todoTaskId = await todoTaskService.AddAsync(circleId, request, ct);
         }
-        catch (ArgumentException e)
+        catch (Exception e)
         {
             return NotFound(_response.FailureResponse(e.Message));
         }

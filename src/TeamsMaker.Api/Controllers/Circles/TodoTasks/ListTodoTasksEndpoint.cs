@@ -22,7 +22,7 @@ public class ListTodoTasksEndpoint(ITodoTaskService todoTaskService) : BaseApiCo
             var todoTasks = await todoTaskService.ListAsync(id, queryString, ct);
             return todoTasks is not null ? Ok(_response.SuccessResponseWithPagination(todoTasks)) : NotFound();
         }
-        catch (ArgumentException e)
+        catch (Exception e)
         {
             return NotFound(_response.FailureResponse(e.Message));
         }

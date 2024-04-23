@@ -21,7 +21,7 @@ public class AddCircleEndpoint(ICircleService circleService) : BaseApiController
         {
             circleId = await circleService.AddAsync(request, ct);
         }
-        catch (ArgumentException e)
+        catch (Exception e)
         {
             return NotFound(_response.FailureResponse(e.Message));
         }

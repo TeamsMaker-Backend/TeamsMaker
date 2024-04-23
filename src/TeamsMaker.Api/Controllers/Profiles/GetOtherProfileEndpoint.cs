@@ -22,7 +22,7 @@ public class GetOtherProfileEndpoint(IServiceProvider serviceProvider) : BaseApi
         {
             response = await profileService.GetOtherAsync(id, ct);
         }
-        catch (ArgumentException e)
+        catch (Exception e)
         {
             return NotFound(_response.FailureResponse(e.Message));
         }

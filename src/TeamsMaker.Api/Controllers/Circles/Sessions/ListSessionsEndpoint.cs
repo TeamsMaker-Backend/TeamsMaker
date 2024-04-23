@@ -22,7 +22,7 @@ public class ListSessionsEndpoint(ISessionService sessionService) : BaseApiContr
             var sessions = await sessionService.ListAsync(id, queryString, ct);
             return sessions is not null ? Ok(_response.SuccessResponseWithPagination(sessions)) : NotFound();
         }
-        catch (ArgumentException e)
+        catch (Exception e)
         {
             return NotFound(_response.FailureResponse(e.Message));
         }

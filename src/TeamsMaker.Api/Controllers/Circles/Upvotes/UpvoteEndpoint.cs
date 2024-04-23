@@ -16,7 +16,7 @@ public class UpvoteEndpoint(ICircleService circleService) : BaseApiController
         {
             await circleService.UpvoteAsync(circleId, ct);
         }
-        catch (ArgumentException e)
+        catch (Exception e)
         {
             return NotFound(_response.FailureResponse(e.Message));
         }

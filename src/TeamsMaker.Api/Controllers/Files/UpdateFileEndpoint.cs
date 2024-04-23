@@ -20,7 +20,7 @@ public class UpdateFileEndpoint(IServiceProvider serviceProvider) : BaseApiContr
         {
             await fileService.UpdateFileAsync(id, fileType, request, ct);
         }
-        catch (ArgumentException e)
+        catch (Exception e)
         {
             return NotFound(_response.FailureResponse(e.Message));
         }

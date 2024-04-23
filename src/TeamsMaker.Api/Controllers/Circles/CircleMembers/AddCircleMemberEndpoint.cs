@@ -16,7 +16,7 @@ public class AddCircleMemberEndpoint(ICircleMemberService memberService) : BaseA
         {
             await memberService.AddAsync(circleId, userId, reciever, ct);
         }
-        catch (ArgumentException e)
+        catch (Exception e)
         {
             return NotFound(_response.FailureResponse(e.Message));
         }
