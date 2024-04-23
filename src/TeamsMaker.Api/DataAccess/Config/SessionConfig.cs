@@ -19,8 +19,7 @@ public class SessionConfig : IEntityTypeConfiguration<Session>
 
         builder.Property(x => x.Notes)
             .HasColumnType("nvarchar(2000)")
-            .HasMaxLength(2000)
-            .IsRequired();
+            .HasMaxLength(2000);
 
         builder.Property(x => x.Status)
             .IsRequired();
