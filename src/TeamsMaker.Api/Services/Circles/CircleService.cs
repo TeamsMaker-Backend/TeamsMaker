@@ -242,7 +242,7 @@ public class CircleService
             ?? throw new InvalidOperationException("This circle not upvoted");
 
         circle.Rate--;
-        circle.Upvotes.Remove(upvote);
+        db.Upvotes.Remove(upvote);
 
         await db.SaveChangesAsync(ct);
     }
