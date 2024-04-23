@@ -227,25 +227,19 @@ public class CircleService
 
     public async Task DownvoteAsync(Guid id, CancellationToken ct)
     {
-        using var transaction = await db.Database.BeginTransactionAsync(ct);
+        var circle = await db.Circles
+            .Include(c => c.Upvotes)
+            .SingleOrDefaultAsync(c => c.Id == id, ct)
+            ?? throw new NullReferenceException("This circle not found");
 
-        var upvote = await db.Upvotes.FindAsync([id], ct) ?? throw new NullReferenceException();
+        var upvote = circle.Upvotes
+            .SingleOrDefault(upvote => upvote.UserId == userInfo.UserId)
+            ?? throw new InvalidOperationException("This circle not upvoted");
 
-        if (await db.Upvotes.CountAsync(upvote => upvote.CircleId == upvote.CircleId && upvote.UserId == userInfo.UserId, ct) == 0)
-            throw new InvalidOperationException();
-
-        var circleId = upvote.CircleId;
-
-        db.Upvotes.Remove(upvote);
+        circle.Rate--;
+        circle.Upvotes.Remove(upvote);
 
         await db.SaveChangesAsync(ct);
-
-        await db
-            .Circles
-            .Where(c => c.Id == circleId)
-            .ExecuteUpdateAsync(setters => setters.SetProperty(c => c.Rate, c => c.Rate - 1), cancellationToken: ct);
-
-        await transaction.CommitAsync(ct);
     }
 
     // CircleManagment
