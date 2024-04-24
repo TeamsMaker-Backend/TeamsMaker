@@ -10,7 +10,7 @@ public class UpdateTodoTaskStatusEndpoint(ITodoTaskService todoTaskService) : Ba
 {
     [Tags("circles/todo_tasks")]
     [HttpPatch("circles/todo_tasks/{id}/{status}")]
-    public async Task<IActionResult> TodoTask(Guid id, [FromBody] TodoTaskStatus status, CancellationToken ct)
+    public async Task<IActionResult> TodoTask(Guid id, TodoTaskStatus status, CancellationToken ct)
     {
         try
         {
