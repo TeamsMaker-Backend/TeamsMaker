@@ -94,7 +94,7 @@ public class CircleService
             Rate = circle.Rate,
             OwnerName = circle.CircleMembers
                 .Where(cm => cm.IsOwner)
-                .Select(cm => $"{cm.User.FirstName} {cm.User.FirstName}")
+                .Select(cm => $"{cm.User.FirstName} {cm.User.LastName}")
                 .Single(),
             IsUpvoted = circle.Upvotes.Any(up => up.UserId == userInfo.UserId),
             Status = circle.Status,
