@@ -9,7 +9,8 @@ using TeamsMaker.Api.Services.Circles.Interfaces;
 namespace TeamsMaker.Api.Services.Circles;
 
 public class CircleMemberService
-    (AppDBContext db, IUserInfo userInfo, ICircleValidationService validationService, IServiceProvider serviceProvider) : ICircleMemberService, IPermissionService
+    (AppDBContext db, IUserInfo userInfo,
+    ICircleValidationService validationService, IServiceProvider serviceProvider) : ICircleMemberService, IPermissionService
 {
     public async Task AddAsync(Guid circleId, string userId, string reciever, CancellationToken ct)
     {
@@ -76,7 +77,17 @@ public class CircleMemberService
         await db.SaveChangesAsync(ct);
     }
 
-    //TODO: edit member role 
+    public async Task UpdateAsync(Guid memberId, UpdateCircleMemberRequest request, CancellationToken ct)
+    {
+        var circleMember = await db.CircleMembers
+            .FindAsync([memberId], ct) ??
+            throw new ArgumentException("Not a circle Member");
+
+        if (!string.IsNullOrEmpty(request.Role)) circleMember.Role = request.Role;
+
+        await db.SaveChangesAsync(ct);
+    }
+
     public async Task UpdatePermissionAsync(Guid circleMemberId, UpdatePermissionRequest? request, CancellationToken ct)
     {
         var circleMember = await db.CircleMembers

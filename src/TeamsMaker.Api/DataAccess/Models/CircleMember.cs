@@ -5,7 +5,8 @@ namespace TeamsMaker.Api.DataAccess.Models;
 public class CircleMember : BaseEntity<Guid>
 {
     public bool IsOwner { get; set; } = false;
-    public string? Badge { get; set; } // MemeberBadges const
+    public string? Badge { get; set; } //TODO: MemeberBadges const
+    public string? Role { get; set; }
 
     public virtual Permission? ExceptionPermission { get; set; }
     public string UserId { get; set; } = null!;

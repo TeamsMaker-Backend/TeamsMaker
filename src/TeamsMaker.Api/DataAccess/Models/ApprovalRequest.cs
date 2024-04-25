@@ -11,7 +11,7 @@ public class ApprovalRequest : BaseEntity<Guid>
     public string StaffId { get; set; } = null!;
     public string? SupervisorId { get; set; }
     public bool IsReseted { get; set; }
-    public PositionEnum Destination { get; set; }  //head | supervisor | co-supervisor
+    public PositionEnum Destination { get; set; }  //TODO: to be deleted
     public PositionEnum Position { get; set; } // co-supervisor or supervisor
 
     public virtual Proposal Proposal { get; set; } = null!;

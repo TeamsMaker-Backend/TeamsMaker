@@ -13,6 +13,9 @@ public class CircleMemberConfig : IEntityTypeConfiguration<CircleMember>
 
         builder.HasKey(x => x.Id);
 
+        builder.Property(x => x.Role)
+            .HasMaxLength(200);
+
         builder
             .HasOne(x => x.Circle)
             .WithMany(y => y.CircleMembers)
