@@ -11,6 +11,7 @@ namespace TeamsMaker.Api.Controllers.Posts
     public class AddPostEndPoint(IPostService postService) :BaseApiController
     {
         [Tags("post")]
+        [Produces<IdResponse<Guid>>]
         [HttpPost("post")]
         public async Task<IActionResult> AddPost(AddPostRequest request, CancellationToken ct)
         {

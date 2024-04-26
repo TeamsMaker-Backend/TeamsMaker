@@ -11,6 +11,11 @@ namespace TeamsMaker.Api.DataAccess.Config
             builder.ToTable(nameof(React), DatabaseSchemas.Dbo);
 
             builder
+                .HasOne(r => r.Post)
+                .WithMany(r => r.Reacts)
+                .HasForeignKey(r => r.PostId);
+
+            builder
                 .HasOne(r => r.User)
                 .WithMany(u => u.Reacts)
                 .HasForeignKey(r => r.UserId);
