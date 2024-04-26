@@ -28,4 +28,5 @@ public class Circle : TrackedEntity<Guid>, IReadOnlyOrganizationInfo
     public virtual ICollection<Session> Sessions { get; set; } = [];
     public virtual ICollection<TodoTask> TodoTasks { get; set; } = [];
     public virtual ICollection<Upvote> Upvotes { get; set; } = [];
+    public virtual ICollection<React> Reacts { get; set; } = [];
 }

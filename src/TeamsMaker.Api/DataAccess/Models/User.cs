@@ -26,5 +26,6 @@ public class User : IdentityUser, IActivable
     public virtual ICollection<Link> Links { get; set; } = [];
     public virtual ICollection<CircleMember> MemberOn { get; set; } = [];
     public virtual ICollection<Upvote> Upvotes { get; set; } = [];
+    public virtual ICollection<React> Reacts { get; set; } = [];
 }
 //TODO: Contacts, Circle, Posts, UserLinks, Tags
