@@ -176,6 +176,7 @@ public class CircleService
             {
                 CircleMemberId = cm.Id,
                 UserId = cm.UserId,
+                // UserType = cm.User.
                 FirstName = cm.User.FirstName,
                 LastName = cm.User.LastName,
                 IsOwner = cm.IsOwner,
