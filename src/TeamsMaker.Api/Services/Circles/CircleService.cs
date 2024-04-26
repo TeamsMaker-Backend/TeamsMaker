@@ -172,25 +172,27 @@ public class CircleService
         var response = new GetCircleMembersResponse
         {
             Members = circle.CircleMembers
-            .Select(cm => new CircleMemberInfo
-            {
-                CircleMemberId = cm.Id,
-                UserId = cm.UserId,
-                FirstName = cm.User.FirstName,
-                LastName = cm.User.LastName,
-                IsOwner = cm.IsOwner,
-                Badge = cm.Badge,
-                Bio = cm.User.Bio,
-                ExceptionPermissions = cm.ExceptionPermission == null ? null : new PermissionsInfo
+                .Select(cm => new CircleMemberInfo
                 {
-                    CircleManagment = cm.ExceptionPermission.CircleManagment,
-                    FeedManagment = cm.ExceptionPermission.FeedManagment,
-                    MemberManagement = cm.ExceptionPermission.MemberManagement,
-                    ProposalManagment = cm.ExceptionPermission.ProposalManagment,
-                    SessionManagment = cm.ExceptionPermission.SessionManagment,
-                    TodoTaskManagment = cm.ExceptionPermission.TodoTaskManagment
-                }
-            }).ToList()
+                    CircleMemberId = cm.Id,
+                    UserId = cm.UserId,
+                    UserType = db.Students.Any(x => x.Id == cm.UserId) ? UserEnum.Student : UserEnum.Staff,
+                    FirstName = cm.User.FirstName,
+                    LastName = cm.User.LastName,
+                    IsOwner = cm.IsOwner,
+                    Badge = cm.Badge,
+                    Bio = cm.User.Bio,
+                    ExceptionPermissions = cm.ExceptionPermission == null ? null : new PermissionsInfo
+                    {
+                        CircleManagment = cm.ExceptionPermission.CircleManagment,
+                        FeedManagment = cm.ExceptionPermission.FeedManagment,
+                        MemberManagement = cm.ExceptionPermission.MemberManagement,
+                        ProposalManagment = cm.ExceptionPermission.ProposalManagment,
+                        SessionManagment = cm.ExceptionPermission.SessionManagment,
+                        TodoTaskManagment = cm.ExceptionPermission.TodoTaskManagment
+                    }
+                })
+                .ToList()
         };
 
         foreach (var info in response.Members)

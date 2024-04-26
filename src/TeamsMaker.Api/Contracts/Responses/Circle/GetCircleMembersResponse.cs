@@ -1,4 +1,6 @@
-﻿namespace TeamsMaker.Api.Contracts.Responses.Circle;
+﻿using TeamsMaker.Core.Enums;
+
+namespace TeamsMaker.Api.Contracts.Responses.Circle;
 
 public class GetCircleMembersResponse
 {
@@ -12,6 +14,7 @@ public class CircleMemberInfo
     public string? Avatar { get; set; } = null!;
     public Guid CircleMemberId { get; set; }
     public string UserId { get; set; } = null!;
+    public UserEnum UserType { get; init; }
     public bool IsOwner { get; set; }
     public string? Badge { get; set; }
     public string? Bio { get; set; }
