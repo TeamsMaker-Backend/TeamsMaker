@@ -782,14 +782,13 @@ namespace TeamsMaker.Api.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CircleId")
+                    b.Property<Guid?>("CircleId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("PostId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("UserId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
@@ -1552,9 +1551,7 @@ namespace TeamsMaker.Api.Migrations
                 {
                     b.HasOne("TeamsMaker.Api.DataAccess.Models.Circle", "Circle")
                         .WithMany("Reacts")
-                        .HasForeignKey("CircleId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .HasForeignKey("CircleId");
 
                     b.HasOne("TeamsMaker.Api.DataAccess.Models.Post", "Post")
                         .WithMany("Reacts")
@@ -1564,9 +1561,7 @@ namespace TeamsMaker.Api.Migrations
 
                     b.HasOne("TeamsMaker.Api.DataAccess.Models.User", "User")
                         .WithMany("Reacts")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .HasForeignKey("UserId");
 
                     b.Navigation("Circle");
 

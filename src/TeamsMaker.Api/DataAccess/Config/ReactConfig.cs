@@ -13,17 +13,20 @@ namespace TeamsMaker.Api.DataAccess.Config
             builder
                 .HasOne(r => r.Post)
                 .WithMany(r => r.Reacts)
-                .HasForeignKey(r => r.PostId);
+                .HasForeignKey(r => r.PostId)
+                .IsRequired(true);
 
             builder
                 .HasOne(r => r.User)
                 .WithMany(u => u.Reacts)
-                .HasForeignKey(r => r.UserId);
+                .HasForeignKey(r => r.UserId)
+                .IsRequired(false);
 
             builder
                 .HasOne(r => r.Circle)
                 .WithMany(c => c.Reacts)
-                .HasForeignKey(r => r.CircleId);
+                .HasForeignKey(r => r.CircleId)
+                .IsRequired(false);
         }
     }
 }

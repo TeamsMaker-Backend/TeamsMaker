@@ -12,8 +12,8 @@ using TeamsMaker.Api.DataAccess.Context;
 namespace TeamsMaker.Api.Migrations
 {
     [DbContext(typeof(AppDBContext))]
-    [Migration("20240425121109_add_react_migration")]
-    partial class add_react_migration
+    [Migration("20240426221021_add_react_entity")]
+    partial class add_react_entity
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -785,14 +785,13 @@ namespace TeamsMaker.Api.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CircleId")
+                    b.Property<Guid?>("CircleId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("PostId")
+                    b.Property<Guid>("PostId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("UserId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
@@ -1555,21 +1554,21 @@ namespace TeamsMaker.Api.Migrations
                 {
                     b.HasOne("TeamsMaker.Api.DataAccess.Models.Circle", "Circle")
                         .WithMany("Reacts")
-                        .HasForeignKey("CircleId")
+                        .HasForeignKey("CircleId");
+
+                    b.HasOne("TeamsMaker.Api.DataAccess.Models.Post", "Post")
+                        .WithMany("Reacts")
+                        .HasForeignKey("PostId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-
-                    b.HasOne("TeamsMaker.Api.DataAccess.Models.Post", null)
-                        .WithMany("Reacts")
-                        .HasForeignKey("PostId");
 
                     b.HasOne("TeamsMaker.Api.DataAccess.Models.User", "User")
                         .WithMany("Reacts")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .HasForeignKey("UserId");
 
                     b.Navigation("Circle");
+
+                    b.Navigation("Post");
 
                     b.Navigation("User");
                 });

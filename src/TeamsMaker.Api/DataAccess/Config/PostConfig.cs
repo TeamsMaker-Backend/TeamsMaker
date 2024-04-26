@@ -33,5 +33,10 @@ public class PostConfig : IEntityTypeConfiguration<Post>
             .WithMany(y => y.Posts)
             .HasForeignKey(x => x.AuthorId)
             .IsRequired(true);
+        builder
+            .HasMany(p => p.Reacts)
+            .WithOne(r => r.Post)
+            .HasForeignKey(p => p.PostId)
+            .IsRequired(true);
     }
 }
