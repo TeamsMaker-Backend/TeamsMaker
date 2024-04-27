@@ -8,7 +8,7 @@ using TeamsMaker.Api.Services.Posts.Interfaces;
 namespace TeamsMaker.Api.Controllers.Posts
 {
     [Authorize]
-    public class AddPostEndPoint(IPostService postService) :BaseApiController
+    public class AddPostEndpoint(IPostService postService) :BaseApiController
     {
         [Tags("post")]
         [Produces<IdResponse<Guid>>]
