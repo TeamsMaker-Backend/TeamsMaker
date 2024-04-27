@@ -83,5 +83,11 @@ public class CircleConfig : IEntityTypeConfiguration<Circle>
             .WithOne(y => y.Circle)
             .HasForeignKey<Author>(y => y.CircleId)
             .IsRequired(false);
+
+        builder
+            .HasMany(c => c.Reacts)
+            .WithOne(r => r.Circle)
+            .HasForeignKey(r => r.CircleId)
+            .IsRequired(false);
     }
 }

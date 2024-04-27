@@ -77,5 +77,11 @@ public class UserConfig : IEntityTypeConfiguration<User>
 
         builder.Property(x => x.Gender)
             .HasDefaultValue(GenderEnum.Unknown);
+
+        builder
+            .HasMany(u => u.Reacts)
+            .WithOne(r => r.User)
+            .HasForeignKey(r => r.UserId)
+            .IsRequired(false);
     }
 }
