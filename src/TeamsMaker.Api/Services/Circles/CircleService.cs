@@ -92,6 +92,7 @@ public class CircleService
             Keywords = circle.Keywords != null ? circle.Keywords.Split(',') : [],
             IsPublic = circle.SummaryData?.IsPublic ?? false,
             Rate = circle.Rate,
+
             OwnerName = circle.CircleMembers
                 .Where(cm => cm.IsOwner)
                 .Select(cm => $"{cm.User.FirstName} {cm.User.LastName}")
@@ -275,7 +276,8 @@ public class CircleService
             circle.SummaryData = new SummaryData { Summary = request.Summary, IsPublic = isPublic };
         }
 
-        circle.Keywords = request.Keywords != null ? string.Join(",", request.Keywords) : null;
+        // and check length
+        circle.Keywords = request.Keywords != null && request.Keywords.Any() ? string.Join(",", request.Keywords) : null;
 
         db.Skills.RemoveRange(circle.Skills);
         circle.Skills = request.Skills?.Select(s => new Skill { CircleId = circleId, Name = s }).ToList() ?? [];
