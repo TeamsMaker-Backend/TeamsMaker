@@ -18,8 +18,8 @@ public class GetOtherProfileResponse
     public string? Avatar { get; set; }
     public string? Header { get; set; }
 
-    public OtherStudentInfo? OtherStudentInfo { get; set; }
-    public OtherStaffInfo? OtherStaffInfo { get; set; }
+    public OtherStudentInfo? StudentInfo { get; set; }
+    public OtherStaffInfo? StaffInfo { get; set; }
 }
 
 public class OtherStudentInfo

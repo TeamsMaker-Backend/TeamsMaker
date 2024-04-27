@@ -169,7 +169,7 @@ public class ProfileUtilities //TODO: [Refactor] remove dublicates - Urgent
                 }).ToList()
         };
 
-        response.OtherStudentInfo = otherStudentInfo;
+        response.StudentInfo = otherStudentInfo;
         response.Avatar = fileService.GetFileUrl(student.Id, FileTypes.Avatar);
         response.Header = fileService.GetFileUrl(student.Id, FileTypes.Header);
     }
@@ -194,7 +194,7 @@ public class ProfileUtilities //TODO: [Refactor] remove dublicates - Urgent
         {
             Classification = staff.Classification
         };
-        response.OtherStaffInfo = otherStaffInfo;
+        response.StaffInfo = otherStaffInfo;
     }
 
     public void UpdateUserData(User user, UpdateProfileRequest request)
