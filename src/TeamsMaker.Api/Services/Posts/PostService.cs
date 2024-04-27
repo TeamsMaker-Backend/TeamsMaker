@@ -15,11 +15,11 @@ public class PostService(ICircleValidationService validationService, IUserInfo u
 {
     public async Task<Guid> AddAsync(AddPostRequest request, CancellationToken ct)
     {
-        Guid postId;
+        Post post;
         using var transaction = await db.Database.BeginTransactionAsync(ct);
-        
+
         // CircleId
-        if(request.CircleId != null)
+        if (request.CircleId != null)
         {
             var circle = await db.Circles
                 .Include(c => c.DefaultPermission)
@@ -29,26 +29,25 @@ public class PostService(ICircleValidationService validationService, IUserInfo u
             var circleMember = await validationService.TryGetCircleMemberAsync(userInfo.UserId, (Guid)request.CircleId, ct);
             //FeedManagement
             validationService.CheckPermission(circleMember, circle, PermissionsEnum.FeedManagement);
-            var author = await db.Authors.SingleOrDefaultAsync( a => a.CircleId == request.CircleId, ct);
 
-            if(author == null)
+            var author = await db.Authors.SingleOrDefaultAsync(a => a.CircleId == request.CircleId, ct);
+           
+            if (author == null)
             {
                 var newAuthor = new Author { CircleId = request.CircleId };
                 await db.Authors.AddAsync(newAuthor, ct);
 
                 author = newAuthor;
             }
-            var post = new Post
+            post = new Post
             {
                 AuthorId = author.Id,
                 Content = request.Content,
                 LikesNumber = 0,
                 ParentPostId = request.ParentPostId,
             };
-            await db.Posts.AddAsync(post);
-            postId = post.Id;
         }
-        else 
+        else
         {
             //userId
             var author = await db.Authors.SingleOrDefaultAsync(a => a.UserId == userInfo.UserId, ct);
@@ -58,20 +57,21 @@ public class PostService(ICircleValidationService validationService, IUserInfo u
                 await db.Authors.AddAsync(newAuthor, ct);
                 author = newAuthor;
             }
-            var post = new Post
+            post = new Post
             {
                 AuthorId = author.Id,
                 Content = request.Content,
                 LikesNumber = 0,
                 ParentPostId = request.ParentPostId,
             };
-            await db.Posts.AddAsync(post);
-            postId = post.Id;
         }
+
+        await db.Posts.AddAsync(post, ct);
+
         await db.SaveChangesAsync(ct);
         await transaction.CommitAsync(ct);
 
-        return postId;
+        return post.Id;
     }
 }
 
