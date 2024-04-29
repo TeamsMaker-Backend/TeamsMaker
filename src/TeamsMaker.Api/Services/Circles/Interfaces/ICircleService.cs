@@ -7,6 +7,7 @@ public interface ICircleService
 {
     Task<Guid> AddAsync(AddCircleRequest request, CancellationToken ct);
     Task<GetCircleResponse> GetAsync(Guid circleId, CancellationToken ct);
+    Task<List<GetCircleAsRowResponse>> GetAsync(CancellationToken ct);
     Task<GetCircleMembersResponse> GetMembersAsync(Guid circleId, CancellationToken ct);
     Task UpdateInfoAsync(Guid circleId, UpdateCircleInfoRequest request, CancellationToken ct);
     Task UpdatePrivacyAsync(Guid circleId, bool isPublic, CancellationToken ct);
