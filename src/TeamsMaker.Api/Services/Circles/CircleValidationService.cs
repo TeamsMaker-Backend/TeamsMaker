@@ -36,6 +36,20 @@ public class CircleValidationService(AppDBContext db) : ICircleValidationService
             throw new ArgumentException("Don't Have The Permission");
     }
 
+    public bool HasPermission(CircleMember circleMember, Circle circle, PermissionsEnum permissions)
+    {
+        if (circleMember.IsOwner)
+            return true;
+
+        if (circleMember.ExceptionPermission is not null && IsOn(circleMember.ExceptionPermission, permissions))
+            return true;
+
+        if (IsOn(circle.DefaultPermission, permissions))
+            return true;
+
+        return false;
+    }
+
     public bool IsOn(Permission userPermission, PermissionsEnum permissionToCheck)
         => permissionToCheck switch
         {

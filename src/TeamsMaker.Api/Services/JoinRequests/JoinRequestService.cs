@@ -13,7 +13,8 @@ using TeamsMaker.Api.Services.JoinRequests.Interfaces;
 namespace TeamsMaker.Api.Services.JoinRequests;
 
 public class JoinRequestService
-    (AppDBContext db, IUserInfo userInfo, ICircleMemberService memberService, ICircleValidationService validationService, IServiceProvider serviceProvider) : IJoinRequestService
+    (AppDBContext db, IUserInfo userInfo, ICircleMemberService memberService,
+    ICircleValidationService validationService, IServiceProvider serviceProvider) : IJoinRequestService
 {
     private readonly IFileService _fileService = serviceProvider.GetRequiredKeyedService<IFileService>(BaseTypes.Circle);
 
@@ -66,6 +67,16 @@ public class JoinRequestService
 
         return joinRequest.Id;
     }
+
+
+    public async Task AddAsync(List<AddJoinRequest> requests, CancellationToken ct)
+    {
+        foreach (var request in requests)
+        {
+            await AddAsync(request, ct);
+        }
+    }
+
 
     public async Task<GetJoinRequestResponse> GetAsync(string? circleId, CancellationToken ct)
     {

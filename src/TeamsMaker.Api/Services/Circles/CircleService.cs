@@ -157,6 +157,31 @@ public class CircleService
         return response;
     }
 
+    public async Task<List<GetCircleAsRowResponse>> GetAsync(CancellationToken ct)
+    {
+        var fileService = serviceProvider.GetRequiredKeyedService<IFileService>(BaseTypes.Circle);
+
+        // get user
+        var circles = await db.CircleMembers
+            .Include(cm => cm.Circle)
+            .Where(cm => cm.UserId == userInfo.UserId)
+            .Where(cm => validationService.HasPermission(cm, cm.Circle, PermissionsEnum.MemberManagement))
+            .Select(cm => new GetCircleAsRowResponse
+            {
+                Id = cm.CircleId,
+                Name = cm.Circle.Name,
+                OwnerName = db.CircleMembers
+                    .Include(cm => cm.User)
+                    .Where(m => m.IsOwner && m.CircleId == cm.CircleId)
+                    .Select(m => $"{m.User.FirstName} {m.User.LastName}")
+                    .First(),
+                Avatar = fileService.GetFileUrl(cm.CircleId.ToString(), FileTypes.Avatar)
+            })
+            .ToListAsync(ct);
+
+        return circles;
+    }
+
     public async Task<GetCircleMembersResponse> GetMembersAsync(Guid circleId, CancellationToken ct)
     {
         var circle = await db.Circles
