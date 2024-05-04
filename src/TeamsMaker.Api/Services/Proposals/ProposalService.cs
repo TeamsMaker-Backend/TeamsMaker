@@ -94,27 +94,18 @@ public class ProposalService(AppDBContext db, IUserInfo userInfo,
             .Include(p => p.Circle)
                 .ThenInclude(c => c.CircleMembers.FirstOrDefault(cm => cm.UserId == userInfo.UserId))
             .Include(p => p.ApprovalRequests)
-                .ThenInclude(ar => ar.Supervisor)
             .SingleOrDefaultAsync(p => p.Id == id, ct)
             ?? throw new InvalidDataException("Proposal not found");
 
         circleValidationService.CheckPermission(proposal.Circle.CircleMembers.First(), proposal.Circle, PermissionsEnum.ProposalManagement);
 
         if (proposal.Status != ProposalStatusEnum.FirstApproval && proposal.Status != ProposalStatusEnum.SecondApproval)
-            throw new InvalidOperationException("");
+            throw new InvalidOperationException("Propsal already not approved");
 
-        foreach (var approval in proposal.ApprovalRequests.Where(ar => ar.IsAccepted))
-        {
-            approval.IsAccepted = false;
+        proposal.IsReseted = true;
+        proposal.Status = ProposalStatusEnum.NoApproval;
 
-            if (approval.Supervisor is not null)
-            {
-                approval.Supervisor = null;
-                approval.SupervisorId = null;
-            }
-
-            approval.IsReseted = true;
-        }
+        foreach (var approval in proposal.ApprovalRequests.Where(ar => ar.IsAccepted)) approval.IsAccepted = false;
 
         await db.SaveChangesAsync(ct);
     }

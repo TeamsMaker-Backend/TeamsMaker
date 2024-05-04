@@ -24,11 +24,5 @@ public class StaffConfig : IEntityTypeConfiguration<Staff>
             .WithOne(y => y.Staff)
             .HasForeignKey(y => y.StaffId)
             .IsRequired(true);
-
-        builder
-            .HasMany(x => x.AcceptedApprovalRequests)
-            .WithOne(y => y.Supervisor)
-            .HasForeignKey(y => y.SupervisorId)
-            .IsRequired(false);
     }
 }

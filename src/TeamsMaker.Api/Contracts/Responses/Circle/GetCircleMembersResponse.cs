@@ -17,7 +17,7 @@ public class CircleMemberInfo
     public UserEnum UserType { get; init; }
     public bool IsOwner { get; set; }
     public string? Badge { get; set; }
-    public string? Bio { get; set; }
+    public string? Role { get; set; }
     public PermissionsInfo? ExceptionPermissions { get; set; } = null!;
 }
 
