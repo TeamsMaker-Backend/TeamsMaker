@@ -207,7 +207,7 @@ public class CircleService
                     LastName = cm.User.LastName,
                     IsOwner = cm.IsOwner,
                     Badge = cm.Badge,
-                    Bio = cm.User.Bio,
+                    Role = cm.Role,
                     ExceptionPermissions = cm.ExceptionPermission == null ? null : new PermissionsInfo
                     {
                         CircleManagment = cm.ExceptionPermission.CircleManagment,
