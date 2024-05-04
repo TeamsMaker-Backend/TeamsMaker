@@ -22,6 +22,7 @@ public class StaffProfileService
 
         var staff = await db.Staff
             .Include(st => st.Links)
+            // .Include(st => st.)
             .SingleOrDefaultAsync(st => st.Id == userInfo.UserId, ct) ??
             throw new ArgumentException("Invalid ID!");
 

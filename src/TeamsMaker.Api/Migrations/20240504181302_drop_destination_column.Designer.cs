@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TeamsMaker.Api.DataAccess.Context;
 
@@ -11,9 +12,11 @@ using TeamsMaker.Api.DataAccess.Context;
 namespace TeamsMaker.Api.Migrations
 {
     [DbContext(typeof(AppDBContext))]
-    partial class AppDBContextModelSnapshot : ModelSnapshot
+    [Migration("20240504181302_drop_destination_column")]
+    partial class drop_destination_column
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -137,6 +140,9 @@ namespace TeamsMaker.Api.Migrations
                     b.Property<bool>("IsAccepted")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsReseted")
+                        .HasColumnType("bit");
+
                     b.Property<int>("Position")
                         .HasColumnType("int");
 
@@ -147,11 +153,16 @@ namespace TeamsMaker.Api.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<string>("SupervisorId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("ProposalId");
 
                     b.HasIndex("StaffId");
+
+                    b.HasIndex("SupervisorId");
 
                     b.ToTable("ApprovalRequest", "dbo");
                 });
@@ -738,9 +749,6 @@ namespace TeamsMaker.Api.Migrations
                     b.Property<DateTime?>("CreationDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<bool>("IsReseted")
-                        .HasColumnType("bit");
-
                     b.Property<DateTime?>("LastModificationDate")
                         .HasColumnType("datetime2");
 
@@ -1230,9 +1238,15 @@ namespace TeamsMaker.Api.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("TeamsMaker.Api.DataAccess.Models.Staff", "Supervisor")
+                        .WithMany("AcceptedApprovalRequests")
+                        .HasForeignKey("SupervisorId");
+
                     b.Navigation("Proposal");
 
                     b.Navigation("Staff");
+
+                    b.Navigation("Supervisor");
                 });
 
             modelBuilder.Entity("TeamsMaker.Api.DataAccess.Models.Author", b =>
@@ -1844,6 +1858,8 @@ namespace TeamsMaker.Api.Migrations
 
             modelBuilder.Entity("TeamsMaker.Api.DataAccess.Models.Staff", b =>
                 {
+                    b.Navigation("AcceptedApprovalRequests");
+
                     b.Navigation("ApprovalRequests");
 
                     b.Navigation("DepartmentStaff");

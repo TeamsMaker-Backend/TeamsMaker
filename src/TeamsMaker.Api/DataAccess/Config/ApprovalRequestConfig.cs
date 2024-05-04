@@ -10,9 +10,6 @@ public class ApprovalRequestConfig : IEntityTypeConfiguration<ApprovalRequest>
     {
         builder.ToTable(nameof(ApprovalRequest), DatabaseSchemas.Dbo);
 
-        builder.Property(x => x.Destination)
-            .HasConversion<int>();
-
         builder.Property(x => x.Position)
             .HasConversion<int>();
 
@@ -27,11 +24,5 @@ public class ApprovalRequestConfig : IEntityTypeConfiguration<ApprovalRequest>
             .WithMany(y => y.ApprovalRequests)
             .HasForeignKey(x => x.StaffId)
             .IsRequired(true);
-
-        builder
-            .HasOne(x => x.Supervisor)
-            .WithMany(y => y.AcceptedApprovalRequests)
-            .HasForeignKey(x => x.SupervisorId)
-            .IsRequired(false);
     }
 }

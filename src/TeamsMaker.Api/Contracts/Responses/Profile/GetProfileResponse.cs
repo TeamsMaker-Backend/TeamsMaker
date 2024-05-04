@@ -1,4 +1,5 @@
-﻿using TeamsMaker.Api.Contracts.Responses.JoinRequest;
+﻿using TeamsMaker.Api.Contracts.Responses.Circle;
+using TeamsMaker.Api.Contracts.Responses.JoinRequest;
 using TeamsMaker.Api.Core.Enums;
 using TeamsMaker.Core.Enums;
 
@@ -47,16 +48,9 @@ public class StudentInfo
     public ICollection<ExperienceInfo>? Experiences { get; set; } = [];
     public ICollection<ProjectInfo>? Projects { get; set; } = [];
     public GetJoinRequestResponse? StudentJoinRequests { get; set; }
-    public CircleInfo? CircleInfo { get; set; }
+    public GetCircleAsRowResponse? CircleInfo { get; set; }
 }
 
-public class CircleInfo
-{
-    public Guid Id { get; set; }
-    public string? Avatar { get; set; } = null!;
-    public string Name { get; set; } = null!;
-    public string OwnerName { get; set; } = null!;
-}
 
 public class ProjectInfo
 {
@@ -82,4 +76,6 @@ public class ExperienceInfo
 public class StaffInfo
 {
     public StaffClassificationsEnum Classification { get; set; }
+    public ICollection<GetCircleAsRowResponse> Circles { get; set; } = [];
+    public ICollection<GetCircleAsCardResponse> Archive { get; set; } = [];
 }
