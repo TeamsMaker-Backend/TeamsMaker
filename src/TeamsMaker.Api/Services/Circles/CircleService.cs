@@ -27,6 +27,7 @@ public class CircleService
 {
     public async Task<Guid> AddAsync(AddCircleRequest request, CancellationToken ct)
     {
+        //TODO: search on active circles not archived or deleted
         if (userInfo.Roles.Contains(AppRoles.Student) &&
             await db.CircleMembers.AnyAsync(cm => cm.UserId == userInfo.UserId, ct))
             throw new ArgumentException("Student Cannot Be In Two Circles");
@@ -433,12 +434,14 @@ public class CircleService
             .Include(c => c.CircleMembers)
                 .ThenInclude(cm => cm.ExceptionPermission)
             .Include(c => c.DefaultPermission)
+            .Include(c => c.Proposal)
+            .Include(c => c.Author)
             .Include(c => c.Links)
             .Include(c => c.Skills)
             .Include(c => c.Invitions)
-            .Include(c => c.Upvotes)
-            .Include(c => c.TodoTasks)
             .Include(c => c.Sessions)
+            .Include(c => c.TodoTasks)
+            .Include(c => c.Upvotes)
             .SingleOrDefaultAsync(c => c.Id == circleId, ct) ??
             throw new ArgumentException("Invalid Circle Id");
 
@@ -464,6 +467,10 @@ public class CircleService
         db.TodoTasks.RemoveRange(circle.TodoTasks);
 
         db.Sessions.RemoveRange(circle.Sessions);
+
+        db.Proposals.Remove(circle.Proposal);
+
+        if (circle.Author is not null) db.Authors.Remove(circle.Author);
 
         db.Circles.Remove(circle);
 
