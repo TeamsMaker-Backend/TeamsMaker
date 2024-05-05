@@ -15,29 +15,6 @@ public class StudentProfileService
 {
     private readonly IFileService _fileService = serviceProvider.GetRequiredKeyedService<IFileService>(BaseTypes.Student);
 
-    public async Task<List<GetUserAsRowResponse>> FilterAsync(string query, CancellationToken ct)
-    {
-        var studentsQuery = db.Students.AsQueryable();
-
-        if (!string.IsNullOrEmpty(query))
-            studentsQuery = studentsQuery.Where(std => std.FirstName.Contains(query)
-                        || std.LastName.Contains(query)
-                        || (std.Email != null && std.Email.Contains(query)));
-
-        var students = await studentsQuery
-            .Select(std => new GetUserAsRowResponse
-            {
-                Id = std.Id,
-                FirstName = std.FirstName,
-                LastName = std.LastName,
-                Bio = std.Bio,
-                Avatar = _fileService.GetFileUrl(std.Id, FileTypes.Avatar)
-            })
-            .ToListAsync(ct);
-
-        return students;
-    }
-
     public async Task<GetProfileResponse> GetAsync(CancellationToken ct)
     {
         var response = new GetProfileResponse { Roles = userInfo.Roles.ToList() };
