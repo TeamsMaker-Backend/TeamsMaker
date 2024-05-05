@@ -1,6 +1,9 @@
-﻿using Core.ValueObjects;
+﻿using Core.Generics;
+using Core.ValueObjects;
 
 using DataAccess.Base.Interfaces;
+
+using TeamsMaker.Api.Contracts.QueryStringParameters;
 
 using TeamsMaker.Api.Contracts.Requests.Circle;
 using TeamsMaker.Api.Contracts.Requests.JoinRequest;
@@ -24,6 +27,7 @@ public class CircleService
 {
     public async Task<Guid> AddAsync(AddCircleRequest request, CancellationToken ct)
     {
+        //TODO: search on active circles not archived or deleted
         if (userInfo.Roles.Contains(AppRoles.Student) &&
             await db.CircleMembers.AnyAsync(cm => cm.UserId == userInfo.UserId, ct))
             throw new ArgumentException("Student Cannot Be In Two Circles");
@@ -180,6 +184,45 @@ public class CircleService
             .ToListAsync(ct);
 
         return circles;
+    }
+
+
+    public async Task<PagedList<GetCircleAsRowResponse>> GetAsync(BaseQueryStringWithQ query, CancellationToken ct)
+    {
+        var fileService = serviceProvider.GetRequiredKeyedService<IFileService>(BaseTypes.Circle);
+
+        var circlesQuery = db.Circles
+            .Include(c => c.CircleMembers)
+                .ThenInclude(cm => cm.User)
+            .AsQueryable();
+
+        if (!string.IsNullOrEmpty(query.Q))
+            circlesQuery = circlesQuery
+                .Where(c => c.Name.Contains(query.Q)
+                        || c.CircleMembers.Any(cm => cm.User.FirstName.Contains(query.Q)
+                                                || cm.User.LastName.Contains(query.Q)
+                                                || cm.User.Email!.Contains(query.Q)));
+
+        circlesQuery = circlesQuery.OrderByDescending(c => c.CreationDate);
+
+        if (!string.IsNullOrEmpty(query.Q))
+            circlesQuery = circlesQuery.OrderByDescending(c => c.Name.Contains(query.Q));
+
+
+        var circles = circlesQuery
+            .Select(c => new GetCircleAsRowResponse
+            {
+                Id = c.Id,
+                Name = c.Name,
+                OwnerName = c.CircleMembers
+                    .Where(m => m.IsOwner && m.CircleId == c.Id)
+                    .Select(m => $"{m.User.FirstName} {m.User.LastName}")
+                    .First(),
+                Avatar = fileService.GetFileUrl(c.Id.ToString(), FileTypes.Avatar)
+            });
+
+
+        return await PagedList<GetCircleAsRowResponse>.ToPagedListAsync(circles, query.PageNumber, query.PageSize, ct);
     }
 
     public async Task<GetCircleMembersResponse> GetMembersAsync(Guid circleId, CancellationToken ct)
@@ -391,12 +434,14 @@ public class CircleService
             .Include(c => c.CircleMembers)
                 .ThenInclude(cm => cm.ExceptionPermission)
             .Include(c => c.DefaultPermission)
+            .Include(c => c.Proposal)
+            .Include(c => c.Author)
             .Include(c => c.Links)
             .Include(c => c.Skills)
             .Include(c => c.Invitions)
-            .Include(c => c.Upvotes)
-            .Include(c => c.TodoTasks)
             .Include(c => c.Sessions)
+            .Include(c => c.TodoTasks)
+            .Include(c => c.Upvotes)
             .SingleOrDefaultAsync(c => c.Id == circleId, ct) ??
             throw new ArgumentException("Invalid Circle Id");
 
@@ -422,6 +467,10 @@ public class CircleService
         db.TodoTasks.RemoveRange(circle.TodoTasks);
 
         db.Sessions.RemoveRange(circle.Sessions);
+
+        db.Proposals.Remove(circle.Proposal);
+
+        if (circle.Author is not null) db.Authors.Remove(circle.Author);
 
         db.Circles.Remove(circle);
 

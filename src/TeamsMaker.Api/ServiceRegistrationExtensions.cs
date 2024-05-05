@@ -61,6 +61,7 @@ public static class ServiceRegistrationExtensions
     {
         services.AddScoped<IUserInfo, UserInfo>();
         services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<IUserService, UserService>();
 
         services.AddSingleton<IStorageService, StorageService>();
 

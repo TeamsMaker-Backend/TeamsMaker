@@ -10,19 +10,12 @@ namespace TeamsMaker.Api.Services.Profiles;
 public class StaffProfileService
     (AppDBContext db, IUserInfo userInfo, ProfileUtilities profileUtilities) : IProfileService
 {
-    //TODO: to be implemented
-    public Task<List<GetUserAsRowResponse>> FilterAsync(string query, CancellationToken ct)
-    {
-        throw new NotImplementedException();
-    }
-
     public async Task<GetProfileResponse> GetAsync(CancellationToken ct)
     {
         var response = new GetProfileResponse { Roles = userInfo.Roles.ToList() };
 
         var staff = await db.Staff
             .Include(st => st.Links)
-            // .Include(st => st.)
             .SingleOrDefaultAsync(st => st.Id == userInfo.UserId, ct) ??
             throw new ArgumentException("Invalid ID!");
 

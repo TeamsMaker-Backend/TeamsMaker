@@ -1,4 +1,8 @@
-﻿using TeamsMaker.Api.Contracts.Requests.Circle;
+﻿using Core.Generics;
+
+using TeamsMaker.Api.Contracts.QueryStringParameters;
+
+using TeamsMaker.Api.Contracts.Requests.Circle;
 using TeamsMaker.Api.Contracts.Responses.Circle;
 
 namespace TeamsMaker.Api.Services.Circles.Interfaces;
@@ -7,6 +11,7 @@ public interface ICircleService
 {
     Task<Guid> AddAsync(AddCircleRequest request, CancellationToken ct);
     Task<GetCircleResponse> GetAsync(Guid circleId, CancellationToken ct);
+    Task<PagedList<GetCircleAsRowResponse>> GetAsync(BaseQueryStringWithQ query, CancellationToken ct);
     Task<List<GetCircleAsRowResponse>> GetAsync(CancellationToken ct);
     Task<GetCircleMembersResponse> GetMembersAsync(Guid circleId, CancellationToken ct);
     Task UpdateInfoAsync(Guid circleId, UpdateCircleInfoRequest request, CancellationToken ct);

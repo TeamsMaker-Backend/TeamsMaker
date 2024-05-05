@@ -21,12 +21,6 @@ namespace TeamsMaker.Api.DataAccess.Config
                 .WithMany(u => u.Reacts)
                 .HasForeignKey(r => r.UserId)
                 .IsRequired(false);
-
-            builder
-                .HasOne(r => r.Circle)
-                .WithMany(c => c.Reacts)
-                .HasForeignKey(r => r.CircleId)
-                .IsRequired(false);
         }
     }
 }
