@@ -34,7 +34,7 @@ public static class ServiceRegistrationExtensions
         // add the DbContext
         services.AddDbContext<AppDBContext>(
             options =>
-                options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"),
+                options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"), // ip address: 185.187.169.185
                     o => o
                         .UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
                         .LogTo(Console.WriteLine, LogLevel.Warning)
