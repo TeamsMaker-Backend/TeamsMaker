@@ -26,6 +26,12 @@ public class UserService(AppDBContext db, IUserInfo userInfo, IServiceProvider s
                         || std.LastName.Contains(query.Q)
                         || (std.Email != null && std.Email.Contains(query.Q)));
 
+
+        if(query.CircleId.HasValue) 
+            usersQuery = usersQuery
+                .Include(u => u.MemberOn.Where(cm => cm.CircleId == query.CircleId.Value));
+
+
         var users = usersQuery
             .Select(u => new GetUserAsRowResponse
             {
@@ -37,7 +43,6 @@ public class UserService(AppDBContext db, IUserInfo userInfo, IServiceProvider s
             });
 
         if (query.UserType.HasValue) users = users.Where(u => u.UserType!.Value == query.UserType.Value);
-
 
         var usersList = await users.ToListAsync(ct);
 

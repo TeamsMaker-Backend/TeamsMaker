@@ -6,4 +6,5 @@ public class UsersSearchQueryString
 {
     public string? Q { get; init; }
     public UserEnum? UserType{ get; set; }
+    public Guid? CircleId { get; set; }
 }
