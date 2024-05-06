@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
+using Swashbuckle.AspNetCore.Annotations;
+
 using TeamsMaker.Api.Contracts.Responses.JoinRequest;
 using TeamsMaker.Api.Services.JoinRequests.Interfaces;
 
@@ -11,6 +13,7 @@ public class GetJoinRequestEndpoint(IJoinRequestService joinRequestService) : Ba
 {
     [Tags("join_request")]
     [Produces<GetJoinRequestResponse>]
+    [SwaggerOperation(Description = "If circleId has value get circle join requests, if not userId will be used to get user join requests")]
     [HttpGet("join_requests")]
     public async Task<IActionResult> JoinRequest([FromQuery] string? circleId, CancellationToken ct)
     {

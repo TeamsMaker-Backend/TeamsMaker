@@ -1,7 +1,11 @@
-﻿using Core.Generics;
+﻿using System.ComponentModel;
+
+using Core.Generics;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+
+using Swashbuckle.AspNetCore.Annotations;
 
 using TeamsMaker.Api.Contracts.QueryStringParameters;
 
@@ -15,6 +19,7 @@ public class GetPaginatedCirclesEndpoint(ICircleService circleService) : BaseApi
 {
     [Tags("circles")]
     [Produces<PagedList<GetCircleAsRowResponse>>]
+    [SwaggerOperation(Summary = "get circles with pagination, also search by circle name or user name to get his circle")]
     [HttpGet("circles")]
     public async Task<IActionResult> GetPaginatedCircles([FromQuery] BaseQueryStringWithQ query, CancellationToken ct)
     {
@@ -22,7 +27,7 @@ public class GetPaginatedCirclesEndpoint(ICircleService circleService) : BaseApi
         {
             var response = await circleService.GetAsync(query, ct);
 
-            return Ok(_response.SuccessResponse(response));
+            return Ok(_response.SuccessResponseWithPagination(response));
         }
         catch (Exception e)
         {

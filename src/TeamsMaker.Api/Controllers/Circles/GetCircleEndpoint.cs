@@ -1,5 +1,9 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.ComponentModel;
+
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+
+using Swashbuckle.AspNetCore.Annotations;
 
 using TeamsMaker.Api.Contracts.Responses.Circle;
 using TeamsMaker.Api.Services.Circles.Interfaces;
@@ -11,6 +15,7 @@ public class GetCircleEndpoint(ICircleService circleService) : BaseApiController
 {
     [Tags("circles")]
     [Produces<GetCircleResponse>]
+    [SwaggerOperation(Summary = "get circle page")]
     [HttpGet("circles/{circleId}")]
     public async Task<IActionResult> Circle(Guid circleId, CancellationToken ct)
     {

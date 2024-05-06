@@ -1,5 +1,9 @@
+using System.ComponentModel;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+
+using Swashbuckle.AspNetCore.Annotations;
 
 using TeamsMaker.Api.Contracts.Responses.Circle;
 using TeamsMaker.Api.Services.Circles.Interfaces;
@@ -11,6 +15,7 @@ public class GetUserCirclesEndpoint(ICircleService circleService) : BaseApiContr
 {
     [Tags("circles")]
     [Produces<List<GetCircleAsRowResponse>>]
+    [SwaggerOperation(Summary = "get circles that user is member on")]
     [HttpGet("circles/my")]
     public async Task<IActionResult> Circle(CancellationToken ct)
     {
