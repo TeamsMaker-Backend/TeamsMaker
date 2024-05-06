@@ -29,7 +29,8 @@ public class UserService(AppDBContext db, IUserInfo userInfo, IServiceProvider s
 
         if(query.CircleId.HasValue) 
             usersQuery = usersQuery
-                .Include(u => u.MemberOn.Where(cm => cm.CircleId == query.CircleId.Value));
+                .Include(u => u.MemberOn)
+                .Where(u => u.MemberOn.Any(m => m.CircleId == query.CircleId.Value));
 
 
         var users = usersQuery
