@@ -82,6 +82,6 @@ public class UserConfig : IEntityTypeConfiguration<User>
             .HasMany(u => u.Reacts)
             .WithOne(r => r.User)
             .HasForeignKey(r => r.UserId)
-            .IsRequired(false);
+            .IsRequired(true);
     }
 }
