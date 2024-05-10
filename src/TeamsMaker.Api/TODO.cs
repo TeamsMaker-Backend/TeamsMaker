@@ -1,9 +1,13 @@
 ﻿/**Tasks
-    * *Task#1: 
+    * *Task#1:
         * TODO: Staff profile, use Authorization tag also
         * ? done
 
-    * *Task#2: 
+    * *Task#2:
         * TODO: fix cancel/denay join request
         * ? done      
+
+    * *Task#3:
+        * TODO: fix cancel/denay join request
+        * ? done 
 */
