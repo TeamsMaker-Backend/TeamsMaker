@@ -5,6 +5,7 @@ using TeamsMaker.Api.DataAccess.Base;
 
 namespace TeamsMaker.Api.DataAccess.Models;
 
+//TODO: add contact
 public class Proposal : TrackedEntity<Guid>
 {
     public string Overview { get; set; } = null!;

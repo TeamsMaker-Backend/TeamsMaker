@@ -206,7 +206,7 @@ public class CircleService
         circlesQuery = circlesQuery.OrderByDescending(c => c.CreationDate);
 
         if (!string.IsNullOrEmpty(query.Q))
-            circlesQuery = circlesQuery.OrderByDescending(c => c.Name.Contains(query.Q));
+            circlesQuery = circlesQuery.OrderBy(c => c.Name.Contains(query.Q));
 
 
         var circles = circlesQuery

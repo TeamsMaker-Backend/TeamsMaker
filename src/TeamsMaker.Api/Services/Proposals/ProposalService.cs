@@ -19,6 +19,7 @@ public class ProposalService(AppDBContext db, IUserInfo userInfo,
             .SingleOrDefaultAsync(c => c.Id == circleId, ct) ??
             throw new InvalidDataException("Circle Id is not valid");
 
+        //TODO: isRested
         var proposal = new GetProposalResponse
         {
             Id = circle.Proposal.Id,
@@ -66,6 +67,7 @@ public class ProposalService(AppDBContext db, IUserInfo userInfo,
 
     public async Task UpdateAsync(Guid id, UpdateProposalRequest request, CancellationToken ct)
     {
+        //TODO: missing includes
         var proposal = await db.Proposals
             .Include(p => p.Circle)
                 .ThenInclude(c => c.CircleMembers.FirstOrDefault(cm => cm.UserId == userInfo.UserId))
@@ -93,18 +95,23 @@ public class ProposalService(AppDBContext db, IUserInfo userInfo,
         var proposal = await db.Proposals
             .Include(p => p.Circle)
                 .ThenInclude(c => c.CircleMembers.FirstOrDefault(cm => cm.UserId == userInfo.UserId))
+                    .ThenInclude(cm => cm!.ExceptionPermission)
+            .Include(p => p.Circle)
+                .ThenInclude(c => c.DefaultPermission)
             .Include(p => p.ApprovalRequests)
             .SingleOrDefaultAsync(p => p.Id == id, ct)
             ?? throw new InvalidDataException("Proposal not found");
 
         circleValidationService.CheckPermission(proposal.Circle.CircleMembers.First(), proposal.Circle, PermissionsEnum.ProposalManagement);
 
+        //TODO: ProposalStatusEnum.ThirdApproval -> to be handeled
         if (proposal.Status != ProposalStatusEnum.FirstApproval && proposal.Status != ProposalStatusEnum.SecondApproval)
-            throw new InvalidOperationException("Propsal already not approved");
+            throw new InvalidOperationException("Proposal already not approved");
 
         proposal.IsReseted = true;
         proposal.Status = ProposalStatusEnum.NoApproval;
 
+        //TODO: approval.IsAccepted = null
         foreach (var approval in proposal.ApprovalRequests.Where(ar => ar.IsAccepted)) approval.IsAccepted = false;
 
         await db.SaveChangesAsync(ct);
@@ -112,10 +119,12 @@ public class ProposalService(AppDBContext db, IUserInfo userInfo,
 
     public async Task DeleteAsync(Guid id, CancellationToken ct)
     {
+        //TODO: check permissiom, missing includes
         var proposal = await db.Proposals
             .Include(p => p.ApprovalRequests)
             .SingleOrDefaultAsync(p => p.Id == id, ct) ?? throw new InvalidDataException("proposal not found");
 
+        //TODO: check of not third
         if (proposal.ApprovalRequests.Any(ar => ar.IsAccepted))
             throw new InvalidOperationException("This proposal already approved");
 
