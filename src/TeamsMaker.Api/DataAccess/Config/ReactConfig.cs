@@ -20,7 +20,7 @@ namespace TeamsMaker.Api.DataAccess.Config
                 .HasOne(r => r.User)
                 .WithMany(u => u.Reacts)
                 .HasForeignKey(r => r.UserId)
-                .IsRequired(false);
+                .IsRequired(true);
         }
     }
 }
