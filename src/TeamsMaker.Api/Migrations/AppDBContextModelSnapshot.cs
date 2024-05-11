@@ -1757,8 +1757,7 @@ namespace TeamsMaker.Api.Migrations
 
                     b.Navigation("Links");
 
-                    b.Navigation("Proposal")
-                        .IsRequired();
+                    b.Navigation("Proposal");
 
                     b.Navigation("Sessions");
 

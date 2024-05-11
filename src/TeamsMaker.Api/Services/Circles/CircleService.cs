@@ -3,6 +3,8 @@ using Core.ValueObjects;
 
 using DataAccess.Base.Interfaces;
 
+using Microsoft.IdentityModel.Tokens;
+
 using TeamsMaker.Api.Contracts.QueryStringParameters;
 
 using TeamsMaker.Api.Contracts.Requests.Circle;
@@ -27,9 +29,10 @@ public class CircleService
 {
     public async Task<Guid> AddAsync(AddCircleRequest request, CancellationToken ct)
     {
-        //TODO: search on active circles not archived or deleted
-        if (userInfo.Roles.Contains(AppRoles.Student) &&
-            await db.CircleMembers.AnyAsync(cm => cm.UserId == userInfo.UserId, ct))
+        var activeCircles = await db.CircleMembers
+            .CountAsync(cm => cm.UserId == userInfo.UserId && cm.Circle.Status == CircleStatusEnum.Active, ct);
+
+        if (userInfo.Roles.Contains(AppRoles.Student) && activeCircles > 1)
             throw new ArgumentException("Student Cannot Be In Two Circles");
 
         using var transaction = await db.Database.BeginTransactionAsync(ct);
@@ -165,10 +168,13 @@ public class CircleService
     {
         var fileService = serviceProvider.GetRequiredKeyedService<IFileService>(BaseTypes.Circle);
 
-        // get user
-        var circles = await db.CircleMembers
+        var circleMembersQuery = await db.CircleMembers
             .Include(cm => cm.Circle)
             .Where(cm => cm.UserId == userInfo.UserId)
+            .Where(cm => cm.Circle.Status == CircleStatusEnum.Active)
+            .ToListAsync(ct);
+
+        var circles = circleMembersQuery
             .Where(cm => validationService.HasPermission(cm, cm.Circle, PermissionsEnum.MemberManagement))
             .Select(cm => new GetCircleAsRowResponse
             {
@@ -181,7 +187,7 @@ public class CircleService
                     .First(),
                 Avatar = fileService.GetFileUrl(cm.CircleId.ToString(), FileTypes.Avatar)
             })
-            .ToListAsync(ct);
+            .ToList();
 
         return circles;
     }
@@ -194,6 +200,7 @@ public class CircleService
         var circlesQuery = db.Circles
             .Include(c => c.CircleMembers)
                 .ThenInclude(cm => cm.User)
+            .Where(c => c.Status == CircleStatusEnum.Active)
             .AsQueryable();
 
         if (!string.IsNullOrEmpty(query.Q))
@@ -447,28 +454,29 @@ public class CircleService
 
         // Todo: if Circle has an accepted , throw exception cuz it can't be deleted
 
-        db.Permissions.RemoveRange(
-            circle.CircleMembers
-                .Select(cm => cm.ExceptionPermission)
-                .Where(p => p != null)!);
-
         db.Permissions.Remove(circle.DefaultPermission);
+        
+        if (!circle.CircleMembers.Where(cm => cm.ExceptionPermission != null).IsNullOrEmpty())
+            db.Permissions.RemoveRange(
+                circle.CircleMembers
+                    .Select(cm => cm.ExceptionPermission)
+                    .Where(p => p != null)!);
 
-        db.CircleMembers.RemoveRange(circle.CircleMembers);
+        if (!circle.CircleMembers.IsNullOrEmpty()) db.CircleMembers.RemoveRange(circle.CircleMembers);
 
-        db.Links.RemoveRange(circle.Links);
+        if (!circle.Links.IsNullOrEmpty()) db.Links.RemoveRange(circle.Links);
 
-        db.Skills.RemoveRange(circle.Skills);
+        if (!circle.Skills.IsNullOrEmpty()) db.Skills.RemoveRange(circle.Skills);
 
-        db.JoinRequests.RemoveRange(circle.Invitions);
+        if (!circle.Invitions.IsNullOrEmpty()) db.JoinRequests.RemoveRange(circle.Invitions);
 
-        db.Upvotes.RemoveRange(circle.Upvotes);
+        if (!circle.Upvotes.IsNullOrEmpty()) db.Upvotes.RemoveRange(circle.Upvotes);
 
-        db.TodoTasks.RemoveRange(circle.TodoTasks);
+        if (!circle.TodoTasks.IsNullOrEmpty()) db.TodoTasks.RemoveRange(circle.TodoTasks);
 
-        db.Sessions.RemoveRange(circle.Sessions);
+        if (!circle.Sessions.IsNullOrEmpty()) db.Sessions.RemoveRange(circle.Sessions);
 
-        db.Proposals.Remove(circle.Proposal);
+        if (circle.Proposal is not null) db.Proposals.Remove(circle.Proposal);
 
         if (circle.Author is not null) db.Authors.Remove(circle.Author);
 

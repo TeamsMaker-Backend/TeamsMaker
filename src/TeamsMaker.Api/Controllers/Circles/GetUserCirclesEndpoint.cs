@@ -15,7 +15,7 @@ public class GetUserCirclesEndpoint(ICircleService circleService) : BaseApiContr
 {
     [Tags("circles")]
     [Produces<List<GetCircleAsRowResponse>>]
-    [SwaggerOperation(Summary = "get circles that user is member on")]
+    [SwaggerOperation(Summary = "get active circles that user is member on, used on sending invitaions case")]
     [HttpGet("circles/my")]
     public async Task<IActionResult> Circle(CancellationToken ct)
     {

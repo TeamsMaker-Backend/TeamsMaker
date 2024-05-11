@@ -79,6 +79,12 @@ public class CircleConfig : IEntityTypeConfiguration<Circle>
             .HasForeignKey(y => y.CircleId);
 
         builder
+            .HasOne(x => x.Proposal)
+            .WithOne(y => y.Circle)
+            .HasForeignKey<Proposal>(y => y.CircleId)
+            .IsRequired(false);
+
+        builder
             .HasOne(x => x.Author)
             .WithOne(y => y.Circle)
             .HasForeignKey<Author>(y => y.CircleId)
