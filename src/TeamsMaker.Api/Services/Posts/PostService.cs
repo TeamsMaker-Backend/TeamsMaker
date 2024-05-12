@@ -76,31 +76,73 @@ public class PostService(ICircleValidationService validationService, IUserInfo u
 
     public async Task DeleteAsync(Guid id, CancellationToken ct)
     {
-        //using var transaction = await db.Database.BeginTransactionAsync(ct);
+        using var transaction = await db.Database.BeginTransactionAsync(ct);
 
         var post = await db.Posts
             .Include(p => p.Comments)
             .Include(p => p.Reacts)
-            .SingleOrDefaultAsync(p => p.Id == id) ??
-        throw new ArgumentException("Invalid Id");
+            .SingleOrDefaultAsync(p => p.Id == id, ct) ??
+            throw new ArgumentException("Invalid Id");
 
         if (post.LikesNumber != 0)
-        {
-            db.RemoveRange(post.Reacts);
-        }
+            db.Reacts.RemoveRange(post.Reacts);
+
         if(post.Comments != null)
         { 
             var commentsId = post.Comments.Select(c => c.Id);
 
             for (int i = 0; i < commentsId.Count(); i++)
-            {
                 await DeleteAsync(commentsId.ElementAt(i), ct);
-            }
+        
         }
-        db.Remove(post);
+        db.Posts.Remove(post);
 
         await db.SaveChangesAsync(ct);
-        //await transaction.CommitAsync(ct);
+        await transaction.CommitAsync(ct);
+    }
+
+    public async Task<Guid> AddReactAsync(Guid postId, CancellationToken ct)
+    {
+        var post = await db.Posts.FindAsync([postId], ct) ??
+        throw new ArgumentException("Invalid Id");
+
+        var react = await db.Reacts
+            .SingleOrDefaultAsync(r => r.UserId == userInfo.UserId && r.PostId == postId, ct);
+        if (react != null)
+        {
+            throw new ArgumentException("You already reacted");
+        }
+
+        var newReact = new React
+        {
+            PostId = postId,
+            UserId = userInfo.UserId,
+        };
+        await db.Reacts.AddAsync(newReact, ct);
+
+        post.LikesNumber += 1;
+        db.Update(post);
+
+        await db.SaveChangesAsync(ct);
+
+        return newReact.Id;
+    }
+
+    public async Task DeleteReactAsync(Guid postId, CancellationToken ct)
+    {
+        var post = await db.Posts.FindAsync([postId], ct) ??
+        throw new ArgumentException("Invalid Id");
+
+        var react = await db.Reacts
+            .SingleOrDefaultAsync(r => r.UserId == userInfo.UserId && r.PostId == postId, ct) ??
+            throw new ArgumentException("You not reacted yet");
+
+        db.Reacts.Remove(react);
+
+        post.LikesNumber -= 1;
+        db.Update(post);
+
+        await db.SaveChangesAsync(ct);
     }
 }
 

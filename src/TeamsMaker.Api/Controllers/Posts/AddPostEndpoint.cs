@@ -10,9 +10,9 @@ namespace TeamsMaker.Api.Controllers.Posts;
 [Authorize]
 public class AddPostEndpoint(IPostService postService) :BaseApiController
 {
-    [Tags("post")]
+    [Tags("posts")]
     [Produces<IdResponse<Guid>>]
-    [HttpPost("post")]
+    [HttpPost("posts")]
     public async Task<IActionResult> AddPost(AddPostRequest request, CancellationToken ct)
     {
         Guid postId;
