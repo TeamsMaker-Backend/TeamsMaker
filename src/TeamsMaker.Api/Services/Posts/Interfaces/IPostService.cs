@@ -5,4 +5,5 @@ namespace TeamsMaker.Api.Services.Posts.Interfaces;
 public interface IPostService
 {
     Task<Guid> AddAsync(AddPostRequest request, CancellationToken ct);
+    Task DeleteAsync(Guid id, CancellationToken ct);
 }

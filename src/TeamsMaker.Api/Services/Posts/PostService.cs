@@ -73,6 +73,35 @@ public class PostService(ICircleValidationService validationService, IUserInfo u
 
         return post.Id;
     }
+
+    public async Task DeleteAsync(Guid id, CancellationToken ct)
+    {
+        //using var transaction = await db.Database.BeginTransactionAsync(ct);
+
+        var post = await db.Posts
+            .Include(p => p.Comments)
+            .Include(p => p.Reacts)
+            .SingleOrDefaultAsync(p => p.Id == id) ??
+        throw new ArgumentException("Invalid Id");
+
+        if (post.LikesNumber != 0)
+        {
+            db.RemoveRange(post.Reacts);
+        }
+        if(post.Comments != null)
+        { 
+            var commentsId = post.Comments.Select(c => c.Id);
+
+            for (int i = 0; i < commentsId.Count(); i++)
+            {
+                await DeleteAsync(commentsId.ElementAt(i), ct);
+            }
+        }
+        db.Remove(post);
+
+        await db.SaveChangesAsync(ct);
+        //await transaction.CommitAsync(ct);
+    }
 }
 
 
