@@ -100,6 +100,18 @@ public class PostService(ICircleValidationService validationService, IUserInfo u
         await db.SaveChangesAsync(ct);
         await transaction.CommitAsync(ct);
     }
+    
+    public async Task UpdateAsync(Guid id, UpdatePostRequest request, CancellationToken ct)
+    {
+        var post = await db.Posts.FindAsync([id], ct) ??
+        throw new ArgumentException("Invalid Id");
+
+        post.Content = request.Content;
+        db.Update(post);
+
+        await db.SaveChangesAsync(ct);
+
+    }
 
     public async Task<Guid> AddReactAsync(Guid postId, CancellationToken ct)
     {
@@ -144,6 +156,7 @@ public class PostService(ICircleValidationService validationService, IUserInfo u
 
         await db.SaveChangesAsync(ct);
     }
+
 }
 
 
