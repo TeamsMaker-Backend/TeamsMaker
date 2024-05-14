@@ -85,7 +85,7 @@ public class TodoTaskSerevice
 
         if (!string.IsNullOrEmpty(request.Title)) todoTask.Title = request.Title;
         if (request.DeadLine.HasValue) todoTask.DeadLine = request.DeadLine.Value;
-        
+
         todoTask.Notes = request.Notes;
         todoTask.SessionId = request.SessionId;
 

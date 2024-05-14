@@ -455,7 +455,7 @@ public class CircleService
         // Todo: if Circle has an accepted , throw exception cuz it can't be deleted
 
         db.Permissions.Remove(circle.DefaultPermission);
-        
+
         if (!circle.CircleMembers.Where(cm => cm.ExceptionPermission != null).IsNullOrEmpty())
             db.Permissions.RemoveRange(
                 circle.CircleMembers

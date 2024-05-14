@@ -78,7 +78,7 @@ public class SessionService
 
         if (!string.IsNullOrEmpty(request.Title)) session.Title = request.Title;
         if (request.Date.HasValue) session.Date = request.Date.Value;
-        
+
         session.Notes = request.Notes;
         session.Time = request.Time;
 

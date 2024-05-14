@@ -12,7 +12,7 @@ public class UpdateCircleMemberEndpoint(ICircleMemberService memberService) : Ba
 {
     [Tags("circles/members")]
     [HttpPatch("members/{memberId}")]
-    public async Task<IActionResult> CircleMember(Guid memberId,[FromBody] UpdateCircleMemberRequest request, CancellationToken ct)
+    public async Task<IActionResult> CircleMember(Guid memberId, [FromBody] UpdateCircleMemberRequest request, CancellationToken ct)
     {
         try
         {

@@ -1,6 +1,4 @@
-﻿using Core.ValueObjects;
-
-using TeamsMaker.Api.Core.Enums;
+﻿using TeamsMaker.Api.Core.Enums;
 using TeamsMaker.Api.DataAccess.Base;
 
 namespace TeamsMaker.Api.DataAccess.Models;
