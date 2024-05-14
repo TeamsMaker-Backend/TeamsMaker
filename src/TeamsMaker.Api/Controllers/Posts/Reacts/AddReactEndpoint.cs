@@ -2,22 +2,22 @@
 using Microsoft.AspNetCore.Mvc;
 
 using TeamsMaker.Api.Contracts.Responses;
-using TeamsMaker.Api.Services.Reacts.Interfaces;
+using TeamsMaker.Api.Services.Posts.Interfaces;
 
-namespace TeamsMaker.Api.Controllers.Reacts;
+namespace TeamsMaker.Api.Controllers.Posts.Reacts;
 
 [Authorize]
-public class AddReactEndpoint(IReactService reactService) : BaseApiController
+public class AddReactEndpoint(IPostService postService) : BaseApiController
 {
-    [Tags("React")]
+    [Tags("posts/reacts")]
     [Produces<IdResponse<Guid>>]
-    [HttpPost("react")]
-    public async Task<IActionResult> AddReact ([FromQuery] Guid id, CancellationToken ct)
+    [HttpPost("posts/{postId}/reacts")]
+    public async Task<IActionResult> AddReact(Guid postId, CancellationToken ct)
     {
         Guid reactId;
         try
         {
-            reactId = await reactService.AddAsync(id, ct);
+            reactId = await postService.AddReactAsync(postId, ct);
         }
         catch (Exception e)
         {

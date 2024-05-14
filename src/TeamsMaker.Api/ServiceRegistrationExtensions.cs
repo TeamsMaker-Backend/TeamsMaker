@@ -21,8 +21,6 @@ using TeamsMaker.Api.Services.Profiles;
 using TeamsMaker.Api.Services.Profiles.Interfaces;
 using TeamsMaker.Api.Services.Proposals;
 using TeamsMaker.Api.Services.Proposals.Interfaces;
-using TeamsMaker.Api.Services.Reacts;
-using TeamsMaker.Api.Services.Reacts.Interfaces;
 using TeamsMaker.Api.Services.Storage;
 using TeamsMaker.Api.Services.Storage.Interfacecs;
 using TeamsMaker.Core.Enums;
@@ -101,8 +99,6 @@ public static class ServiceRegistrationExtensions
         services.AddScoped<IApprovalRequestService, ApprovalRequestService>();
 
         services.AddScoped<IPostService, PostService>();
-
-        services.AddScoped<IReactService, ReactService>();
 
         return services;
     }
