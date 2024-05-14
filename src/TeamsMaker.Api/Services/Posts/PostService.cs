@@ -1,11 +1,8 @@
 ﻿using DataAccess.Base.Interfaces;
 
-using Microsoft.EntityFrameworkCore;
-
 using TeamsMaker.Api.Contracts.Requests.Post;
 using TeamsMaker.Api.Core.Enums;
 using TeamsMaker.Api.DataAccess.Context;
-using TeamsMaker.Api.DataAccess.Models;
 using TeamsMaker.Api.Services.Circles.Interfaces;
 using TeamsMaker.Api.Services.Posts.Interfaces;
 
@@ -31,7 +28,7 @@ public class PostService(ICircleValidationService validationService, IUserInfo u
             validationService.CheckPermission(circleMember, circle, PermissionsEnum.FeedManagement);
 
             var author = await db.Authors.SingleOrDefaultAsync(a => a.CircleId == request.CircleId, ct);
-           
+
             if (author == null)
             {
                 var newAuthor = new Author { CircleId = request.CircleId };

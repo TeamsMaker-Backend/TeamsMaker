@@ -1,7 +1,3 @@
-using TeamsMaker.Api.Contracts.Responses.JoinRequest;
-using TeamsMaker.Api.Contracts.Responses.Profile;
-using TeamsMaker.Core.Enums;
-
 namespace TeamsMaker.Api.Contracts.Responses.Circle;
 
 public class GetCircleAsRowResponse
