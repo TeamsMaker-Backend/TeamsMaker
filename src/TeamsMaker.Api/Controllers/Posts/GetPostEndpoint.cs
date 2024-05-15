@@ -3,27 +3,27 @@ using Microsoft.AspNetCore.Mvc;
 
 using TeamsMaker.Api.Contracts.Requests.Post;
 using TeamsMaker.Api.Contracts.Responses;
+using TeamsMaker.Api.Contracts.Responses.Post;
 using TeamsMaker.Api.Services.Posts.Interfaces;
 
 namespace TeamsMaker.Api.Controllers.Posts;
 
 [Authorize]
-public class AddPostEndpoint(IPostService postService) :BaseApiController
+public class GetPostEndpoint(IPostService postService) : BaseApiController
 {
-    [Tags("Post")]
-    [Produces<IdResponse<Guid>>]
-    [HttpPost("post")]
-    public async Task<IActionResult> AddPost(AddPostRequest request, CancellationToken ct)
+    [Tags("posts")]
+    [HttpGet("posts/{id}")]
+    public async Task<IActionResult> GetPost(Guid id, CancellationToken ct)
     {
-        Guid postId;
+        GetPostResponse response;
         try
         {
-            postId = await postService.AddAsync(request, ct);
+           response =  await postService.GetPostAsync(id, ct);
         }
         catch (Exception e)
         {
             return NotFound(_response.FailureResponse(e.Message));
         }
-        return Created("", _response.SuccessResponse(new IdResponse<Guid>(postId)));
+        return Ok(_response.SuccessResponse(response));
     }
 }
