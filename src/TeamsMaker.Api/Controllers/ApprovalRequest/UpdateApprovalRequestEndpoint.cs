@@ -9,7 +9,7 @@ namespace TeamsMaker.Api.Controllers.ApprovalRequest;
 public class UpdateApprovalRequestEndpoint(IApprovalRequestService approvalRequestService) : BaseApiController
 {
     [Tags("proposals/approval_requests")]
-    [HttpPut("proposals/approval_requests/{id}")]
+    [HttpPut("proposals/approval_requests/{id}/{isAccepted}")]
     public async Task<IActionResult> ApprovalRequest(Guid id, bool isAccepted, CancellationToken ct)
     {
         try
