@@ -12,23 +12,27 @@ namespace TeamsMaker.Api.Services.Proposals;
 public class ProposalService(AppDBContext db, IUserInfo userInfo,
     ICircleValidationService circleValidationService) : IProposalService
 {
-    public async Task<GetProposalResponse> GetAsync(Guid circleId, CancellationToken ct)
+    public async Task<GetProposalResponse?> GetAsync(Guid circleId, CancellationToken ct)
     {
         var circle = await db.Circles
             .Include(c => c.Proposal)
             .SingleOrDefaultAsync(c => c.Id == circleId, ct) ??
             throw new InvalidDataException("Circle Id is not valid");
 
-        //TODO: isRested
-        var proposal = new GetProposalResponse
-        {
-            Id = circle.Proposal.Id,
-            CircleId = circle.Id,
-            Overview = circle.Proposal.Overview,
-            Objectives = circle.Proposal.Objectives,
-            TechStack = circle.Proposal.TechStack,
-            Status = circle.Proposal.Status,
-        };
+
+        GetProposalResponse? proposal = null;
+
+        if(circle.Proposal is not null)
+            proposal = new GetProposalResponse
+            {
+                Id = circle.Proposal!.Id,
+                CircleId = circle.Id,
+                Overview = circle.Proposal.Overview,
+                Objectives = circle.Proposal.Objectives,
+                TechStack = circle.Proposal.TechStack,
+                Status = circle.Proposal.Status,
+                IsRested = circle.Proposal.IsReseted
+            };
 
         return proposal;
     }
@@ -70,11 +74,12 @@ public class ProposalService(AppDBContext db, IUserInfo userInfo,
         //TODO: missing includes
         var proposal = await db.Proposals
             .Include(p => p.Circle)
-                .ThenInclude(c => c.CircleMembers.FirstOrDefault(cm => cm.UserId == userInfo.UserId))
+                .ThenInclude(c => c.CircleMembers)
             .SingleOrDefaultAsync(p => p.Id == id, ct)
             ?? throw new InvalidDataException("Proposal not found");
 
-        circleValidationService.CheckPermission(proposal.Circle.CircleMembers.First(), proposal.Circle, PermissionsEnum.ProposalManagement);
+        var member = await circleValidationService.TryGetCircleMemberAsync(userInfo.UserId, proposal.CircleId, ct);
+        circleValidationService.CheckPermission(member, proposal.Circle, PermissionsEnum.ProposalManagement);
 
         if (proposal.Status != ProposalStatusEnum.NoApproval)
             throw new InvalidOperationException("Reset your proposal approval status to update it");
