@@ -22,7 +22,7 @@ public class ProposalService(AppDBContext db, IUserInfo userInfo,
 
         GetProposalResponse? proposal = null;
 
-        if(circle.Proposal is not null)
+        if (circle.Proposal is not null)
             proposal = new GetProposalResponse
             {
                 Id = circle.Proposal!.Id,
@@ -72,14 +72,14 @@ public class ProposalService(AppDBContext db, IUserInfo userInfo,
     {
         var proposal = await db.Proposals
             .Include(p => p.Circle)
-                .ThenInclude(c => c.CircleMembers.FirstOrDefault(cm => cm.UserId == userInfo.UserId))
-                    .ThenInclude(cm => cm!.ExceptionPermission)
+                .ThenInclude(c => c.CircleMembers)
             .Include(p => p.Circle)
                 .ThenInclude(c => c.DefaultPermission)
             .SingleOrDefaultAsync(p => p.Id == id, ct)
             ?? throw new InvalidDataException("Proposal not found");
 
-        validationService.CheckPermission(proposal.Circle.CircleMembers.First(), proposal.Circle, PermissionsEnum.ProposalManagement);
+        var circleMember = await validationService.TryGetCircleMemberAsync(userInfo.UserId, proposal.CircleId, ct);
+        validationService.CheckPermission(circleMember, proposal.Circle, PermissionsEnum.ProposalManagement);
 
         if (proposal.Status != ProposalStatusEnum.NoApproval)
             throw new InvalidOperationException("Reset your proposal approval status to update it");
@@ -99,7 +99,7 @@ public class ProposalService(AppDBContext db, IUserInfo userInfo,
     {
         var proposal = await db.Proposals
             .Include(p => p.Circle)
-                .ThenInclude(c => c.CircleMembers.FirstOrDefault(cm => cm.UserId == userInfo.UserId))
+                .ThenInclude(c => c.CircleMembers)
                     .ThenInclude(cm => cm!.ExceptionPermission)
             .Include(p => p.Circle)
                 .ThenInclude(c => c.DefaultPermission)
@@ -107,7 +107,8 @@ public class ProposalService(AppDBContext db, IUserInfo userInfo,
             .SingleOrDefaultAsync(p => p.Id == id, ct)
             ?? throw new InvalidDataException("Proposal not found");
 
-        validationService.CheckPermission(proposal.Circle.CircleMembers.First(), proposal.Circle, PermissionsEnum.ProposalManagement);
+        var circleMember = await validationService.TryGetCircleMemberAsync(userInfo.UserId, proposal.CircleId, ct);
+        validationService.CheckPermission(circleMember, proposal.Circle, PermissionsEnum.ProposalManagement);
 
         if (proposal.Status == ProposalStatusEnum.NoApproval)
             throw new InvalidOperationException("Proposal already not approved");
