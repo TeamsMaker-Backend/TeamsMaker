@@ -11,7 +11,7 @@ namespace TeamsMaker.Api.Controllers.Proposals;
 public class GetProposalEndpoint(IProposalService proposalService) : BaseApiController
 {
     [Tags("proposal")]
-    [Produces<GetProposalEndpoint>]
+    [Produces<GetProposalResponse>]
     [HttpGet("proposal/{circleId}")]
     public async Task<IActionResult> Proposal(Guid circleId, CancellationToken ct)
     {
