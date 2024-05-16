@@ -10,7 +10,7 @@ using TeamsMaker.Api.Services.Proposals.Interfaces;
 namespace TeamsMaker.Api.Services.Proposals;
 
 public class ProposalService(AppDBContext db, IUserInfo userInfo,
-    ICircleValidationService circleValidationService) : IProposalService
+    ICircleValidationService validationService) : IProposalService
 {
     public async Task<GetProposalResponse?> GetAsync(Guid circleId, CancellationToken ct)
     {
@@ -52,7 +52,7 @@ public class ProposalService(AppDBContext db, IUserInfo userInfo,
             .SingleOrDefault() ??
             throw new InvalidDataException("Member Id is not valid");
 
-        circleValidationService.CheckPermission(member, circle, PermissionsEnum.ProposalManagement);
+        validationService.CheckPermission(member, circle, PermissionsEnum.ProposalManagement);
 
         var proposal = new Proposal
         {
@@ -68,18 +68,18 @@ public class ProposalService(AppDBContext db, IUserInfo userInfo,
         return proposal.Id;
     }
 
-
     public async Task UpdateAsync(Guid id, UpdateProposalRequest request, CancellationToken ct)
     {
-        //TODO: missing includes
         var proposal = await db.Proposals
             .Include(p => p.Circle)
-                .ThenInclude(c => c.CircleMembers)
+                .ThenInclude(c => c.CircleMembers.FirstOrDefault(cm => cm.UserId == userInfo.UserId))
+                    .ThenInclude(cm => cm!.ExceptionPermission)
+            .Include(p => p.Circle)
+                .ThenInclude(c => c.DefaultPermission)
             .SingleOrDefaultAsync(p => p.Id == id, ct)
             ?? throw new InvalidDataException("Proposal not found");
 
-        var member = await circleValidationService.TryGetCircleMemberAsync(userInfo.UserId, proposal.CircleId, ct);
-        circleValidationService.CheckPermission(member, proposal.Circle, PermissionsEnum.ProposalManagement);
+        validationService.CheckPermission(proposal.Circle.CircleMembers.First(), proposal.Circle, PermissionsEnum.ProposalManagement);
 
         if (proposal.Status != ProposalStatusEnum.NoApproval)
             throw new InvalidOperationException("Reset your proposal approval status to update it");
@@ -107,30 +107,36 @@ public class ProposalService(AppDBContext db, IUserInfo userInfo,
             .SingleOrDefaultAsync(p => p.Id == id, ct)
             ?? throw new InvalidDataException("Proposal not found");
 
-        circleValidationService.CheckPermission(proposal.Circle.CircleMembers.First(), proposal.Circle, PermissionsEnum.ProposalManagement);
+        validationService.CheckPermission(proposal.Circle.CircleMembers.First(), proposal.Circle, PermissionsEnum.ProposalManagement);
 
-        //TODO: ProposalStatusEnum.ThirdApproval -> to be handeled
-        if (proposal.Status != ProposalStatusEnum.FirstApproval && proposal.Status != ProposalStatusEnum.SecondApproval)
+        if (proposal.Status == ProposalStatusEnum.NoApproval)
             throw new InvalidOperationException("Proposal already not approved");
+        if (proposal.Status == ProposalStatusEnum.ThirdApproval)
+            throw new InvalidOperationException("Proposal already approved");
 
         proposal.IsReseted = true;
         proposal.Status = ProposalStatusEnum.NoApproval;
 
-        //TODO: approval.IsAccepted = null
-        foreach (var approval in proposal.ApprovalRequests.Where(ar => ar.IsAccepted)) approval.IsAccepted = false;
+        foreach (var approval in proposal.ApprovalRequests.Where(ar => ar.IsAccepted is not null)) approval.IsAccepted = null;
 
         await db.SaveChangesAsync(ct);
     }
 
     public async Task DeleteAsync(Guid id, CancellationToken ct)
     {
-        //TODO: check permissiom, missing includes
         var proposal = await db.Proposals
             .Include(p => p.ApprovalRequests)
             .SingleOrDefaultAsync(p => p.Id == id, ct) ?? throw new InvalidDataException("proposal not found");
 
-        //TODO: check of not third
-        if (proposal.ApprovalRequests.Any(ar => ar.IsAccepted))
+        var circle = await db.Circles
+            .Include(c => c.DefaultPermission)
+            .SingleOrDefaultAsync(c => c.Id == proposal.CircleId, ct) ??
+            throw new ArgumentException("Invalid Circle ID");
+
+        var circleMember = await validationService.TryGetCircleMemberAsync(userInfo.UserId, circle.Id, ct);
+        validationService.CheckPermission(circleMember, circle, PermissionsEnum.ProposalManagement);
+
+        if (proposal.ApprovalRequests.Any(ar => ar.ProposalStatusSnapShot == ProposalStatusEnum.ThirdApproval && ar.IsAccepted == true))
             throw new InvalidOperationException("This proposal already approved");
 
         db.ApprovalRequests.RemoveRange(proposal.ApprovalRequests);

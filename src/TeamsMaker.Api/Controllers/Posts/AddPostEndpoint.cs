@@ -5,25 +5,26 @@ using TeamsMaker.Api.Contracts.Requests.Post;
 using TeamsMaker.Api.Contracts.Responses;
 using TeamsMaker.Api.Services.Posts.Interfaces;
 
-namespace TeamsMaker.Api.Controllers.Posts;
-
-[Authorize]
-public class AddPostEndpoint(IPostService postService) :BaseApiController
+namespace TeamsMaker.Api.Controllers.Posts
 {
-    [Tags("posts")]
-    [Produces<IdResponse<Guid>>]
-    [HttpPost("posts")]
-    public async Task<IActionResult> AddPost(AddPostRequest request, CancellationToken ct)
+    [Authorize]
+    public class AddPostEndpoint(IPostService postService) : BaseApiController
     {
-        Guid postId;
-        try
+        [Tags("post")]
+        [Produces<IdResponse<Guid>>]
+        [HttpPost("post")]
+        public async Task<IActionResult> AddPost(AddPostRequest request, CancellationToken ct)
         {
-            postId = await postService.AddAsync(request, ct);
+            Guid postId;
+            try
+            {
+                postId = await postService.AddAsync(request, ct);
+            }
+            catch (Exception e)
+            {
+                return NotFound(_response.FailureResponse(e.Message));
+            }
+            return Created("", _response.SuccessResponse(new IdResponse<Guid>(postId)));
         }
-        catch (Exception e)
-        {
-            return NotFound(_response.FailureResponse(e.Message));
-        }
-        return Created("", _response.SuccessResponse(new IdResponse<Guid>(postId)));
     }
 }
