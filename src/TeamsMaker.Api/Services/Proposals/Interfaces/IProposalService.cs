@@ -5,7 +5,7 @@ namespace TeamsMaker.Api.Services.Proposals.Interfaces;
 
 public interface IProposalService
 {
-    Task<GetProposalResponse> GetAsync(Guid circleId, CancellationToken ct);
+    Task<GetProposalResponse?> GetAsync(Guid circleId, CancellationToken ct);
     Task<Guid> AddAsync(AddProposalRequest request, CancellationToken ct);
     Task UpdateAsync(Guid id, UpdateProposalRequest request, CancellationToken ct);
     Task ResetAsync(Guid id, CancellationToken ct);
