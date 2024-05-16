@@ -30,6 +30,14 @@ public class ApprovalRequestService
             .SingleOrDefaultAsync(p => p.CircleId == circle.Id, ct) ??
             throw new ArgumentException("Make Your Proposal First");
 
+        /*
+        
+            proposal: 1st      req: head    not valid                  
+            proposal: 2nd      req: supervisor  not valid
+            proposal: 3rd      req: not co-supervisor   not valid
+
+        */
+
         // Assure that the suitable position for a suitable proposal state
         if ((request.CurrentProposalStatus == ProposalStatusEnum.NoApproval && request.Position != PositionEnum.Head) ||
             (request.CurrentProposalStatus == ProposalStatusEnum.FirstApproval && request.Position == PositionEnum.Head) ||
@@ -160,17 +168,18 @@ public class ApprovalRequestService
             .SingleOrDefaultAsync(p => p.Id == proposalId, ct) ??
             throw new ArgumentException("Invalid Proposal Id");
 
+
         var response = new ListCircleApprovalRequestResponse
         {
             ApprovalRequests = propsal.ApprovalRequests
                 .Where(ar =>
-                    (queryString.ProposalStatusEnum == null || ar.ProposalStatusSnapShot == queryString.ProposalStatusEnum))
+                    queryString.ProposalStatusEnum == null || ar.ProposalStatusSnapShot == queryString.ProposalStatusEnum)
                 .Where(ar =>
-                    (queryString.PositionEnum == null || ar.Position == queryString.PositionEnum))
+                    queryString.PositionEnum == null || ar.Position == queryString.PositionEnum)
                 .Where(ar =>
-                    (queryString.IsAccepted == null || ar.IsAccepted == queryString.IsAccepted))
+                    queryString.IsAccepted == null || ar.IsAccepted == queryString.IsAccepted)
                 .OrderBy(ar => ar.ProposalStatusSnapShot)
-                .OrderBy(ar => ar.IsAccepted)
+                .OrderBy(ar => ar.IsAccepted) 
                 .Select(ar => new CircleApprovalRequestInfo
                 {
                     Id = ar.Id,
@@ -204,11 +213,11 @@ public class ApprovalRequestService
             ApprovalRequests = await db.ApprovalRequests
                 .Where(ar => ar.StaffId == staff.Id)
                 .Where(ar =>
-                    (queryString.ProposalStatusEnum == null || ar.ProposalStatusSnapShot == queryString.ProposalStatusEnum))
+                    queryString.ProposalStatusEnum == null || ar.ProposalStatusSnapShot == queryString.ProposalStatusEnum)
                 .Where(ar =>
-                    (queryString.PositionEnum == null || ar.Position == queryString.PositionEnum))
+                    queryString.PositionEnum == null || ar.Position == queryString.PositionEnum)
                 .Where(ar =>
-                    (queryString.IsAccepted == null || ar.IsAccepted == queryString.IsAccepted))
+                    queryString.IsAccepted == null || ar.IsAccepted == queryString.IsAccepted)
                 .OrderBy(ar => ar.ProposalStatusSnapShot)
                 .OrderBy(ar => ar.IsAccepted)
                 .Select(ar => new StaffApprovalRequestInfo
