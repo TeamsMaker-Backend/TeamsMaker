@@ -70,7 +70,7 @@ public class ApprovalRequestService
             throw new ArgumentException("This teaching staff didnot recieve any approval request with this approval request ID");
 
 
-        if ((approvalRequest.Position == PositionEnum.Supervisor ||approvalRequest.Position == PositionEnum.CoSupervisor)
+        if ((approvalRequest.Position == PositionEnum.Supervisor || approvalRequest.Position == PositionEnum.CoSupervisor)
             && approvalRequest.Proposal.Status == ProposalStatusEnum.NoApproval)
             throw new ArgumentException("Need the first approval");
 
@@ -130,16 +130,15 @@ public class ApprovalRequestService
             .SingleOrDefaultAsync(p => p.Id == proposalId, ct) ??
             throw new ArgumentException("Invalid Proposal Id");
 
-        var query = propsal.ApprovalRequests.AsQueryable();
+        var query = propsal.ApprovalRequests
+            .Where(ar => ar.IsAccepted == queryString.IsAccepted)
+            .AsQueryable();
 
         if (queryString.ProposalStatusEnum != null)
             query = query.Where(ar => ar.ProposalStatusSnapshot == queryString.ProposalStatusEnum);
 
         if (queryString.PositionEnum != null)
             query = query.Where(ar => ar.Position == queryString.PositionEnum);
-
-        if (queryString.IsAccepted != null)
-            query = query.Where(ar => ar.IsAccepted == queryString.IsAccepted);
 
         var response = await query
                 .OrderBy(ar => ar.ProposalStatusSnapshot)
@@ -171,16 +170,15 @@ public class ApprovalRequestService
         var staff = await db.Staff.SingleOrDefaultAsync(st => st.Id == userInfo.UserId, ct) ??
             throw new ArgumentException("You arenot From Teaching Staff");
 
-        var query = db.ApprovalRequests.Where(ar => ar.StaffId == staff.Id);
+        var query = db.ApprovalRequests
+            .Where(ar => ar.StaffId == staff.Id)
+            .Where(ar => ar.IsAccepted == queryString.IsAccepted);
 
         if (queryString.ProposalStatusEnum != null)
             query = query.Where(ar => ar.ProposalStatusSnapshot == queryString.ProposalStatusEnum);
 
         if (queryString.PositionEnum != null)
             query = query.Where(ar => ar.Position == queryString.PositionEnum);
-
-        if (queryString.IsAccepted != null)
-            query = query.Where(ar => ar.IsAccepted == queryString.IsAccepted);
 
         var response = await query
                 .OrderBy(ar => ar.ProposalStatusSnapshot)
@@ -235,7 +233,6 @@ public class ApprovalRequestService
     public async Task<GetApprovalRequestResponse> GetAsync(Guid id, CancellationToken ct)
     {
         var approvalRequest = await db.ApprovalRequests
-            .Include(ar => ar.Staff)
             .Include(ar => ar.Proposal)
                 .ThenInclude(p => p.Circle)
                     .ThenInclude(c => c.CircleMembers)
