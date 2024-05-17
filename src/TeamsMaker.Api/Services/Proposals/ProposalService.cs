@@ -75,11 +75,13 @@ public class ProposalService(AppDBContext db, IUserInfo userInfo,
         var proposal = await db.Proposals
             .Include(p => p.Circle)
                 .ThenInclude(c => c.CircleMembers)
+            .Include(p => p.Circle)
+                .ThenInclude(c => c.DefaultPermission)
             .SingleOrDefaultAsync(p => p.Id == id, ct)
             ?? throw new InvalidDataException("Proposal not found");
 
-        var member = await circleValidationService.TryGetCircleMemberAsync(userInfo.UserId, proposal.CircleId, ct);
-        circleValidationService.CheckPermission(member, proposal.Circle, PermissionsEnum.ProposalManagement);
+        var circleMember = await validationService.TryGetCircleMemberAsync(userInfo.UserId, proposal.CircleId, ct);
+        validationService.CheckPermission(circleMember, proposal.Circle, PermissionsEnum.ProposalManagement);
 
         if (proposal.Status != ProposalStatusEnum.NoApproval)
             throw new InvalidOperationException("Reset your proposal approval status to update it");

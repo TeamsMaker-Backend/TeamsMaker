@@ -14,7 +14,7 @@ public class DeleteJoinRequestEndpoint(IJoinRequestService joinRequestService) :
     {
         try
         {
-            await joinRequestService.DeleteAsync(id, ct);
+            await joinRequestService.DeleteAsync(id, circleId, ct);
         }
         catch (Exception e)
         {
