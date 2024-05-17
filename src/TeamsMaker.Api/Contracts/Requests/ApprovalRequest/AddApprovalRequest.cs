@@ -7,5 +7,4 @@ public class AddApprovalRequest
     public Guid CircleId { get; init; }
     public string StaffId { get; init; } = null!;
     public PositionEnum Position { get; init; }
-    public ProposalStatusEnum CurrentProposalStatus { get; init; }
 }

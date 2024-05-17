@@ -192,7 +192,6 @@ public class CircleService
         return circles;
     }
 
-
     public async Task<PagedList<GetCircleAsRowResponse>> GetAsync(BaseQueryStringWithQ query, CancellationToken ct)
     {
         var fileService = serviceProvider.GetRequiredKeyedService<IFileService>(BaseTypes.Circle);

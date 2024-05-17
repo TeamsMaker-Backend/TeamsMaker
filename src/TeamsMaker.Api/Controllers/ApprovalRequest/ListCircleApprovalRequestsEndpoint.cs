@@ -11,11 +11,11 @@ namespace TeamsMaker.Api.Controllers.ApprovalRequest;
 public class ListCircleApprovalRequestsEndpoint(IApprovalRequestService approvalRequestService) : BaseApiController
 {
     [Tags("proposals/approval_requests")]
-    //[Produces<ListCircleApprovalRequestResponse>]
+    //[Produces<List<GetCircleApprovalRequestResponse>>]
     [HttpGet("proposals/{id}/approval_requests")]
     public async Task<IActionResult> CircleApprovalRequests(Guid id, [FromQuery] ApprovalRequestQueryString queryString, CancellationToken ct)
     {
-        ListCircleApprovalRequestResponse approvalRequestResponse;
+        List<GetCircleApprovalRequestResponse> approvalRequestResponse;
 
         try
         {
