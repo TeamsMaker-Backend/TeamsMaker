@@ -13,12 +13,12 @@ namespace TeamsMaker.Api.Controllers.Posts;
 public class ListAuthorPostsEndpoint(IPostService postService) : BaseApiController
 {
     [Tags("posts")]
-    [HttpGet("posts/authors/{id}")]
-    public async Task<IActionResult> ListAuthorPosts(string id,[FromQuery] PostsQueryString postsQueryString, CancellationToken ct)
+    [HttpGet("posts/authors/{entityId}")]
+    public async Task<IActionResult> ListAuthorPosts(string entityId,[FromQuery] PostsQueryString postsQueryString, CancellationToken ct)
     {
         try
         {
-            var posts = await postService.ListAuthorPostsAsync(id, postsQueryString, ct);
+            var posts = await postService.ListAuthorPostsAsync(entityId, postsQueryString, ct);
             return posts is not null ? Ok(_response.SuccessResponseWithPagination(posts)) : NotFound();
         }
         catch (Exception e)

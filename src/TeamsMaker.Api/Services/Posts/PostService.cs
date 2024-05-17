@@ -1,4 +1,6 @@
-﻿using System.Xml.Linq;
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.Xml.Linq;
 
 using Core.Generics;
 
@@ -82,40 +84,92 @@ public class PostService(ICircleValidationService validationService, IUserInfo u
         return post.Id;
     }
 
-    public async Task<PagedList<GetPostResponse>> ListAuthorPostsAsync(string id, PostsQueryString queryString, CancellationToken ct)
+     public async Task<PagedList<GetPostResponse>> ListAuthorPostsAsync(string id, PostsQueryString queryString, CancellationToken ct)
     {
         var author = await GetAuthorAsync(id, ct);
 
-        var postsId = author?.Posts
-            .Where(ps => author != null && ps.AuthorId == author.Id && ps.ParentPostId == null)
-            .OrderByDescending(ps => ps.CreationDate)
-            .Select(ps => ps.Id)?? [];
-
-        var posts = new List<GetPostResponse>();
-
-        foreach (var post in postsId)
-            posts.Add(await GetPostAsync(post, ct));
+        var posts = db.Posts
+            .Where(p => author != null && p.AuthorId == author.Id && p.ParentPostId == null)
+            .OrderByDescending(p => p.CreationDate)
+            .Select(p => new GetPostResponse
+            {
+                Id = p.Id,
+                Content = p.Content,
+                LikesNumber = p.LikesNumber,
+                AuthorId = p.AuthorId,
+                CommentsNumber = p.Comments.Count,
+                CreationDate = p.CreationDate,
+                CreatedBy = p.CreatedBy,
+                ModifiedBy = p.ModifiedBy,
+                LastModificationDate = p.LastModificationDate,
+                Comments = p.Comments.Select(cm => new GetPostResponse
+                {
+                    Id = cm.Id,
+                    Content = cm.Content,
+                    LikesNumber = cm.LikesNumber,
+                    AuthorId = cm.AuthorId,
+                    CommentsNumber = cm.Comments.Count,
+                    CreationDate = cm.CreationDate,
+                    CreatedBy = cm.CreatedBy,
+                    ModifiedBy = cm.ModifiedBy,
+                    LastModificationDate = cm.LastModificationDate,
+                }).ToList()
+            });
 
         return await PagedList<GetPostResponse>
                        .ToPagedListAsync(posts.AsQueryable(), queryString.PageNumber, queryString.PageSize, ct);
     }
 
-    //public async Task<PagedList<GetPostResponse>> ListFeedsPostsAsync(string id, PostsQueryString queryString, CancellationToken ct)
-    //{
-    //    var author = await GetAuthorAsync(id, ct);
+    public async Task<PagedList<GetPostResponse>> ListFeedsPostsAsync(string id, PostsQueryString queryString, CancellationToken ct)
+    {
+        var author = await GetAuthorAsync(id, ct);
 
-        
-    //    if(author?.UserId != null)
-    //    { 
+        var authorsListId = new List<Guid>();
 
-    //    }
-    //    else
-    //    {
+        if (author?.UserId != null)
+        {
+            authorsListId = await db.Authors
+                .Where(a => a.CircleId != null)
+                .Select(a => a.Id).ToListAsync();
+        }
+        else
+        {
+            authorsListId = await db.Authors
+                .Where(a => a.UserId != null)
+                .Select(a => a.Id).ToListAsync();
+        }
 
-    //    }
+        var posts = db.Posts
+            .Where(p => authorsListId.Contains(p.AuthorId) == true && p.ParentPostId == null)
+            .OrderByDescending(p => p.CreationDate)
+            .Select(p => new GetPostResponse
+            {
+                Id = p.Id,
+                Content = p.Content,
+                LikesNumber = p.LikesNumber,
+                AuthorId = p.AuthorId,
+                CommentsNumber = p.Comments.Count,
+                CreationDate = p.CreationDate,
+                CreatedBy = p.CreatedBy,
+                ModifiedBy = p.ModifiedBy,
+                LastModificationDate = p.LastModificationDate,
+                Comments = p.Comments.Select(cm => new GetPostResponse
+                {
+                    Id = cm.Id,
+                    Content = cm.Content,
+                    LikesNumber = cm.LikesNumber,
+                    AuthorId = cm.AuthorId,
+                    CommentsNumber = cm.Comments.Count,
+                    CreationDate = cm.CreationDate,
+                    CreatedBy = cm.CreatedBy,
+                    ModifiedBy = cm.ModifiedBy,
+                    LastModificationDate = cm.LastModificationDate,
+                }).ToList()
+            });
 
-        
-    //    }
+        return await PagedList<GetPostResponse>
+                      .ToPagedListAsync(posts.AsQueryable(), queryString.PageNumber, queryString.PageSize, ct);
+    }
 
     public async Task<GetPostResponse> GetPostAsync(Guid postId, CancellationToken ct)
     {
