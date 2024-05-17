@@ -44,6 +44,12 @@ public class AuthService : IAuthService
     {
         User user;
 
+        if (await _db.Users.AnyAsync(u => u.Email == registerRequest.Email, ct))
+            throw new ArgumentException("This Email already exists");
+
+        if (await _db.Users.AnyAsync(u => u.SSN == registerRequest.SSN, ct))
+            throw new ArgumentException("This SSN already exists");
+
         if (registerRequest.UserType == UserEnum.Student) user = await RegisterStudentAsync(registerRequest, ct);
         else if (registerRequest.UserType == UserEnum.Staff) user = await RegisterStaffAsync(registerRequest, ct);
         else throw new ArgumentException("Invalid user type");
@@ -117,9 +123,6 @@ public class AuthService : IAuthService
         var existedStudent = await _db.ImportedStudents.SingleOrDefaultAsync(u => u.SSN == registerRequest.SSN, ct)
             ?? throw new InvalidOperationException("This user is not allowed to register.");
 
-        if (await _db.Users.AnyAsync(x => x.Email == registerRequest.Email, ct))
-            throw new ArgumentException("This Email already exists");
-
         Student student = new();
         CreateUser(student, registerRequest);
 
@@ -138,9 +141,6 @@ public class AuthService : IAuthService
     {
         var existedStaff = await _db.ImportedStaff.SingleOrDefaultAsync(u => u.SSN == registerRequest.SSN, ct)
             ?? throw new InvalidOperationException("This user is not allowed to register.");
-
-        if (await _db.Users.AnyAsync(x => x.Email == registerRequest.Email, ct))
-            throw new ArgumentException("This Email already exists");
 
         Staff staff = new();
         CreateUser(staff, registerRequest);
