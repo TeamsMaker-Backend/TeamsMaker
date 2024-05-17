@@ -26,12 +26,13 @@ public class ProposalService(AppDBContext db, IUserInfo userInfo,
             proposal = new GetProposalResponse
             {
                 Id = circle.Proposal!.Id,
-                CircleId = circle.Id,
+                CircleName = circle.Name,
                 Overview = circle.Proposal.Overview,
                 Objectives = circle.Proposal.Objectives,
                 TechStack = circle.Proposal.TechStack,
                 Status = circle.Proposal.Status,
-                IsRested = circle.Proposal.IsReseted
+                IsReseted = circle.Proposal.IsReseted,
+
             };
 
         return proposal;
@@ -59,7 +60,8 @@ public class ProposalService(AppDBContext db, IUserInfo userInfo,
             Overview = request.Overview,
             Objectives = request.Objectives,
             TechStack = request.TechStack,
-            CircleId = request.CircleId
+            CircleId = request.CircleId,
+            Contact = request.Contact
         };
 
         await db.Proposals.AddAsync(proposal, ct);

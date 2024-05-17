@@ -8,8 +8,7 @@ public class GetProposalResponse
     public string Overview { get; set; } = null!;
     public string Objectives { get; set; } = null!;
     public string TechStack { get; set; } = null!;
-    public bool IsRested { get; set; }
     public ProposalStatusEnum Status { get; set; } = ProposalStatusEnum.NoApproval;
     public bool IsReseted { get; set; }
-    public Guid CircleId { get; set; }
+    public string CircleName { get; set; } = null!;
 }

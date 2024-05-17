@@ -6,4 +6,5 @@ public class AddProposalRequest
     public required string Overview { get; init; }
     public required string Objectives { get; init; }
     public required string TechStack { get; init; }
+    public required string Contact { get; set; }
 }
