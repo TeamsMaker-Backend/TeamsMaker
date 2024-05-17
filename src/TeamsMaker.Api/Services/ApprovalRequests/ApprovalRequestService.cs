@@ -3,16 +3,19 @@
 using TeamsMaker.Api.Contracts.QueryStringParameters;
 using TeamsMaker.Api.Contracts.Requests.ApprovalRequest;
 using TeamsMaker.Api.Contracts.Responses.ApprovalRequest;
+using TeamsMaker.Api.Contracts.Responses.Circle;
+using TeamsMaker.Api.Contracts.Responses.Proposal;
 using TeamsMaker.Api.Core.Consts;
 using TeamsMaker.Api.Core.Enums;
 using TeamsMaker.Api.DataAccess.Context;
 using TeamsMaker.Api.Services.ApprovalRequests.Interfaces;
 using TeamsMaker.Api.Services.Circles.Interfaces;
+using TeamsMaker.Api.Services.Files.Interfaces;
 
 namespace TeamsMaker.Api.Services.ApprovalRequests;
 
 public class ApprovalRequestService
-    (AppDBContext db, IUserInfo userInfo, ICircleValidationService validationService) : IApprovalRequestService
+    (AppDBContext db, IUserInfo userInfo, IServiceProvider serviceProvider, ICircleValidationService validationService) : IApprovalRequestService
 {
     public async Task<Guid> AddAsync(AddApprovalRequest request, CancellationToken ct)
     {
@@ -225,6 +228,62 @@ public class ApprovalRequestService
                 };
             }
         }
+
+        return response;
+    }
+
+    public async Task<GetApprovalRequestResponse> GetAsync(Guid id, CancellationToken ct)
+    {
+        var approvalRequest = await db.ApprovalRequests
+            .Include(ar => ar.Staff)
+            .Include(ar => ar.Proposal)
+                .ThenInclude(p => p.Circle)
+                    .ThenInclude(c => c.CircleMembers)
+                        .ThenInclude(cm => cm.User)
+            .SingleOrDefaultAsync(ar => ar.Id == id, ct) ??
+            throw new ArgumentException("Invalid Approval Request ID");
+
+        var circleFileService = serviceProvider.GetRequiredKeyedService<IFileService>(BaseTypes.Circle);
+        var studentFileService = serviceProvider.GetRequiredKeyedService<IFileService>(BaseTypes.Student);
+
+        var circle = approvalRequest.Proposal.Circle;
+        var circleMemberOwner = circle.CircleMembers.Single(cm => cm.IsOwner);
+
+        var proposal = approvalRequest.Proposal;
+
+        var response = new GetApprovalRequestResponse
+        {
+            IsAccepted = approvalRequest.IsAccepted,
+            ProposalId = approvalRequest.ProposalId,
+            StaffId = approvalRequest.StaffId,
+            Position = approvalRequest.Position,
+            ProposalStatusSnapshot = approvalRequest.ProposalStatusSnapshot,
+            CircleResponse = new GetCircleAsRowResponse
+            {
+                Id = circle.Id,
+                Avatar = circleFileService.GetFileUrl(circle.Id.ToString(), FileTypes.Avatar),
+                Name = circle.Name,
+                OwnerName = circleMemberOwner.User.FirstName + " " + circleMemberOwner.User.LastName,
+            },
+            ProposalResponse = new GetProposalResponse
+            {
+                Id = proposal.Id,
+                CircleId = proposal.CircleId,
+                IsReseted = proposal.IsReseted,
+                Objectives = proposal.Objectives,
+                Overview = proposal.Overview,
+                Status = proposal.Status,
+                TechStack = proposal.TechStack
+            },
+            Members = circle.CircleMembers.Select(cm => new GetMemberAsRowResponse
+            {
+                UserId = cm.UserId,
+                Name = cm.User.FirstName + " " + cm.User.LastName,
+                Avatar = studentFileService.GetFileUrl(cm.UserId, FileTypes.Avatar),
+                Badge = cm.Badge,
+                IsOwner = cm.IsOwner,
+            }).ToList(),
+        };
 
         return response;
     }
