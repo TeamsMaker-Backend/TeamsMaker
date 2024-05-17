@@ -34,7 +34,7 @@ public static class ServiceRegistrationExtensions
         // add the DbContext
         services.AddDbContext<AppDBContext>(
             options =>
-                options.UseSqlServer("Data Source=185.187.169.185,1434;Initial Catalog=TeamsMakerDB;Persist Security Info=True;User ID=sa;Password=P@ssword123;Encrypt=False;MultipleActiveResultSets=true;", // ip address: 185.187.169.185
+                options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"), // ip address: 185.187.169.185
                     o => o
                         .UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
                         .LogTo(Console.WriteLine, LogLevel.Warning)
