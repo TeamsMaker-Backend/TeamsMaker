@@ -2,6 +2,8 @@
 
 using DataAccess.Base.Interfaces;
 
+using Microsoft.IdentityModel.Tokens;
+
 using TeamsMaker.Api.Contracts.Requests.Post;
 using TeamsMaker.Api.Core.Enums;
 using TeamsMaker.Api.DataAccess.Context;
