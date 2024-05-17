@@ -1,4 +1,8 @@
-﻿using DataAccess.Base.Interfaces;
+﻿using Azure.Core;
+
+using DataAccess.Base.Interfaces;
+
+using Microsoft.IdentityModel.Tokens;
 
 using TeamsMaker.Api.Contracts.Requests.Post;
 using TeamsMaker.Api.Core.Enums;
@@ -40,7 +44,6 @@ public class PostService(ICircleValidationService validationService, IUserInfo u
             {
                 AuthorId = author.Id,
                 Content = request.Content,
-                LikesNumber = 0,
                 ParentPostId = request.ParentPostId,
             };
         }
@@ -58,7 +61,6 @@ public class PostService(ICircleValidationService validationService, IUserInfo u
             {
                 AuthorId = author.Id,
                 Content = request.Content,
-                LikesNumber = 0,
                 ParentPostId = request.ParentPostId,
             };
         }
@@ -71,26 +73,34 @@ public class PostService(ICircleValidationService validationService, IUserInfo u
         return post.Id;
     }
 
-    public async Task DeleteAsync(Guid id, CancellationToken ct)
+    public async Task DeleteAsync(Guid id, CancellationToken ct, bool isAuthorized = false)
     {
         using var transaction = await db.Database.BeginTransactionAsync(ct);
 
         var post = await db.Posts
+            .Include(p => p.Author)
             .Include(p => p.Comments)
             .Include(p => p.Reacts)
             .SingleOrDefaultAsync(p => p.Id == id, ct) ??
             throw new ArgumentException("Invalid Id");
 
-        if (post.LikesNumber != 0)
+        var circleId = post.Author.CircleId;
+        
+        if (!isAuthorized && circleId != null)
+            await CheckFeedPermission((Guid)circleId, ct);
+
+        isAuthorized = true;
+
+        if (post.LikesNumber > 0 && post.Reacts.Any())
             db.Reacts.RemoveRange(post.Reacts);
 
-        if(post.Comments != null)
-        { 
+        if (!post.Comments.IsNullOrEmpty())
+        {
             var commentsId = post.Comments.Select(c => c.Id);
 
             for (int i = 0; i < commentsId.Count(); i++)
-                await DeleteAsync(commentsId.ElementAt(i), ct);
-        
+                await DeleteAsync(commentsId.ElementAt(i), ct, isAuthorized);
+
         }
         db.Posts.Remove(post);
 
@@ -100,11 +110,16 @@ public class PostService(ICircleValidationService validationService, IUserInfo u
     
     public async Task UpdateAsync(Guid id, UpdatePostRequest request, CancellationToken ct)
     {
-        var post = await db.Posts.FindAsync([id], ct) ??
+        var post = await db.Posts
+            .Include(p => p.Author)
+            .SingleOrDefaultAsync(p => p.Id == id, ct) ??
         throw new ArgumentException("Invalid Id");
 
+        var circleId = post.Author.CircleId;
+        if(circleId != null)
+            await CheckFeedPermission((Guid)circleId, ct);
+
         post.Content = request.Content;
-        db.Update(post);
 
         await db.SaveChangesAsync(ct);
 
@@ -130,7 +145,6 @@ public class PostService(ICircleValidationService validationService, IUserInfo u
         await db.Reacts.AddAsync(newReact, ct);
 
         post.LikesNumber += 1;
-        db.Update(post);
 
         await db.SaveChangesAsync(ct);
 
@@ -146,14 +160,23 @@ public class PostService(ICircleValidationService validationService, IUserInfo u
             .SingleOrDefaultAsync(r => r.UserId == userInfo.UserId && r.PostId == postId, ct) ??
             throw new ArgumentException("You not reacted yet");
 
-        db.Reacts.Remove(react);
-
         post.LikesNumber -= 1;
-        db.Update(post);
+
+        db.Reacts.Remove(react);
 
         await db.SaveChangesAsync(ct);
     }
 
+    private async Task CheckFeedPermission(Guid circleId, CancellationToken ct)
+    {
+        var circle = await db.Circles
+            .Include(c => c.DefaultPermission)
+            .SingleAsync(c => c.Id == circleId, ct);
+
+        var circleMember = await validationService.TryGetCircleMemberAsync(userInfo.UserId, (Guid)circleId, ct);
+        //FeedManagement
+        validationService.CheckPermission(circleMember, circle, PermissionsEnum.FeedManagement);
+    }
 }
 
 
