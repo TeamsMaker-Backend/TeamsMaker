@@ -12,8 +12,8 @@ using TeamsMaker.Api.DataAccess.Context;
 namespace TeamsMaker.Api.Migrations
 {
     [DbContext(typeof(AppDBContext))]
-    [Migration("20240513234934_fix_aprroval_request_proposal_status_snapshot")]
-    partial class fix_aprroval_request_proposal_status_snapshot
+    [Migration("20240517145732_add_aprroval_request_proposal_status_snapshot")]
+    partial class add_aprroval_request_proposal_status_snapshot
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -146,7 +146,7 @@ namespace TeamsMaker.Api.Migrations
                     b.Property<Guid>("ProposalId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("ProposalStatusSnapShot")
+                    b.Property<int>("ProposalStatusSnapshot")
                         .HasColumnType("int");
 
                     b.Property<string>("StaffId")

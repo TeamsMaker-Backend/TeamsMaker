@@ -3,6 +3,7 @@
 using TeamsMaker.Api.Contracts.QueryStringParameters;
 using TeamsMaker.Api.Contracts.Requests.ApprovalRequest;
 using TeamsMaker.Api.Contracts.Responses.ApprovalRequest;
+using TeamsMaker.Api.Core.Consts;
 using TeamsMaker.Api.Core.Enums;
 using TeamsMaker.Api.DataAccess.Context;
 using TeamsMaker.Api.Services.ApprovalRequests.Interfaces;
@@ -30,64 +31,25 @@ public class ApprovalRequestService
             .SingleOrDefaultAsync(p => p.CircleId == circle.Id, ct) ??
             throw new ArgumentException("Make Your Proposal First");
 
-        /*
-        
-            proposal: 1st      req: head    not valid                  
-            proposal: 2nd      req: supervisor  not valid
-            proposal: 3rd      req: not co-supervisor   not valid
-
-        */
-
-        // Assure that the suitable position for a suitable proposal state
-        if ((request.CurrentProposalStatus == ProposalStatusEnum.NoApproval && request.Position != PositionEnum.Head) ||
-            (request.CurrentProposalStatus == ProposalStatusEnum.FirstApproval && request.Position == PositionEnum.Head) ||
-            (request.CurrentProposalStatus == ProposalStatusEnum.SecondApproval && request.Position == PositionEnum.Supervisor))
-            throw new ArgumentException("Position and Proposal status donot match");
-
-
         // Assure that the staff Id is as same as the required position
-        StaffClassificationsEnum staffClassification;
+        await MatchStaffWithPosition(request, ct);
 
-        if (request.Position == PositionEnum.Head)
-            staffClassification = StaffClassificationsEnum.HeadOfDept;
-        else if (request.Position == PositionEnum.Supervisor)
-            staffClassification = StaffClassificationsEnum.Professor;
-        else
-            staffClassification = StaffClassificationsEnum.Professor | StaffClassificationsEnum.Assistant;
+        if ((proposal.Status == ProposalStatusEnum.FirstApproval && request.Position == PositionEnum.Head) ||
+            (proposal.Status == ProposalStatusEnum.SecondApproval && request.Position == PositionEnum.Supervisor) ||
+            (proposal.Status == ProposalStatusEnum.ThirdApproval && request.Position != PositionEnum.CoSupervisor))
+            throw new ArgumentException("Cannot Send To This Position With Your Current Proposal State");
 
-        if (await db.Staff.AnyAsync(s => s.Id == request.StaffId && (s.Classification & staffClassification) != 0, ct) == false)
-            throw new ArgumentException("Staff ID and Position donot match");
+        ProposalStatusEnum targetedProposalStatus = proposal.Status;
+        if (request.Position == PositionEnum.Supervisor || request.Position == PositionEnum.CoSupervisor)
+            targetedProposalStatus = ProposalStatusEnum.FirstApproval;
 
-        // Other Validations
-        if (proposal.Status < ProposalStatusEnum.SecondApproval && proposal.ApprovalRequests
-                .Any(ar => ar.Position == request.Position && ar.IsAccepted == null))
-            throw new ArgumentException("Proposal should has only one pending request at each position");
-
-        if (proposal.Status == ProposalStatusEnum.SecondApproval)
-        {
-            if (request.Position != PositionEnum.Head)
-                throw new ArgumentException("Expected Head of Department");
-
-            // Assure that if there is already pending 3rd approval
-            if (proposal.ApprovalRequests
-                .Any(ar => ar.Position == PositionEnum.Head && ar.IsAccepted == null))
-                throw new ArgumentException("There is an already pending 3rd Approval request");
-
-            // Assure that the hea₫ of the first approval is the same as the head of the third approval
-            var firstApprovalRequest = proposal.ApprovalRequests
-                .Single(ar => ar.IsAccepted == true && ar.Position == PositionEnum.Head);
-
-            if (firstApprovalRequest.StaffId != request.StaffId)
-                throw new ArgumentException("Head of department ID doesnot match Head of department ID of the 1st approval request");
-        }
-        else if (proposal.Status == ProposalStatusEnum.ThirdApproval)
-            throw new ArgumentException("Proposal is already approved");
+        ValidateAddApprovalRequest(request, proposal, targetedProposalStatus);
 
         var approvalRequest = new ApprovalRequest
         {
             StaffId = request.StaffId,
             Position = request.Position,
-            ProposalStatusSnapShot = request.CurrentProposalStatus
+            ProposalStatusSnapshot = targetedProposalStatus
         };
 
         proposal.ApprovalRequests.Add(approvalRequest);
@@ -105,12 +67,9 @@ public class ApprovalRequestService
             throw new ArgumentException("This teaching staff didnot recieve any approval request with this approval request ID");
 
 
-        if (approvalRequest.Position == PositionEnum.Supervisor ||
-            approvalRequest.Position == PositionEnum.CoSupervisor)
-        {
-            if (approvalRequest.Proposal.Status == ProposalStatusEnum.NoApproval)
-                throw new ArgumentException("Need the first approval");
-        }
+        if ((approvalRequest.Position == PositionEnum.Supervisor ||approvalRequest.Position == PositionEnum.CoSupervisor)
+            && approvalRequest.Proposal.Status == ProposalStatusEnum.NoApproval)
+            throw new ArgumentException("Need the first approval");
 
         using var transaction = await db.Database.BeginTransactionAsync(ct);
 
@@ -161,40 +120,41 @@ public class ApprovalRequestService
         await db.SaveChangesAsync(ct);
     }
 
-    public async Task<ListCircleApprovalRequestResponse> ListCircleAsync(Guid proposalId, ApprovalRequestQueryString queryString, CancellationToken ct)
+    public async Task<List<GetCircleApprovalRequestResponse>> ListCircleAsync(Guid proposalId, ApprovalRequestQueryString queryString, CancellationToken ct)
     {
         var propsal = await db.Proposals
             .Include(p => p.ApprovalRequests)
             .SingleOrDefaultAsync(p => p.Id == proposalId, ct) ??
             throw new ArgumentException("Invalid Proposal Id");
 
+        var query = propsal.ApprovalRequests.AsQueryable();
 
-        var response = new ListCircleApprovalRequestResponse
-        {
-            ApprovalRequests = propsal.ApprovalRequests
-                .Where(ar =>
-                    queryString.ProposalStatusEnum == null || ar.ProposalStatusSnapShot == queryString.ProposalStatusEnum)
-                .Where(ar =>
-                    queryString.PositionEnum == null || ar.Position == queryString.PositionEnum)
-                .Where(ar =>
-                    queryString.IsAccepted == null || ar.IsAccepted == queryString.IsAccepted)
-                .OrderBy(ar => ar.ProposalStatusSnapShot)
-                .OrderBy(ar => ar.IsAccepted) 
-                .Select(ar => new CircleApprovalRequestInfo
+        if (queryString.ProposalStatusEnum != null)
+            query = query.Where(ar => ar.ProposalStatusSnapshot == queryString.ProposalStatusEnum);
+
+        if (queryString.PositionEnum != null)
+            query = query.Where(ar => ar.Position == queryString.PositionEnum);
+
+        if (queryString.IsAccepted != null)
+            query = query.Where(ar => ar.IsAccepted == queryString.IsAccepted);
+
+        var response = await query
+                .OrderBy(ar => ar.ProposalStatusSnapshot)
+                .OrderBy(ar => ar.IsAccepted)
+                .Select(ar => new GetCircleApprovalRequestResponse
                 {
                     Id = ar.Id,
                     ProposalId = ar.ProposalId,
-                    ProposalStatus = ar.ProposalStatusSnapShot,
+                    ProposalStatus = ar.ProposalStatusSnapshot,
                     IsAccepted = ar.IsAccepted,
                     TargetedStaffInfo = new StaffInfo
                     {
                         Id = ar.StaffId,
                         Position = ar.Position,
                     },
-                }).ToList()
-        };
+                }).ToListAsync(ct);
 
-        foreach (var approval in response.ApprovalRequests)
+        foreach (var approval in response)
         {
             var staff = await db.Staff.SingleAsync(st => st.Id == approval.TargetedStaffInfo.Id, ct);
             approval.TargetedStaffInfo.Name = staff.FirstName + " " + staff.LastName;
@@ -203,28 +163,30 @@ public class ApprovalRequestService
         return response;
     }
 
-    public async Task<ListStaffApprovalRequestResponse> ListStaffAsync(ApprovalRequestQueryString queryString, CancellationToken ct)
+    public async Task<List<GetStaffApprovalRequestResponse>> ListStaffAsync(ApprovalRequestQueryString queryString, CancellationToken ct)
     {
         var staff = await db.Staff.SingleOrDefaultAsync(st => st.Id == userInfo.UserId, ct) ??
             throw new ArgumentException("You arenot From Teaching Staff");
 
-        var response = new ListStaffApprovalRequestResponse
-        {
-            ApprovalRequests = await db.ApprovalRequests
-                .Where(ar => ar.StaffId == staff.Id)
-                .Where(ar =>
-                    queryString.ProposalStatusEnum == null || ar.ProposalStatusSnapShot == queryString.ProposalStatusEnum)
-                .Where(ar =>
-                    queryString.PositionEnum == null || ar.Position == queryString.PositionEnum)
-                .Where(ar =>
-                    queryString.IsAccepted == null || ar.IsAccepted == queryString.IsAccepted)
-                .OrderBy(ar => ar.ProposalStatusSnapShot)
+        var query = db.ApprovalRequests.Where(ar => ar.StaffId == staff.Id);
+
+        if (queryString.ProposalStatusEnum != null)
+            query = query.Where(ar => ar.ProposalStatusSnapshot == queryString.ProposalStatusEnum);
+
+        if (queryString.PositionEnum != null)
+            query = query.Where(ar => ar.Position == queryString.PositionEnum);
+
+        if (queryString.IsAccepted != null)
+            query = query.Where(ar => ar.IsAccepted == queryString.IsAccepted);
+
+        var response = await query
+                .OrderBy(ar => ar.ProposalStatusSnapshot)
                 .OrderBy(ar => ar.IsAccepted)
-                .Select(ar => new StaffApprovalRequestInfo
+                .Select(ar => new GetStaffApprovalRequestResponse
                 {
                     Id = ar.Id,
                     ProposalId = ar.ProposalId,
-                    ProposalStatus = ar.ProposalStatusSnapShot,
+                    ProposalStatus = ar.ProposalStatusSnapshot,
                     IsAccepted = ar.IsAccepted,
                     TargetedStaffInfo = new StaffInfo
                     {
@@ -232,21 +194,26 @@ public class ApprovalRequestService
                         Position = ar.Position,
                     },
 
-                }).ToListAsync(ct)
-        };
+                }).ToListAsync(ct);
 
-        foreach (var approval in response.ApprovalRequests)
+        foreach (var approval in response)
         {
             var targetedStaff = await db.Staff.SingleAsync(st => st.Id == approval.TargetedStaffInfo.Id, ct);
             approval.TargetedStaffInfo.Name = targetedStaff.FirstName + " " + targetedStaff.LastName;
 
-            ApprovalRequest? previousApproval =
-                approval.ProposalStatus != ProposalStatusEnum.NoApproval
-                ? await db.ApprovalRequests
+            ApprovalRequest? previousApproval = null;
+
+            if (approval.ProposalStatus == ProposalStatusEnum.FirstApproval)
+                previousApproval = await db.ApprovalRequests
                     .Include(ar => ar.Staff)
                     .SingleAsync(ar => ar.ProposalId == approval.ProposalId &&
-                        ar.ProposalStatusSnapShot == approval.ProposalStatus - 1, ct)
-                : null;
+                                       ar.ProposalStatusSnapshot == ProposalStatusEnum.NoApproval, ct);
+            else if (approval.ProposalStatus == ProposalStatusEnum.SecondApproval)
+                previousApproval = await db.ApprovalRequests
+                    .Include(ar => ar.Staff)
+                    .SingleAsync(ar => ar.ProposalId == approval.ProposalId &&
+                                       ar.Position == PositionEnum.Supervisor &&
+                                       ar.ProposalStatusSnapshot == ProposalStatusEnum.FirstApproval, ct);
 
             if (previousApproval is not null)
             {
@@ -260,5 +227,58 @@ public class ApprovalRequestService
         }
 
         return response;
+    }
+
+    private async Task MatchStaffWithPosition(AddApprovalRequest request, CancellationToken ct)
+    {
+        List<string> rolesName =
+            request.Position == PositionEnum.Head
+            ? [AppRoles.HeadOfDept]
+            : request.Position == PositionEnum.Supervisor
+            ? [AppRoles.Professor]
+            : [AppRoles.Professor, AppRoles.Assistant];
+
+        List<string> rolesId = [];
+        foreach (var roleName in rolesName)
+        {
+            var role = await db.Roles.SingleAsync(r => r.Name == roleName, ct);
+            rolesId.Add(role.Id);
+        }
+
+        bool isMatched = false;
+        foreach (var roleId in rolesId)
+            isMatched |= await db.UserRoles.AnyAsync(ur => ur.UserId == request.StaffId && ur.RoleId == roleId, ct);
+
+        if (!isMatched)
+            throw new ArgumentException("Staff ID and Position donot match");
+    }
+
+    private static void ValidateAddApprovalRequest(AddApprovalRequest request, Proposal proposal, ProposalStatusEnum targetedProposalStatus)
+    {
+        if (proposal.ApprovalRequests
+                        .Any(ar => ar.Position == request.Position
+                          && ar.ProposalStatusSnapshot == targetedProposalStatus
+                          && ar.IsAccepted == null))
+            throw new ArgumentException("There is an already pending Approval request at this position");
+
+        if (request.Position == PositionEnum.Head)
+        {
+            var firstAR = proposal.ApprovalRequests
+                .SingleOrDefault(ar => ar.IsAccepted == true && ar.Position == PositionEnum.Head);
+            if (firstAR != null && request.StaffId != firstAR.StaffId)
+                throw new ArgumentException("Head of department ID doesnot match Head of department ID of the 1st approval request");
+
+            var repeatedAR = proposal.ApprovalRequests
+                .SingleOrDefault(ar => ar.IsAccepted != null && ar.ProposalStatusSnapshot == targetedProposalStatus);
+            if (repeatedAR != null)
+                throw new ArgumentException("Cannot send This Approval Request Twice");
+        }
+        else
+        {
+            var repeatedAR = proposal.ApprovalRequests
+                .SingleOrDefault(ar => ar.IsAccepted != null && ar.StaffId == request.StaffId);
+            if (repeatedAR != null)
+                throw new ArgumentException("Cannot send This Approval Request Twice");
+        }
     }
 }
