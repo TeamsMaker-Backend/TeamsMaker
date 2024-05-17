@@ -26,6 +26,7 @@ namespace TeamsMaker.Api.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     SSN = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Classification = table.Column<int>(type: "int", nullable: true),
                     OrganizationId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -359,6 +360,31 @@ namespace TeamsMaker.Api.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Author",
+                schema: "dbo",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    CircleId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Author", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Author_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Author_Circle_CircleId",
+                        column: x => x.CircleId,
+                        principalSchema: "dbo",
+                        principalTable: "Circle",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "CircleMember",
                 schema: "dbo",
                 columns: table => new
@@ -366,6 +392,7 @@ namespace TeamsMaker.Api.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     IsOwner = table.Column<bool>(type: "bit", nullable: false),
                     Badge = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Role = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     CircleId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
@@ -416,13 +443,43 @@ namespace TeamsMaker.Api.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Proposal",
+                schema: "dbo",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Overview = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Objectives = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    TechStack = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Contact = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IsReseted = table.Column<bool>(type: "bit", nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: false, defaultValue: 0),
+                    CircleId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreationDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    LastModificationDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Proposal", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Proposal_Circle_CircleId",
+                        column: x => x.CircleId,
+                        principalSchema: "dbo",
+                        principalTable: "Circle",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Session",
                 schema: "dbo",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Title = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
-                    Notes = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: false),
+                    Notes = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: true),
                     Status = table.Column<int>(type: "int", nullable: false),
                     Date = table.Column<DateOnly>(type: "date", nullable: false),
                     Time = table.Column<TimeOnly>(type: "time", nullable: true),
@@ -537,6 +594,39 @@ namespace TeamsMaker.Api.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Post",
+                schema: "dbo",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Content = table.Column<string>(type: "nvarchar(300)", maxLength: 300, nullable: false),
+                    LikesNumber = table.Column<long>(type: "bigint", nullable: false),
+                    AuthorId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ParentPostId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreationDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    LastModificationDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Post", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Post_Author_AuthorId",
+                        column: x => x.AuthorId,
+                        principalSchema: "dbo",
+                        principalTable: "Author",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Post_Post_ParentPostId",
+                        column: x => x.ParentPostId,
+                        principalSchema: "dbo",
+                        principalTable: "Post",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Permission",
                 schema: "lookups",
                 columns: table => new
@@ -570,13 +660,44 @@ namespace TeamsMaker.Api.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ApprovalRequest",
+                schema: "dbo",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    IsAccepted = table.Column<bool>(type: "bit", nullable: true),
+                    ProposalId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    StaffId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Position = table.Column<int>(type: "int", nullable: false),
+                    ProposalStatusSnapshot = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ApprovalRequest", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ApprovalRequest_Proposal_ProposalId",
+                        column: x => x.ProposalId,
+                        principalSchema: "dbo",
+                        principalTable: "Proposal",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_ApprovalRequest_Staff_StaffId",
+                        column: x => x.StaffId,
+                        principalSchema: "dbo",
+                        principalTable: "Staff",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "TodoTask",
                 schema: "dbo",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Title = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
-                    Notes = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: false),
+                    Notes = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: true),
                     Status = table.Column<int>(type: "int", nullable: false),
                     DeadLine = table.Column<DateOnly>(type: "date", nullable: false),
                     SessionId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
@@ -611,7 +732,6 @@ namespace TeamsMaker.Api.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Organization = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Role = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     StartDate = table.Column<DateOnly>(type: "date", nullable: true),
@@ -692,6 +812,33 @@ namespace TeamsMaker.Api.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "React",
+                schema: "dbo",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    PostId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_React", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_React_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_React_Post_PostId",
+                        column: x => x.PostId,
+                        principalSchema: "dbo",
+                        principalTable: "Post",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Skill",
                 schema: "dbo",
                 columns: table => new
@@ -722,11 +869,11 @@ namespace TeamsMaker.Api.Migrations
             migrationBuilder.InsertData(
                 schema: "lookups",
                 table: "ImportedStaff",
-                columns: new[] { "Id", "OrganizationId", "SSN" },
+                columns: new[] { "Id", "Classification", "OrganizationId", "SSN" },
                 values: new object[,]
                 {
-                    { new Guid("3e9f4430-2927-41eb-a8a5-099248d1e6ba"), 1, "553-35-8652" },
-                    { new Guid("9266966b-fa8e-461a-bd61-0a1a15d5c234"), 1, "622-45-0646" }
+                    { new Guid("3e9f4430-2927-41eb-a8a5-099248d1e6ba"), 2, 1, "553-35-8652" },
+                    { new Guid("9266966b-fa8e-461a-bd61-0a1a15d5c234"), 2, 1, "622-45-0646" }
                 });
 
             migrationBuilder.InsertData(
@@ -735,8 +882,8 @@ namespace TeamsMaker.Api.Migrations
                 columns: new[] { "Id", "CollegeId", "Department", "GPA", "GraduationYear", "OrganizationId", "SSN" },
                 values: new object[,]
                 {
-                    { new Guid("5cba5edb-d6f0-4dee-85df-7f23fcbf86d3"), "College-123", "CS", 3.5f, new DateOnly(2026, 2, 17), 1, "600-68-1014" },
-                    { new Guid("86281c15-127d-4c91-9dff-dcc24164f79b"), "College-456", "IS", 3.3f, new DateOnly(2024, 2, 17), 1, "776-11-4808" }
+                    { new Guid("5cba5edb-d6f0-4dee-85df-7f23fcbf86d3"), "01HVK5SHDAA4NG1AJHJDY3MFDW", "CS", 3.5f, new DateOnly(2026, 2, 17), 1, "600-68-1014" },
+                    { new Guid("86281c15-127d-4c91-9dff-dcc24164f79b"), "01HVK5SHD9JFNX853XW06NAD4W", "IS", 3.3f, new DateOnly(2024, 2, 17), 1, "776-11-4808" }
                 });
 
             migrationBuilder.InsertData(
@@ -754,6 +901,18 @@ namespace TeamsMaker.Api.Migrations
                     { 1, "CS", null, null, true, null, null, "Computer Science", 1 },
                     { 2, "IS", null, null, true, null, null, "Information System", 1 }
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ApprovalRequest_ProposalId",
+                schema: "dbo",
+                table: "ApprovalRequest",
+                column: "ProposalId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ApprovalRequest_StaffId",
+                schema: "dbo",
+                table: "ApprovalRequest",
+                column: "StaffId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
@@ -809,6 +968,22 @@ namespace TeamsMaker.Api.Migrations
                 column: "NormalizedUserName",
                 unique: true,
                 filter: "[NormalizedUserName] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Author_CircleId",
+                schema: "dbo",
+                table: "Author",
+                column: "CircleId",
+                unique: true,
+                filter: "[CircleId] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Author_UserId",
+                schema: "dbo",
+                table: "Author",
+                column: "UserId",
+                unique: true,
+                filter: "[UserId] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Circle_OrganizationId",
@@ -893,10 +1068,41 @@ namespace TeamsMaker.Api.Migrations
                 filter: "[CircleMemberId] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Post_AuthorId",
+                schema: "dbo",
+                table: "Post",
+                column: "AuthorId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Post_ParentPostId",
+                schema: "dbo",
+                table: "Post",
+                column: "ParentPostId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Project_StudentId",
                 schema: "dbo",
                 table: "Project",
                 column: "StudentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Proposal_CircleId",
+                schema: "dbo",
+                table: "Proposal",
+                column: "CircleId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_React_PostId",
+                schema: "dbo",
+                table: "React",
+                column: "PostId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_React_UserId",
+                schema: "dbo",
+                table: "React",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_RefreshToken_UserId",
@@ -957,6 +1163,10 @@ namespace TeamsMaker.Api.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "ApprovalRequest",
+                schema: "dbo");
+
+            migrationBuilder.DropTable(
                 name: "AspNetRoleClaims");
 
             migrationBuilder.DropTable(
@@ -1000,6 +1210,10 @@ namespace TeamsMaker.Api.Migrations
                 schema: "lookups");
 
             migrationBuilder.DropTable(
+                name: "React",
+                schema: "dbo");
+
+            migrationBuilder.DropTable(
                 name: "RefreshToken",
                 schema: "dbo");
 
@@ -1016,6 +1230,10 @@ namespace TeamsMaker.Api.Migrations
                 schema: "dbo");
 
             migrationBuilder.DropTable(
+                name: "Proposal",
+                schema: "dbo");
+
+            migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
@@ -1027,11 +1245,19 @@ namespace TeamsMaker.Api.Migrations
                 schema: "dbo");
 
             migrationBuilder.DropTable(
+                name: "Post",
+                schema: "dbo");
+
+            migrationBuilder.DropTable(
                 name: "Project",
                 schema: "dbo");
 
             migrationBuilder.DropTable(
                 name: "Session",
+                schema: "dbo");
+
+            migrationBuilder.DropTable(
+                name: "Author",
                 schema: "dbo");
 
             migrationBuilder.DropTable(

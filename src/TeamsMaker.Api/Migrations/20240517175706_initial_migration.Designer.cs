@@ -12,8 +12,8 @@ using TeamsMaker.Api.DataAccess.Context;
 namespace TeamsMaker.Api.Migrations
 {
     [DbContext(typeof(AppDBContext))]
-    [Migration("20240426221021_add_react_entity")]
-    partial class add_react_entity
+    [Migration("20240517175706_initial_migration")]
+    partial class initial_migration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -137,13 +137,7 @@ namespace TeamsMaker.Api.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("Destination")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsAccepted")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsReseted")
+                    b.Property<bool?>("IsAccepted")
                         .HasColumnType("bit");
 
                     b.Property<int>("Position")
@@ -152,11 +146,11 @@ namespace TeamsMaker.Api.Migrations
                     b.Property<Guid>("ProposalId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<int>("ProposalStatusSnapshot")
+                        .HasColumnType("int");
+
                     b.Property<string>("StaffId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("SupervisorId")
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
@@ -164,8 +158,6 @@ namespace TeamsMaker.Api.Migrations
                     b.HasIndex("ProposalId");
 
                     b.HasIndex("StaffId");
-
-                    b.HasIndex("SupervisorId");
 
                     b.ToTable("ApprovalRequest", "dbo");
                 });
@@ -253,6 +245,10 @@ namespace TeamsMaker.Api.Migrations
 
                     b.Property<bool>("IsOwner")
                         .HasColumnType("bit");
+
+                    b.Property<string>("Role")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<string>("UserId")
                         .IsRequired()
@@ -742,11 +738,18 @@ namespace TeamsMaker.Api.Migrations
                     b.Property<Guid>("CircleId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("Contact")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("CreationDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsReseted")
+                        .HasColumnType("bit");
 
                     b.Property<DateTime?>("LastModificationDate")
                         .HasColumnType("datetime2");
@@ -785,18 +788,14 @@ namespace TeamsMaker.Api.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("CircleId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<Guid>("PostId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("UserId")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CircleId");
 
                     b.HasIndex("PostId");
 
@@ -1237,15 +1236,9 @@ namespace TeamsMaker.Api.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("TeamsMaker.Api.DataAccess.Models.Staff", "Supervisor")
-                        .WithMany("AcceptedApprovalRequests")
-                        .HasForeignKey("SupervisorId");
-
                     b.Navigation("Proposal");
 
                     b.Navigation("Staff");
-
-                    b.Navigation("Supervisor");
                 });
 
             modelBuilder.Entity("TeamsMaker.Api.DataAccess.Models.Author", b =>
@@ -1552,10 +1545,6 @@ namespace TeamsMaker.Api.Migrations
 
             modelBuilder.Entity("TeamsMaker.Api.DataAccess.Models.React", b =>
                 {
-                    b.HasOne("TeamsMaker.Api.DataAccess.Models.Circle", "Circle")
-                        .WithMany("Reacts")
-                        .HasForeignKey("CircleId");
-
                     b.HasOne("TeamsMaker.Api.DataAccess.Models.Post", "Post")
                         .WithMany("Reacts")
                         .HasForeignKey("PostId")
@@ -1564,9 +1553,9 @@ namespace TeamsMaker.Api.Migrations
 
                     b.HasOne("TeamsMaker.Api.DataAccess.Models.User", "User")
                         .WithMany("Reacts")
-                        .HasForeignKey("UserId");
-
-                    b.Navigation("Circle");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.Navigation("Post");
 
@@ -1781,10 +1770,7 @@ namespace TeamsMaker.Api.Migrations
 
                     b.Navigation("Links");
 
-                    b.Navigation("Proposal")
-                        .IsRequired();
-
-                    b.Navigation("Reacts");
+                    b.Navigation("Proposal");
 
                     b.Navigation("Sessions");
 
@@ -1857,8 +1843,6 @@ namespace TeamsMaker.Api.Migrations
 
             modelBuilder.Entity("TeamsMaker.Api.DataAccess.Models.Staff", b =>
                 {
-                    b.Navigation("AcceptedApprovalRequests");
-
                     b.Navigation("ApprovalRequests");
 
                     b.Navigation("DepartmentStaff");

@@ -735,6 +735,10 @@ namespace TeamsMaker.Api.Migrations
                     b.Property<Guid>("CircleId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("Contact")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
 
