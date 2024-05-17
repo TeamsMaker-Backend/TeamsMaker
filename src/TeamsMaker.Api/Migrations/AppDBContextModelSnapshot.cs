@@ -134,7 +134,7 @@ namespace TeamsMaker.Api.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<bool>("IsAccepted")
+                    b.Property<bool?>("IsAccepted")
                         .HasColumnType("bit");
 
                     b.Property<int>("Position")
@@ -142,6 +142,9 @@ namespace TeamsMaker.Api.Migrations
 
                     b.Property<Guid>("ProposalId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("ProposalStatusSnapshot")
+                        .HasColumnType("int");
 
                     b.Property<string>("StaffId")
                         .IsRequired()

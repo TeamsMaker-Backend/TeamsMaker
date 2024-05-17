@@ -135,7 +135,7 @@ public class ProposalService(AppDBContext db, IUserInfo userInfo,
         var circleMember = await validationService.TryGetCircleMemberAsync(userInfo.UserId, circle.Id, ct);
         validationService.CheckPermission(circleMember, circle, PermissionsEnum.ProposalManagement);
 
-        if (proposal.ApprovalRequests.Any(ar => ar.ProposalStatusSnapShot == ProposalStatusEnum.ThirdApproval && ar.IsAccepted == true))
+        if (proposal.ApprovalRequests.Any(ar => ar.ProposalStatusSnapshot == ProposalStatusEnum.ThirdApproval && ar.IsAccepted == true))
             throw new InvalidOperationException("This proposal already approved");
 
         db.ApprovalRequests.RemoveRange(proposal.ApprovalRequests);
