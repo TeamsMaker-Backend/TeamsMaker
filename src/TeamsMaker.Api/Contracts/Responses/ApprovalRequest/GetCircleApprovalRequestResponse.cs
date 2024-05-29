@@ -8,12 +8,13 @@ public class GetCircleApprovalRequestResponse
     public bool? IsAccepted { get; set; } = null;
     public Guid ProposalId { get; set; }
     public ProposalStatusEnum ProposalStatus { get; set; }
-    public StaffInfo TargetedStaffInfo { get; set; } = null!;
+    public ApprovalRequestStaffInfo TargetedStaffInfo { get; set; } = null!;
 }
 
-public class StaffInfo
+public class ApprovalRequestStaffInfo
 {
     public string Id { get; set; } = null!;
     public string Name { get; set; } = null!;
     public PositionEnum Position { get; set; }
+    public string? Avatar { get; set; }
 }
