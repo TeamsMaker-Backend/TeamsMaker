@@ -131,8 +131,7 @@ public class ApprovalRequestService
             throw new ArgumentException("Invalid Proposal Id");
 
         var query = propsal.ApprovalRequests
-            .Where(ar => ar.IsAccepted == queryString.IsAccepted)
-            .AsQueryable();
+            .Where(ar => ar.IsAccepted == queryString.IsAccepted);
 
         if (queryString.ProposalStatusEnum != null)
             query = query.Where(ar => ar.ProposalStatusSnapshot == queryString.ProposalStatusEnum);
@@ -140,7 +139,9 @@ public class ApprovalRequestService
         if (queryString.PositionEnum != null)
             query = query.Where(ar => ar.Position == queryString.PositionEnum);
 
-        var response = await query
+        var fileService = serviceProvider.GetRequiredKeyedService<IFileService>(BaseTypes.Staff);
+
+        var response = query
                 .OrderBy(ar => ar.ProposalStatusSnapshot)
                 .OrderBy(ar => ar.IsAccepted)
                 .Select(ar => new GetCircleApprovalRequestResponse
@@ -149,12 +150,13 @@ public class ApprovalRequestService
                     ProposalId = ar.ProposalId,
                     ProposalStatus = ar.ProposalStatusSnapshot,
                     IsAccepted = ar.IsAccepted,
-                    TargetedStaffInfo = new StaffInfo
+                    TargetedStaffInfo = new ApprovalRequestStaffInfo
                     {
                         Id = ar.StaffId,
                         Position = ar.Position,
+                        Avatar = fileService.GetFileUrl(ar.StaffId, FileTypes.Avatar)
                     },
-                }).ToListAsync(ct);
+                }).ToList();
 
         foreach (var approval in response)
         {
@@ -171,6 +173,7 @@ public class ApprovalRequestService
             throw new ArgumentException("You arenot From Teaching Staff");
 
         var query = db.ApprovalRequests
+            .Include(ar => ar.Proposal)
             .Where(ar => ar.StaffId == staff.Id)
             .Where(ar => ar.IsAccepted == queryString.IsAccepted);
 
@@ -180,19 +183,24 @@ public class ApprovalRequestService
         if (queryString.PositionEnum != null)
             query = query.Where(ar => ar.Position == queryString.PositionEnum);
 
+        var staffFileService = serviceProvider.GetRequiredKeyedService<IFileService>(BaseTypes.Staff);
+        var circleFileService = serviceProvider.GetRequiredKeyedService<IFileService>(BaseTypes.Circle);
+
         var response = await query
                 .OrderBy(ar => ar.ProposalStatusSnapshot)
                 .OrderBy(ar => ar.IsAccepted)
                 .Select(ar => new GetStaffApprovalRequestResponse
                 {
                     Id = ar.Id,
+                    CircleAvatar = circleFileService.GetFileUrl(ar.Proposal.CircleId.ToString(), FileTypes.Avatar),
                     ProposalId = ar.ProposalId,
                     ProposalStatus = ar.ProposalStatusSnapshot,
                     IsAccepted = ar.IsAccepted,
-                    TargetedStaffInfo = new StaffInfo
+                    TargetedStaffInfo = new ApprovalRequestStaffInfo
                     {
                         Id = ar.StaffId,
                         Position = ar.Position,
+                        Avatar = staffFileService.GetFileUrl(ar.StaffId, FileTypes.Avatar)
                     },
 
                 }).ToListAsync(ct);
@@ -218,10 +226,11 @@ public class ApprovalRequestService
 
             if (previousApproval is not null)
             {
-                approval.PreviousStaffInfo = new StaffInfo
+                approval.PreviousStaffInfo = new ApprovalRequestStaffInfo
                 {
                     Id = previousApproval.StaffId,
                     Position = previousApproval.Position,
+                    Avatar = staffFileService.GetFileUrl(previousApproval.StaffId, FileTypes.Avatar),
                     Name = previousApproval.Staff.FirstName + " " + previousApproval.Staff.LastName,
                 };
             }

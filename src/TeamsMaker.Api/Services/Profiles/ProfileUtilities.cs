@@ -176,7 +176,7 @@ public class ProfileUtilities //TODO: [Refactor] remove dublicates - Urgent
 
     public void GetStaffData(Staff staff, GetProfileResponse response)
     {
-        var fileService = serviceProvider.GetRequiredKeyedService<IFileService>(BaseTypes.Student);
+        var fileService = serviceProvider.GetRequiredKeyedService<IFileService>(BaseTypes.Staff);
 
         var staffInfo = new StaffInfo
         {

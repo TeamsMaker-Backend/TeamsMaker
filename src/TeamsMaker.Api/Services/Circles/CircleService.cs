@@ -448,26 +448,35 @@ public class CircleService
             .Include(c => c.Sessions)
             .Include(c => c.TodoTasks)
             .Include(c => c.Upvotes)
-            .SingleOrDefaultAsync(c => c.Id == circleId, ct) ??
+            .SingleOrDefaultAsync(c => c.Id == circleId && c.Status == CircleStatusEnum.Active, ct) ??
             throw new ArgumentException("Invalid Circle Id");
 
-        // Todo: if Circle has an accepted , throw exception cuz it can't be deleted
+        // if Circle has an accepted , throw exception cuz it can't be deleted
+        if (circle.Proposal is not null &&
+                await db.ApprovalRequests.AnyAsync(ar =>
+                    ar.ProposalId == circle.Proposal.Id &&
+                    ar.ProposalStatusSnapshot == ProposalStatusEnum.SecondApproval &&
+                    ar.IsAccepted == true, ct))
+            throw new InvalidOperationException("Cannot delete a circle with accepted third approval request");
+
+        if (!circle.Invitions.IsNullOrEmpty()) db.JoinRequests.RemoveRange(circle.Invitions);
+
+        if (circle.Proposal is not null &&
+                await db.ApprovalRequests.AnyAsync(ar =>
+                    ar.ProposalId == circle.Proposal.Id &&
+                    ar.IsAccepted == true, ct))
+        {
+            circle.Status = CircleStatusEnum.Deleted;
+            return;
+        }
 
         db.Permissions.Remove(circle.DefaultPermission);
-
-        if (!circle.CircleMembers.Where(cm => cm.ExceptionPermission != null).IsNullOrEmpty())
-            db.Permissions.RemoveRange(
-                circle.CircleMembers
-                    .Select(cm => cm.ExceptionPermission)
-                    .Where(p => p != null)!);
 
         if (!circle.CircleMembers.IsNullOrEmpty()) db.CircleMembers.RemoveRange(circle.CircleMembers);
 
         if (!circle.Links.IsNullOrEmpty()) db.Links.RemoveRange(circle.Links);
 
         if (!circle.Skills.IsNullOrEmpty()) db.Skills.RemoveRange(circle.Skills);
-
-        if (!circle.Invitions.IsNullOrEmpty()) db.JoinRequests.RemoveRange(circle.Invitions);
 
         if (!circle.Upvotes.IsNullOrEmpty()) db.Upvotes.RemoveRange(circle.Upvotes);
 
@@ -478,6 +487,12 @@ public class CircleService
         if (circle.Proposal is not null) db.Proposals.Remove(circle.Proposal);
 
         if (circle.Author is not null) db.Authors.Remove(circle.Author);
+
+        if (!circle.CircleMembers.Where(cm => cm.ExceptionPermission != null).IsNullOrEmpty())
+            db.Permissions.RemoveRange(
+                circle.CircleMembers
+                    .Select(cm => cm.ExceptionPermission)
+                    .Where(p => p != null)!);
 
         db.Circles.Remove(circle);
 
