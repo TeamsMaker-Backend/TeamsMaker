@@ -9,5 +9,5 @@ public interface IJoinRequestService
     Task AddAsync(List<AddJoinRequest> requests, CancellationToken ct);
     Task<GetJoinRequestResponse> GetAsync(string? circleId, CancellationToken ct);
     Task AcceptAsync(Guid id, CancellationToken ct);
-    Task DeleteAsync(Guid id, CancellationToken ct);
+    Task DeleteAsync(Guid id, Guid? circleId, CancellationToken ct);
 }

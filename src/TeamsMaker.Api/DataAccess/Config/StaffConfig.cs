@@ -13,7 +13,7 @@ public class StaffConfig : IEntityTypeConfiguration<Staff>
         // Enums
         builder.Property(x => x.Classification)
             .HasConversion<int>();
-        
+
         builder
             .HasMany(x => x.DepartmentStaff)
             .WithOne(y => y.Staff)

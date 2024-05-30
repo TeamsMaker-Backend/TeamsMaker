@@ -10,11 +10,11 @@ public class DeleteJoinRequestEndpoint(IJoinRequestService joinRequestService) :
 {
     [Tags("join_request")]
     [HttpDelete("join_request/{id}")]
-    public async Task<IActionResult> JoinRequest(Guid id, CancellationToken ct)
+    public async Task<IActionResult> JoinRequest(Guid id, [FromQuery] Guid? circleId, CancellationToken ct)
     {
         try
         {
-            await joinRequestService.DeleteAsync(id, ct);
+            await joinRequestService.DeleteAsync(id, circleId, ct);
         }
         catch (Exception e)
         {

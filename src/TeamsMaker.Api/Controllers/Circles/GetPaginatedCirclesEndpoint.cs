@@ -1,6 +1,4 @@
-﻿using System.ComponentModel;
-
-using Core.Generics;
+﻿using Core.Generics;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

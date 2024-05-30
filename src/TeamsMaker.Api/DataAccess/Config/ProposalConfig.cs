@@ -15,7 +15,7 @@ public class ProposalConfig : IEntityTypeConfiguration<Proposal>
         builder.Property(x => x.Status)
             .HasConversion<int>()
             .HasDefaultValue(ProposalStatusEnum.NoApproval);
-        
+
         builder
             .HasOne(x => x.Circle)
             .WithOne(y => y.Proposal)

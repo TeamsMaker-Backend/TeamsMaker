@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
+using Swashbuckle.AspNetCore.Annotations;
+
 
 using TeamsMaker.Api.Contracts.Responses.Proposal;
 using TeamsMaker.Api.Services.Proposals.Interfaces;
@@ -11,11 +13,12 @@ namespace TeamsMaker.Api.Controllers.Proposals;
 public class GetProposalEndpoint(IProposalService proposalService) : BaseApiController
 {
     [Tags("proposal")]
-    [Produces<GetProposalEndpoint>]
+    [Produces<GetProposalResponse>]
+    [SwaggerOperation(Summary = "if there is no proposal, will return null")]
     [HttpGet("proposal/{circleId}")]
     public async Task<IActionResult> Proposal(Guid circleId, CancellationToken ct)
     {
-        GetProposalResponse response;
+        GetProposalResponse? response;
 
         try
         {

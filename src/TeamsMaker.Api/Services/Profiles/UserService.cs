@@ -27,7 +27,7 @@ public class UserService(AppDBContext db, IUserInfo userInfo, IServiceProvider s
                         || (std.Email != null && std.Email.Contains(query.Q)));
 
 
-        if(query.CircleId.HasValue) 
+        if (query.CircleId.HasValue)
             usersQuery = usersQuery
                 .Include(u => u.MemberOn)
                 .Where(u => u.MemberOn.Any(m => m.CircleId == query.CircleId.Value));

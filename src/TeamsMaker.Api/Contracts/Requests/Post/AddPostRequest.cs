@@ -2,9 +2,7 @@
 
 public class AddPostRequest
 {
-    public Guid? CircleId { get; set; }
-    public string Content { get; set; } = null!;
-    public Guid? ParentPostId { get; set; }
-
+    public Guid? CircleId { get; init; }
+    public string Content { get; init; } = null!;
+    public Guid? ParentPostId { get; init; }
 }
-

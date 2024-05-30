@@ -91,7 +91,8 @@ public class CircleMemberService
     public async Task UpdatePermissionAsync(Guid circleMemberId, UpdatePermissionRequest? request, CancellationToken ct)
     {
         var circleMember = await db.CircleMembers
-            .FindAsync([circleMemberId], ct) ??
+            .Include(cm => cm.ExceptionPermission)
+            .SingleOrDefaultAsync(cm => cm.Id == circleMemberId, ct) ??
             throw new ArgumentException("Not a circle Member");
 
         if (circleMember.IsOwner)

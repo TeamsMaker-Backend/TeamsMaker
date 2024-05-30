@@ -73,10 +73,14 @@ public class JoinRequestService
 
     public async Task AddAsync(List<AddJoinRequest> requests, CancellationToken ct)
     {
+        using var transaction = await db.Database.BeginTransactionAsync(ct);
+
         foreach (var request in requests)
         {
             await AddAsync(request, ct);
         }
+
+        await transaction.CommitAsync(ct);
     }
 
 
@@ -183,20 +187,22 @@ public class JoinRequestService
         await transaction.CommitAsync(ct);
     }
 
-    public async Task DeleteAsync(Guid id, CancellationToken ct)
+    public async Task DeleteAsync(Guid id, Guid? circleId, CancellationToken ct)
     {
         var joinRequest =
             await db.JoinRequests
             .Include(jr => jr.Circle)
-                .ThenInclude(c => c.CircleMembers.FirstOrDefault(cm => cm.UserId == userInfo.UserId))
+                .ThenInclude(c => c.CircleMembers)
             .SingleOrDefaultAsync(jr => jr.Id == id && jr.IsAccepted == false, ct) ??
             throw new ArgumentException("Not found");
 
         // In case of sender is a circle
-        if (joinRequest.Sender == InvitationTypes.Circle && !joinRequest.Circle.CircleMembers.IsNullOrEmpty())
+        if (joinRequest.Sender == InvitationTypes.Circle 
+            && joinRequest.Circle.CircleMembers.Any(cm => cm.UserId == userInfo.UserId)
+            && circleId.HasValue)
         {
             // Check wether the circle member have a permission to delete an invitition or not
-            var circleMember = await validationService.TryGetCircleMemberAsync(userInfo.UserId, joinRequest.CircleId, ct);
+            var circleMember = await validationService.TryGetCircleMemberAsync(userInfo.UserId, circleId.Value, ct);
 
             var circle = await db.Circles
                 .Include(c => c.DefaultPermission)

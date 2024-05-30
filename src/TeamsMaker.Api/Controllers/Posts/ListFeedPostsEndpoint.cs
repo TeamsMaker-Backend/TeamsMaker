@@ -5,7 +5,7 @@ using TeamsMaker.Api.Services.Posts.Interfaces;
 
 namespace TeamsMaker.Api.Controllers.Posts;
 
-public class ListPostsEndpoint(IPostService postService) : BaseApiController
+public class ListFeedPostsEndpoint(IPostService postService) : BaseApiController
 {
     [Tags("posts")]
     [HttpGet("posts/feed/{isCircle}")]
