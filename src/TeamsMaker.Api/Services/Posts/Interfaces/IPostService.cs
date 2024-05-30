@@ -11,5 +11,5 @@ public interface IPostService
     Task<Guid> AddAsync(AddPostRequest request, CancellationToken ct);
     Task<GetPostResponse> GetPostAsync(Guid id, CancellationToken ct);
     Task<PagedList<GetPostResponse>> ListAuthorPostsAsync(string id, PostsQueryString postsQueryString, CancellationToken ct);
-    Task<PagedList<GetPostResponse>> ListFeedsPostsAsync(string id, PostsQueryString postsQueryString, CancellationToken ct);
+    Task<PagedList<GetPostResponse>> ListFeedPostsAsync(bool isCircle, PostsQueryString postsQueryString, CancellationToken ct);
 }

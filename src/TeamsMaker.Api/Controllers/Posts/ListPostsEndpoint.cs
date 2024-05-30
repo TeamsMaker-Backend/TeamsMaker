@@ -5,16 +5,16 @@ using TeamsMaker.Api.Services.Posts.Interfaces;
 
 namespace TeamsMaker.Api.Controllers.Posts;
 
-public class ListPostsEndpoint(IPostService postService): BaseApiController
+public class ListPostsEndpoint(IPostService postService) : BaseApiController
 {
     [Tags("posts")]
-    [HttpGet("posts/feeds/{entityId}")]
-    public async Task<IActionResult> ListfeddsPosts(string entityId, [FromQuery] PostsQueryString postsQueryString, CancellationToken ct)
+    [HttpGet("posts/feed/{isCircle}")]
+    public async Task<IActionResult> ListfeddsPosts(bool isCircle, [FromQuery] PostsQueryString postsQueryString, CancellationToken ct)
     {
         try
         {
-            var posts = await postService.ListFeedsPostsAsync(entityId, postsQueryString, ct);
-            return posts is not null ? Ok(_response.SuccessResponseWithPagination(posts)) : NotFound();
+            var posts = await postService.ListFeedPostsAsync(isCircle, postsQueryString, ct);
+            return posts is null ? NotFound() : Ok(_response.SuccessResponseWithPagination(posts));
         }
         catch (Exception e)
         {

@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-using TeamsMaker.Api.Contracts.Requests.Post;
-using TeamsMaker.Api.Contracts.Responses;
 using TeamsMaker.Api.Contracts.Responses.Post;
 using TeamsMaker.Api.Services.Posts.Interfaces;
 
@@ -18,7 +16,7 @@ public class GetPostEndpoint(IPostService postService) : BaseApiController
         GetPostResponse response;
         try
         {
-           response =  await postService.GetPostAsync(id, ct);
+            response = await postService.GetPostAsync(id, ct);
         }
         catch (Exception e)
         {

@@ -1,6 +1,3 @@
 ﻿namespace TeamsMaker.Api.Contracts.QueryStringParameters;
 
-public class PostsQueryString : BaseQueryStringParametersWithPagination
-{
-
-}
+public class PostsQueryString : BaseQueryStringParametersWithPagination { }
