@@ -9,5 +9,5 @@ public class GetCircleAsCardResponse
     public string? Avatar { get; set; }
     public string? Github { get; set; }
     public long Rate { get; set; }
-    public ICollection<string> Keywords { get; set; } = [];
+    public string? Keywords { get; set; }
 }

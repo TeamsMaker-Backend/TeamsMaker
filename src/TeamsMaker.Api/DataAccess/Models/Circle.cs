@@ -15,6 +15,7 @@ public class Circle : TrackedEntity<Guid>, IReadOnlyOrganizationInfo
     public FileData? Header { get; set; } // back ground
     public long Rate { get; set; }
     public CircleStatusEnum Status { get; set; } = CircleStatusEnum.Active;
+    public DateTime? ArchivedOn { get; set; }
 
     public int OrganizationId { get; set; }
     public virtual Organization Organization { get; set; } = null!;
