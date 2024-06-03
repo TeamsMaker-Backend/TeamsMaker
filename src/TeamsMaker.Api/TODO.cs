@@ -4,10 +4,18 @@
         * ? done
 
     * *Task#2:
-        * TODO: fix cancel/denay join request
-        * ? done      
+        * TODO: add api/profiles/   filter with classification
+        * ? todo
 
     * *Task#3:
-        * TODO: fix cancel/denay join request
-        * ? done 
+        * TODO: add contact on proposal form
+        * ? todo
+
+    * *Task#4:
+        * TODO: patch deafult value
+        * ? todo
+
+    * *Task#5:
+        * TODO: order approval requests with positon value
+        * ? todo
 */
