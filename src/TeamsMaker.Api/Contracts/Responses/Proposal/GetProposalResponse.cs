@@ -11,4 +11,5 @@ public class GetProposalResponse
     public ProposalStatusEnum Status { get; set; } = ProposalStatusEnum.NoApproval;
     public bool IsReseted { get; set; }
     public string CircleName { get; set; } = null!;
+    public string Contact { get; set; } = null!;
 }
