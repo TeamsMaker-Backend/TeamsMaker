@@ -6,13 +6,15 @@ namespace TeamsMaker.Api.Contracts.Responses.ApprovalRequest;
 
 public class GetApprovalRequestResponse
 {
+    public DateTime? CreationDate { get; set; }
     public bool? IsAccepted { get; set; } = null;
     public Guid ProposalId { get; set; }
-    public string StaffId { get; set; } = null!;
+    public bool IsProposalReseted { get; set; }
     public PositionEnum Position { get; set; }
-    public ProposalStatusEnum ProposalStatusSnapshot { get; set; }
-    public GetCircleAsRowResponse CircleResponse { get; set; } = null!;
+    public ProposalStatusEnum ProposalStatus { get; set; }
+    public ApprovalRequestStaffInfo TargetedStaffInfo { get; set; } = null!;
     public GetProposalResponse ProposalResponse { get; set; } = null!;
+    public GetCircleAsRowResponse CircleResponse { get; set; } = null!;
     public ICollection<GetMemberAsRowResponse> Members { get; set; } = [];
 }
 

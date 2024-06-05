@@ -4,7 +4,7 @@ using TeamsMaker.Api.DataAccess.Base;
 namespace TeamsMaker.Api.DataAccess.Models;
 
 
-public class ApprovalRequest : BaseEntity<Guid>
+public class ApprovalRequest : TrackedEntity<Guid>
 {
     public bool? IsAccepted { get; set; } = null;
     public Guid ProposalId { get; set; }

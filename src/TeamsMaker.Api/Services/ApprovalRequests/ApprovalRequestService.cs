@@ -8,8 +8,10 @@ using TeamsMaker.Api.Contracts.Responses.Proposal;
 using TeamsMaker.Api.Core.Consts;
 using TeamsMaker.Api.Core.Enums;
 using TeamsMaker.Api.DataAccess.Context;
+using TeamsMaker.Api.DataAccess.Models;
 using TeamsMaker.Api.Services.ApprovalRequests.Interfaces;
 using TeamsMaker.Api.Services.Circles.Interfaces;
+using TeamsMaker.Api.Services.Files;
 using TeamsMaker.Api.Services.Files.Interfaces;
 
 namespace TeamsMaker.Api.Services.ApprovalRequests;
@@ -37,16 +39,16 @@ public class ApprovalRequestService
         // Assure that the staff Id is as same as the required position
         await MatchStaffWithPosition(request, ct);
 
-        if ((proposal.Status == ProposalStatusEnum.FirstApproval && request.Position == PositionEnum.Head) ||
+        if ((proposal.Status != ProposalStatusEnum.NoApproval && request.Position == PositionEnum.Head) ||
             (proposal.Status == ProposalStatusEnum.SecondApproval && request.Position == PositionEnum.Supervisor) ||
             (proposal.Status == ProposalStatusEnum.ThirdApproval && request.Position != PositionEnum.CoSupervisor))
             throw new ArgumentException("Cannot Send To This Position With Your Current Proposal State");
 
+        ValidateAddApprovalRequest(request, proposal);
+
         ProposalStatusEnum targetedProposalStatus = proposal.Status;
         if (request.Position == PositionEnum.Supervisor || request.Position == PositionEnum.CoSupervisor)
             targetedProposalStatus = ProposalStatusEnum.FirstApproval;
-
-        ValidateAddApprovalRequest(request, proposal, targetedProposalStatus);
 
         var approvalRequest = new ApprovalRequest
         {
@@ -93,6 +95,16 @@ public class ApprovalRequestService
                     ar.IsAccepted == true, ct))
         {
             approvalRequest.Proposal.Status = ProposalStatusEnum.SecondApproval;
+
+            var thirdApprovalRequest = new ApprovalRequest
+            {
+                StaffId = approvalRequest.StaffId,
+                Position = PositionEnum.Head,
+                ProposalStatusSnapshot = ProposalStatusEnum.SecondApproval,
+                ProposalId = approvalRequest.ProposalId,
+            };
+
+            db.ApprovalRequests.Add(approvalRequest);
         }
 
         await db.SaveChangesAsync(ct);
@@ -125,13 +137,12 @@ public class ApprovalRequestService
 
     public async Task<List<GetCircleApprovalRequestResponse>> ListCircleAsync(Guid proposalId, ApprovalRequestQueryString queryString, CancellationToken ct)
     {
-        var propsal = await db.Proposals
+        var proposal = await db.Proposals
             .Include(p => p.ApprovalRequests)
             .SingleOrDefaultAsync(p => p.Id == proposalId, ct) ??
             throw new ArgumentException("Invalid Proposal Id");
 
-        var query = propsal.ApprovalRequests
-            .Where(ar => ar.IsAccepted == queryString.IsAccepted);
+        var query = proposal.ApprovalRequests.AsQueryable();
 
         if (queryString.ProposalStatusEnum != null)
             query = query.Where(ar => ar.ProposalStatusSnapshot == queryString.ProposalStatusEnum);
@@ -142,14 +153,13 @@ public class ApprovalRequestService
         var fileService = serviceProvider.GetRequiredKeyedService<IFileService>(BaseTypes.Staff);
 
         var response = query
-                .OrderBy(ar => ar.ProposalStatusSnapshot)
-                .OrderBy(ar => ar.IsAccepted)
                 .Select(ar => new GetCircleApprovalRequestResponse
                 {
                     Id = ar.Id,
                     ProposalId = ar.ProposalId,
-                    ProposalStatus = ar.ProposalStatusSnapshot,
+                    ProposalStatus = proposal.Status,
                     IsAccepted = ar.IsAccepted,
+                    CreationDate = ar.CreationDate,
                     TargetedStaffInfo = new ApprovalRequestStaffInfo
                     {
                         Id = ar.StaffId,
@@ -174,8 +184,9 @@ public class ApprovalRequestService
 
         var query = db.ApprovalRequests
             .Include(ar => ar.Proposal)
-            .Where(ar => ar.StaffId == staff.Id)
-            .Where(ar => ar.IsAccepted == queryString.IsAccepted);
+                .ThenInclude(p => p.Circle)
+                    .ThenInclude(c => c.CircleMembers)
+            .Where(ar => ar.StaffId == staff.Id);
 
         if (queryString.ProposalStatusEnum != null)
             query = query.Where(ar => ar.ProposalStatusSnapshot == queryString.ProposalStatusEnum);
@@ -184,25 +195,41 @@ public class ApprovalRequestService
             query = query.Where(ar => ar.Position == queryString.PositionEnum);
 
         var staffFileService = serviceProvider.GetRequiredKeyedService<IFileService>(BaseTypes.Staff);
+        var studentFileService = serviceProvider.GetRequiredKeyedService<IFileService>(BaseTypes.Student);
         var circleFileService = serviceProvider.GetRequiredKeyedService<IFileService>(BaseTypes.Circle);
 
         var response = await query
-                .OrderBy(ar => ar.ProposalStatusSnapshot)
-                .OrderBy(ar => ar.IsAccepted)
                 .Select(ar => new GetStaffApprovalRequestResponse
                 {
                     Id = ar.Id,
-                    CircleAvatar = circleFileService.GetFileUrl(ar.Proposal.CircleId.ToString(), FileTypes.Avatar),
                     ProposalId = ar.ProposalId,
-                    ProposalStatus = ar.ProposalStatusSnapshot,
+                    ProposalStatus = ar.Proposal.Status,
+                    IsProposalReseted = ar.Proposal.IsReseted,
                     IsAccepted = ar.IsAccepted,
+                    CreationDate = ar.CreationDate,
                     TargetedStaffInfo = new ApprovalRequestStaffInfo
                     {
                         Id = ar.StaffId,
                         Position = ar.Position,
                         Avatar = staffFileService.GetFileUrl(ar.StaffId, FileTypes.Avatar)
                     },
-
+                    CircleResponse = new GetCircleAsRowResponse
+                    {
+                        Id = ar.Proposal.Circle.Id,
+                        Avatar = circleFileService.GetFileUrl(ar.Proposal.Circle.Id.ToString(), FileTypes.Avatar),
+                        Name = ar.Proposal.Circle.Name,
+                        OwnerName 
+                            = ar.Proposal.Circle.CircleMembers.Single(cm => cm.IsOwner).User.FirstName + " " 
+                            + ar.Proposal.Circle.CircleMembers.Single(cm => cm.IsOwner).User.LastName,
+                    },
+                    Members = ar.Proposal.Circle.CircleMembers.Select(cm => new GetMemberAsRowResponse
+                    {
+                        UserId = cm.UserId,
+                        Name = cm.User.FirstName + " " + cm.User.LastName,
+                        Avatar = studentFileService.GetFileUrl(cm.UserId, FileTypes.Avatar),
+                        Badge = cm.Badge,
+                        IsOwner = cm.IsOwner,
+                    }).ToList(),
                 }).ToListAsync(ct);
 
         foreach (var approval in response)
@@ -216,13 +243,15 @@ public class ApprovalRequestService
                 previousApproval = await db.ApprovalRequests
                     .Include(ar => ar.Staff)
                     .SingleAsync(ar => ar.ProposalId == approval.ProposalId &&
-                                       ar.ProposalStatusSnapshot == ProposalStatusEnum.NoApproval, ct);
+                                       ar.ProposalStatusSnapshot == ProposalStatusEnum.NoApproval &&
+                                       ar.IsAccepted == true, ct);
             else if (approval.ProposalStatus == ProposalStatusEnum.SecondApproval)
                 previousApproval = await db.ApprovalRequests
                     .Include(ar => ar.Staff)
                     .SingleAsync(ar => ar.ProposalId == approval.ProposalId &&
                                        ar.Position == PositionEnum.Supervisor &&
-                                       ar.ProposalStatusSnapshot == ProposalStatusEnum.FirstApproval, ct);
+                                       ar.ProposalStatusSnapshot == ProposalStatusEnum.FirstApproval &&
+                                       ar.IsAccepted == true, ct);
 
             if (previousApproval is not null)
             {
@@ -251,6 +280,7 @@ public class ApprovalRequestService
 
         var circleFileService = serviceProvider.GetRequiredKeyedService<IFileService>(BaseTypes.Circle);
         var studentFileService = serviceProvider.GetRequiredKeyedService<IFileService>(BaseTypes.Student);
+        var staffFileService = serviceProvider.GetRequiredKeyedService<IFileService>(BaseTypes.Staff);
 
         var circle = approvalRequest.Proposal.Circle;
         var circleMemberOwner = circle.CircleMembers.Single(cm => cm.IsOwner);
@@ -259,11 +289,18 @@ public class ApprovalRequestService
 
         var response = new GetApprovalRequestResponse
         {
+            CreationDate = approvalRequest.CreationDate,
             IsAccepted = approvalRequest.IsAccepted,
             ProposalId = approvalRequest.ProposalId,
-            StaffId = approvalRequest.StaffId,
+            IsProposalReseted = approvalRequest.Proposal.IsReseted,
             Position = approvalRequest.Position,
-            ProposalStatusSnapshot = approvalRequest.ProposalStatusSnapshot,
+            ProposalStatus = proposal.Status,
+            TargetedStaffInfo = new ApprovalRequestStaffInfo
+            {
+                Id = approvalRequest.StaffId,
+                Position = approvalRequest.Position,
+                Avatar = staffFileService.GetFileUrl(approvalRequest.StaffId, FileTypes.Avatar)
+            },
             CircleResponse = new GetCircleAsRowResponse
             {
                 Id = circle.Id,
@@ -279,7 +316,8 @@ public class ApprovalRequestService
                 Objectives = proposal.Objectives,
                 Overview = proposal.Overview,
                 Status = proposal.Status,
-                TechStack = proposal.TechStack
+                TechStack = proposal.TechStack,
+                Contact = proposal.Contact
             },
             Members = circle.CircleMembers.Select(cm => new GetMemberAsRowResponse
             {
@@ -318,32 +356,15 @@ public class ApprovalRequestService
             throw new ArgumentException("Staff ID and Position donot match");
     }
 
-    private static void ValidateAddApprovalRequest(AddApprovalRequest request, Proposal proposal, ProposalStatusEnum targetedProposalStatus)
+    private static void ValidateAddApprovalRequest(AddApprovalRequest request, Proposal proposal)
     {
         if (proposal.ApprovalRequests
-                        .Any(ar => ar.Position == request.Position
-                          && ar.ProposalStatusSnapshot == targetedProposalStatus
-                          && ar.IsAccepted == null))
-            throw new ArgumentException("There is an already pending Approval request at this position");
+                        .Any(ar => ar.Position == request.Position && 
+                             ar.IsAccepted != false))
+            throw new ArgumentException("There is an already approval request at this position");
 
-        if (request.Position == PositionEnum.Head)
-        {
-            var firstAR = proposal.ApprovalRequests
-                .SingleOrDefault(ar => ar.IsAccepted == true && ar.Position == PositionEnum.Head);
-            if (firstAR != null && request.StaffId != firstAR.StaffId)
-                throw new ArgumentException("Head of department ID doesnot match Head of department ID of the 1st approval request");
-
-            var repeatedAR = proposal.ApprovalRequests
-                .SingleOrDefault(ar => ar.IsAccepted != null && ar.ProposalStatusSnapshot == targetedProposalStatus);
-            if (repeatedAR != null)
-                throw new ArgumentException("Cannot send This Approval Request Twice");
-        }
-        else
-        {
-            var repeatedAR = proposal.ApprovalRequests
-                .SingleOrDefault(ar => ar.IsAccepted != null && ar.StaffId == request.StaffId);
-            if (repeatedAR != null)
-                throw new ArgumentException("Cannot send This Approval Request Twice");
-        }
+        if (proposal.ApprovalRequests
+                        .Any(ar => ar.StaffId == request.StaffId && ar.IsAccepted == true))
+            throw new ArgumentException("Cannot assign this staff in different positions at the same time");
     }
 }
