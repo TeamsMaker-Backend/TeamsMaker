@@ -64,7 +64,7 @@ public class PostService(ICircleValidationService validationService, IUserInfo u
 
         isAuthorized = true;
 
-        if (post.LikesNumber > 0 && post.Reacts.Any())
+        if (post.LikesNumber > 0 && post.Reacts.Count != 0)
             db.Reacts.RemoveRange(post.Reacts);
 
         if (!post.Comments.IsNullOrEmpty())

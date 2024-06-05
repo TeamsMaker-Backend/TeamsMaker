@@ -22,7 +22,7 @@ public class GetMemberAsRowResponse
 {
     public string UserId { get; set; } = null!;
     public bool IsOwner { get; set; }
-    public string? Avatar {  get; set; }
+    public string? Avatar { get; set; }
     public string Name { get; set; } = null!;
     public string? Badge { get; set; }
 }

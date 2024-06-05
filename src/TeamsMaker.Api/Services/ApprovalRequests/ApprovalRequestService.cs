@@ -8,10 +8,8 @@ using TeamsMaker.Api.Contracts.Responses.Proposal;
 using TeamsMaker.Api.Core.Consts;
 using TeamsMaker.Api.Core.Enums;
 using TeamsMaker.Api.DataAccess.Context;
-using TeamsMaker.Api.DataAccess.Models;
 using TeamsMaker.Api.Services.ApprovalRequests.Interfaces;
 using TeamsMaker.Api.Services.Circles.Interfaces;
-using TeamsMaker.Api.Services.Files;
 using TeamsMaker.Api.Services.Files.Interfaces;
 
 namespace TeamsMaker.Api.Services.ApprovalRequests;
@@ -218,8 +216,8 @@ public class ApprovalRequestService
                         Id = ar.Proposal.Circle.Id,
                         Avatar = circleFileService.GetFileUrl(ar.Proposal.Circle.Id.ToString(), FileTypes.Avatar),
                         Name = ar.Proposal.Circle.Name,
-                        OwnerName 
-                            = ar.Proposal.Circle.CircleMembers.Single(cm => cm.IsOwner).User.FirstName + " " 
+                        OwnerName
+                            = ar.Proposal.Circle.CircleMembers.Single(cm => cm.IsOwner).User.FirstName + " "
                             + ar.Proposal.Circle.CircleMembers.Single(cm => cm.IsOwner).User.LastName,
                     },
                     Members = ar.Proposal.Circle.CircleMembers.Select(cm => new GetMemberAsRowResponse
@@ -359,7 +357,7 @@ public class ApprovalRequestService
     private static void ValidateAddApprovalRequest(AddApprovalRequest request, Proposal proposal)
     {
         if (proposal.ApprovalRequests
-                        .Any(ar => ar.Position == request.Position && 
+                        .Any(ar => ar.Position == request.Position &&
                              ar.IsAccepted != false))
             throw new ArgumentException("There is an already approval request at this position");
 

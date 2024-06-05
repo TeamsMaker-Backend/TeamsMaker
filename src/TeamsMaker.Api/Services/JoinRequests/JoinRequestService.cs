@@ -1,7 +1,5 @@
 ﻿using DataAccess.Base.Interfaces;
 
-using Microsoft.IdentityModel.Tokens;
-
 using TeamsMaker.Api.Contracts.Requests.JoinRequest;
 using TeamsMaker.Api.Contracts.Responses.JoinRequest;
 using TeamsMaker.Api.Core.Consts;
@@ -197,7 +195,7 @@ public class JoinRequestService
             throw new ArgumentException("Not found");
 
         // In case of sender is a circle
-        if (joinRequest.Sender == InvitationTypes.Circle 
+        if (joinRequest.Sender == InvitationTypes.Circle
             && joinRequest.Circle.CircleMembers.Any(cm => cm.UserId == userInfo.UserId)
             && circleId.HasValue)
         {

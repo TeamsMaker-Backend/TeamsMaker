@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-using TeamsMaker.Api.Contracts.Requests.Proposal;
 using TeamsMaker.Api.Services.Proposals.Interfaces;
 
 namespace TeamsMaker.Api.Controllers.Proposals;
