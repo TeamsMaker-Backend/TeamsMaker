@@ -8,6 +8,7 @@ public class GetCircleApprovalRequestResponse
     public bool? IsAccepted { get; set; } = null;
     public Guid ProposalId { get; set; }
     public ProposalStatusEnum ProposalStatus { get; set; }
+    public DateTime? CreationDate { get; set; }
     public ApprovalRequestStaffInfo TargetedStaffInfo { get; set; } = null!;
 }
 

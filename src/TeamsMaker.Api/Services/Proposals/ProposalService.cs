@@ -32,7 +32,7 @@ public class ProposalService(AppDBContext db, IUserInfo userInfo,
                 TechStack = circle.Proposal.TechStack,
                 Status = circle.Proposal.Status,
                 IsReseted = circle.Proposal.IsReseted,
-
+                Contact = circle.Proposal.Contact
             };
 
         return proposal;
