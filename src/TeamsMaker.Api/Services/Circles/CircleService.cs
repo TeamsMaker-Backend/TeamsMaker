@@ -227,8 +227,93 @@ public class CircleService
                 Avatar = fileService.GetFileUrl(c.Id.ToString(), FileTypes.Avatar)
             });
 
-
         return await PagedList<GetCircleAsRowResponse>.ToPagedListAsync(circles, query.PageNumber, query.PageSize, ct);
+    }
+
+    public async Task<PagedList<GetCircleAsCardResponse>> GetArchiveAsync(ArchiveQueryString archiveQuery, CancellationToken ct)
+    {
+        var fileService = serviceProvider.GetRequiredKeyedService<IFileService>(BaseTypes.Circle);
+
+        var archivedCirclesQuery = db.Circles
+            .Include(c => c.CircleMembers)
+                .ThenInclude(cm => cm.User)
+            .Include(c => c.Upvotes)
+            .Where(c => c.Status == CircleStatusEnum.Archived);
+
+        #region filtering
+
+        if (!string.IsNullOrEmpty(archiveQuery.Q))
+            archivedCirclesQuery = archivedCirclesQuery
+                .Where(c => c.Name.Contains(archiveQuery.Q)
+                        || c.CircleMembers.Any(cm => cm.User.FirstName.Contains(archiveQuery.Q)
+                                                || cm.User.LastName.Contains(archiveQuery.Q)
+                                                || cm.User.Email!.Contains(archiveQuery.Q)));
+
+
+        if (archiveQuery.CreatedOn.HasValue)
+            archivedCirclesQuery = archivedCirclesQuery.Where(c => c.CreationDate == archiveQuery.CreatedOn);
+
+
+        if (archiveQuery.ArchivedOn.HasValue)
+            archivedCirclesQuery = archivedCirclesQuery.Where(c => c.ArchivedOn == archiveQuery.ArchivedOn);
+
+
+        if (!string.IsNullOrEmpty(archiveQuery.SupervisorId))
+            archivedCirclesQuery = archivedCirclesQuery
+                .Where(c => c.CircleMembers.Any(cm => cm.UserId == archiveQuery.SupervisorId));
+
+
+        if (archiveQuery.DepartmentId.HasValue)
+        {
+            var staff = await db.Departments
+                .Include(d => d.DepartmentStaff)
+                .Where(d => d.Id == archiveQuery.DepartmentId.Value)
+                .SelectMany(d => d.DepartmentStaff)
+                .Select(st => st.StaffId)
+                .ToListAsync(cancellationToken: ct);
+
+            archivedCirclesQuery = archivedCirclesQuery
+                .Where(c => c.CircleMembers.Any(cm => staff.Contains(cm.UserId)));
+        }
+
+
+        if (!string.IsNullOrEmpty(archiveQuery.Technologies))
+            archivedCirclesQuery = archivedCirclesQuery
+                .Where(c => string.IsNullOrEmpty(c.Keywords) || c.Keywords.Contains(archiveQuery.Technologies));
+        #endregion
+
+
+        #region ordering
+
+        if (archiveQuery.SortByUpvotesDesc.HasValue && !archiveQuery.SortByUpvotesAsc.HasValue)
+            archivedCirclesQuery = archivedCirclesQuery.OrderByDescending(c => c.Upvotes.Count());
+
+        if (archiveQuery.SortByUpvotesAsc.HasValue && !archiveQuery.SortByUpvotesDesc.HasValue)
+            archivedCirclesQuery = archivedCirclesQuery.OrderBy(c => c.Upvotes.Count());
+
+
+        if (archiveQuery.SortByCreationDateAsc.HasValue)
+            archivedCirclesQuery = archivedCirclesQuery.OrderBy(c => c.CreationDate);
+        else
+            archivedCirclesQuery = archivedCirclesQuery.OrderByDescending(c => c.CreationDate);
+        #endregion
+
+
+        var circlesCardsQuery = archivedCirclesQuery
+            .Select(card => new GetCircleAsCardResponse
+            {
+                Id = card.Id,
+                Avatar = fileService.GetFileUrl(card.Id.ToString(), FileTypes.Avatar),
+                Keywords = string.IsNullOrEmpty(card.Keywords) ? null : card.Keywords,
+                Github = card.Links.Any(l => l.Type == LinkTypesEnum.GitHub) ? card.Links.First(l => l.Type == LinkTypesEnum.GitHub).Url : null,
+                Name = card.Name,
+                OwnerName = $"{card.CircleMembers.First(cm => cm.IsOwner).User.FirstName} {card.CircleMembers.First(cm => cm.IsOwner).User.LastName}",
+                Rate = card.Rate,
+                Summary = card.SummaryData != null ? card.SummaryData.Summary : null
+            });
+
+
+        return await PagedList<GetCircleAsCardResponse>.ToPagedListAsync(circlesCardsQuery, archiveQuery.PageNumber, archiveQuery.PageSize, ct);
     }
 
     public async Task<GetCircleMembersResponse> GetMembersAsync(Guid circleId, CancellationToken ct)
