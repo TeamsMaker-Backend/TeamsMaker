@@ -70,7 +70,7 @@ public class ApprovalRequestService
             throw new ArgumentException("This teaching staff didnot recieve any approval request with this approval request ID");
 
 
-        if ((approvalRequest.Position == PositionEnum.Supervisor || approvalRequest.Position == PositionEnum.CoSupervisor)
+        if (isAccepted && (approvalRequest.Position == PositionEnum.Supervisor || approvalRequest.Position == PositionEnum.CoSupervisor)
             && approvalRequest.Proposal.Status == ProposalStatusEnum.NoApproval)
             throw new ArgumentException("Need the first approval");
 
