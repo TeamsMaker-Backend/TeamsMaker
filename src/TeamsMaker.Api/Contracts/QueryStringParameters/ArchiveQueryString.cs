@@ -1,5 +1,3 @@
-using TeamsMaker.Core.Enums;
-
 namespace TeamsMaker.Api.Contracts.QueryStringParameters;
 
 public class ArchiveQueryString : BaseQueryStringWithQ

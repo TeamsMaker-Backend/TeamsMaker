@@ -1,4 +1,5 @@
-﻿using TeamsMaker.Core.Enums;
+﻿using TeamsMaker.Api.Contracts.Responses.Circle;
+using TeamsMaker.Core.Enums;
 
 namespace TeamsMaker.Api.Contracts.Responses.Profile;
 
@@ -38,4 +39,6 @@ public class OtherStudentInfo
 public class OtherStaffInfo
 {
     public StaffClassificationsEnum Classification { get; set; }
+    public ICollection<GetCircleAsRowResponse> Circles { get; set; } = [];
+    public ICollection<GetCircleAsCardResponse> Archive { get; set; } = [];
 }
