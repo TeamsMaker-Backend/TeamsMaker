@@ -230,7 +230,7 @@ public class CircleService
         return await PagedList<GetCircleAsRowResponse>.ToPagedListAsync(circles, query.PageNumber, query.PageSize, ct);
     }
 
-    public async Task<PagedList<GetCircleAsCardResponse>> GetArchiveAsync(ArchiveQueryString archiveQuery, CancellationToken ct)
+    public async Task<PagedList<GetCircleAsCardResponse>> ListArchivedAsync(ArchiveQueryString archiveQuery, CancellationToken ct)
     {
         var fileService = serviceProvider.GetRequiredKeyedService<IFileService>(BaseTypes.Circle);
 
