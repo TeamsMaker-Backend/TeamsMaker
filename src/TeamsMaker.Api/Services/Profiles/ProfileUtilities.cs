@@ -202,7 +202,7 @@ public class ProfileUtilities //TODO: [Refactor] remove dublicates - Urgent
     private async Task<List<Circle>> GetStaffCircles(string staffId, bool isArchieved, CancellationToken ct)
     {
         var acceptedProposalIds = await db.ApprovalRequests
-            .Where(ar => ar.ProposalStatusSnapshot == ProposalStatusEnum.ThirdApproval 
+            .Where(ar => ar.ProposalStatusSnapshot == ProposalStatusEnum.ThirdApproval
                       && ar.IsAccepted == true)
             .Select(ar => ar.ProposalId)
             .ToListAsync(ct);
@@ -214,7 +214,7 @@ public class ProfileUtilities //TODO: [Refactor] remove dublicates - Urgent
                     .ThenInclude(cm => cm.User)
             .Where(p => acceptedProposalIds.Contains(p.Id))
             .Where(p => p.ApprovalRequests
-                            .Any(ar => ar.StaffId == staffId 
+                            .Any(ar => ar.StaffId == staffId
                                     && ar.ProposalStatusSnapshot == ProposalStatusEnum.SecondApproval));
 
         query = isArchieved
