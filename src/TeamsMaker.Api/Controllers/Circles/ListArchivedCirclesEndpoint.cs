@@ -1,4 +1,4 @@
-using Core.Generics;
+﻿using Core.Generics;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -15,16 +15,15 @@ namespace TeamsMaker.Api.Controllers.Circles;
 public class ListArchivedCirclesEndpoint(ICircleService circleService) : BaseApiController
 {
     [Tags("circles")]
-    [Produces<PagedList<GetCircleAsRowResponse>>]
+    [Produces<PagedList<GetCircleAsCardResponse>>]
     [SwaggerOperation(Summary = "get archived circles with pagination, also search by circle name or user name to get his circle")]
     [HttpGet("circles/archived")]
-    public async Task<IActionResult> ListArchivedCircles([FromQuery] BaseQueryStringWithQ query, CancellationToken ct)
+    public async Task<IActionResult> ArchievedCircles([FromQuery] ArchiveQueryString archiveQuery, CancellationToken ct)
     {
         try
         {
-            var response = await circleService.GetAsync(query, ct);
-
-            return Ok(_response.SuccessResponseWithPagination(response));
+            var archievedCircles = await circleService.ListArchivedAsync(archiveQuery, ct);
+            return archievedCircles is not null ? Ok(_response.SuccessResponseWithPagination(archievedCircles)) : NotFound();
         }
         catch (Exception e)
         {
