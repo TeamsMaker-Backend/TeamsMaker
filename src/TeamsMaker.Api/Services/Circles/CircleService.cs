@@ -238,6 +238,7 @@ public class CircleService
             .Include(c => c.CircleMembers)
                 .ThenInclude(cm => cm.User)
             .Include(c => c.Upvotes)
+            .Include(c => c.Skills)
             .Where(c => c.Status == CircleStatusEnum.Archived);
 
         #region filtering
@@ -304,18 +305,21 @@ public class CircleService
             {
                 Id = card.Id,
                 Avatar = fileService.GetFileUrl(card.Id.ToString(), FileTypes.Avatar),
-                Keywords = string.IsNullOrEmpty(card.Keywords) ? null : card.Keywords,
+                TechStack = card.Skills.Select(sk => sk.Name).ToList(),
                 Github = card.Links.Any(l => l.Type == LinkTypesEnum.GitHub) ? card.Links.First(l => l.Type == LinkTypesEnum.GitHub).Url : null,
                 Name = card.Name,
                 OwnerName = $"{card.CircleMembers.First(cm => cm.IsOwner).User.FirstName} {card.CircleMembers.First(cm => cm.IsOwner).User.LastName}",
                 Rate = card.Rate,
-                Summary = card.SummaryData != null ? card.SummaryData.Summary : null
+                Summary = card.SummaryData != null ? card.SummaryData.Summary : null,
+                ArchivedOn = card.ArchivedOn,
+                CreationDate = card.CreationDate,
+                Supervisor = $"{card.CircleMembers.FirstOrDefault(cm => cm.IsSupervisor)!.User.FirstName} {card.CircleMembers.FirstOrDefault(cm => cm.IsSupervisor)!.User.LastName}"
             });
 
 
         return await PagedList<GetCircleAsCardResponse>.ToPagedListAsync(circlesCardsQuery, archiveQuery.PageNumber, archiveQuery.PageSize, ct);
     }
-
+    
     public async Task<GetCircleMembersResponse> GetMembersAsync(Guid circleId, CancellationToken ct)
     {
         var circle = await db.Circles

@@ -9,5 +9,8 @@ public class GetCircleAsCardResponse
     public string? Avatar { get; set; }
     public string? Github { get; set; }
     public long Rate { get; set; }
-    public string? Keywords { get; set; }
+    public List<string>? TechStack { get; set; } = [];
+    public DateTime? CreationDate { get; set; }
+    public DateTime? ArchivedOn{ get; set; }
+    public string Supervisor { get; set; } = null!;
 }

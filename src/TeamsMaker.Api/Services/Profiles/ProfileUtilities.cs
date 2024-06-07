@@ -255,7 +255,7 @@ public class ProfileUtilities //TODO: [Refactor] remove dublicates - Urgent
             Id = c.Id,
             Name = c.Name,
             Rate = c.Rate,
-            Keywords = c.Keywords,
+            TechStack = c.Skills.Select(sk => sk.Name).ToList(),
             Summary = c.SummaryData?.Summary,
             Avatar = fileService.GetFileUrl(c.Id.ToString(), FileTypes.Avatar),
             Github = c.Links.FirstOrDefault(l => l.Type == LinkTypesEnum.GitHub)?.Url,
