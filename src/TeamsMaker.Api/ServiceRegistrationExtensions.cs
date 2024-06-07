@@ -10,6 +10,8 @@ using TeamsMaker.Api.Services.ApprovalRequests.Interfaces;
 using TeamsMaker.Api.Services.Auth;
 using TeamsMaker.Api.Services.Circles;
 using TeamsMaker.Api.Services.Circles.Interfaces;
+using TeamsMaker.Api.Services.Departments;
+using TeamsMaker.Api.Services.Departments.Interfaces;
 using TeamsMaker.Api.Services.Files;
 using TeamsMaker.Api.Services.Files.Interfaces;
 using TeamsMaker.Api.Services.JoinRequests;
@@ -99,6 +101,8 @@ public static class ServiceRegistrationExtensions
         services.AddScoped<IApprovalRequestService, ApprovalRequestService>();
 
         services.AddScoped<IPostService, PostService>();
+
+        services.AddScoped<IDepartmentService, DepartmentService>();
 
         return services;
     }
