@@ -32,6 +32,15 @@ public class UserService(AppDBContext db, IUserInfo userInfo, IServiceProvider s
                 .Include(u => u.MemberOn)
                 .Where(u => u.MemberOn.Any(m => m.CircleId == query.CircleId.Value));
 
+        if(query.IsSupervisor.HasValue)
+            usersQuery = usersQuery
+                .Join(db.Staff,
+                    u => u.Id,
+                    st => st.Id,
+                    (u, st) => new { u , st})
+                .Where(j => j.st.Classification == StaffClassificationsEnum.Professor)
+                .Where(j => j.st.Classification == StaffClassificationsEnum.HeadOfDept);
+
 
         var users = usersQuery
             .Select(u => new GetUserAsRowResponse
