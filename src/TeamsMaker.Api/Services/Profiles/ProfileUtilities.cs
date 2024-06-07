@@ -1,9 +1,11 @@
 ﻿using Microsoft.IdentityModel.Tokens;
 
 using TeamsMaker.Api.Contracts.Requests.Profile;
+using TeamsMaker.Api.Contracts.Responses.Circle;
 using TeamsMaker.Api.Contracts.Responses.JoinRequest;
 using TeamsMaker.Api.Contracts.Responses.Profile;
 using TeamsMaker.Api.Core.Consts;
+using TeamsMaker.Api.Core.Enums;
 using TeamsMaker.Api.DataAccess.Context;
 using TeamsMaker.Api.Services.Files.Interfaces;
 using TeamsMaker.Core.Enums;
@@ -195,6 +197,71 @@ public class ProfileUtilities //TODO: [Refactor] remove dublicates - Urgent
             Classification = staff.Classification
         };
         response.StaffInfo = otherStaffInfo;
+    }
+
+    private async Task<List<Circle>> GetStaffCircles(string staffId, bool isArchieved, CancellationToken ct)
+    {
+        var acceptedProposalIds = await db.ApprovalRequests
+            .Where(ar => ar.ProposalStatusSnapshot == ProposalStatusEnum.ThirdApproval 
+                      && ar.IsAccepted == true)
+            .Select(ar => ar.ProposalId)
+            .ToListAsync(ct);
+
+        var query = db.Proposals
+            .Include(p => p.ApprovalRequests)
+            .Include(p => p.Circle)
+                .ThenInclude(c => c.CircleMembers)
+                    .ThenInclude(cm => cm.User)
+            .Where(p => acceptedProposalIds.Contains(p.Id))
+            .Where(p => p.ApprovalRequests
+                            .Any(ar => ar.StaffId == staffId 
+                                    && ar.ProposalStatusSnapshot == ProposalStatusEnum.SecondApproval));
+
+        query = isArchieved
+            ? query.Where(p => p.Circle.Status == CircleStatusEnum.Archived)
+            : query.Where(p => p.Circle.Status == CircleStatusEnum.Active);
+
+        var circles = await query
+            .Select(p => p.Circle)
+            .ToListAsync(ct);
+
+        return circles;
+    }
+
+    public async Task<ICollection<GetCircleAsRowResponse>> GetStaffActiveCircles(string staffId, CancellationToken ct)
+    {
+        var circles = await GetStaffCircles(staffId, false, ct);
+
+        var fileService = serviceProvider.GetRequiredKeyedService<IFileService>(BaseTypes.Circle);
+
+        return circles.Select(c => new GetCircleAsRowResponse
+        {
+            Id = c.Id,
+            Name = c.Name,
+            Avatar = fileService.GetFileUrl(c.Id.ToString(), FileTypes.Avatar),
+            OwnerName = c.CircleMembers.First(cm => cm.IsOwner).User.FirstName + " "
+                        + c.CircleMembers.First(cm => cm.IsOwner).User.LastName
+        }).ToList();
+    }
+
+    public async Task<ICollection<GetCircleAsCardResponse>> GetStaffArchievedCircles(string staffId, CancellationToken ct)
+    {
+        var circles = await GetStaffCircles(staffId, true, ct);
+
+        var fileService = serviceProvider.GetRequiredKeyedService<IFileService>(BaseTypes.Circle);
+
+        return circles.Select(c => new GetCircleAsCardResponse
+        {
+            Id = c.Id,
+            Name = c.Name,
+            Rate = c.Rate,
+            Keywords = c.Keywords,
+            Summary = c.SummaryData?.Summary,
+            Avatar = fileService.GetFileUrl(c.Id.ToString(), FileTypes.Avatar),
+            Links = c.Links.Select(l => new LinkInfo { Type = l.Type, Url = l.Url }).ToList(),
+            OwnerName = c.CircleMembers.First(cm => cm.IsOwner).User.FirstName + " "
+                        + c.CircleMembers.First(cm => cm.IsOwner).User.LastName,
+        }).ToList();
     }
 
     public void UpdateUserData(User user, UpdateProfileRequest request)

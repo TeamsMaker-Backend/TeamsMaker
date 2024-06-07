@@ -22,6 +22,9 @@ public class StaffProfileService
         profileUtilities.GetStaffData(staff, response);
         profileUtilities.GetUserData(staff, response);
 
+        response.StaffInfo!.Circles = await profileUtilities.GetStaffActiveCircles(staff.Id, ct);
+        response.StaffInfo!.Archive = await profileUtilities.GetStaffArchievedCircles(staff.Id, ct);
+
         return response;
     }
 
@@ -36,6 +39,9 @@ public class StaffProfileService
 
         profileUtilities.GetOtherStaffData(staff, response);
         profileUtilities.GetOtherUserData(staff, response);
+
+        response.StaffInfo!.Circles = await profileUtilities.GetStaffActiveCircles(id, ct);
+        response.StaffInfo!.Archive = await profileUtilities.GetStaffArchievedCircles(id, ct);
 
         return response;
     }
