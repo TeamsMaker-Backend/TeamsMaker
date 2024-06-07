@@ -362,7 +362,9 @@ public class ApprovalRequestService
             throw new ArgumentException("There is an already approval request at this position");
 
         if (proposal.ApprovalRequests
-                        .Any(ar => ar.StaffId == request.StaffId && ar.IsAccepted == true))
+                        .Any(ar => ar.StaffId == request.StaffId 
+                                && ar.IsAccepted != false 
+                                && ar.Position != PositionEnum.Head))
             throw new ArgumentException("Cannot assign this staff in different positions at the same time");
     }
 }
