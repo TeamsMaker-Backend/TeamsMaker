@@ -258,7 +258,7 @@ public class ProfileUtilities //TODO: [Refactor] remove dublicates - Urgent
             Keywords = c.Keywords,
             Summary = c.SummaryData?.Summary,
             Avatar = fileService.GetFileUrl(c.Id.ToString(), FileTypes.Avatar),
-            Links = c.Links.Select(l => new LinkInfo { Type = l.Type, Url = l.Url }).ToList(),
+            Github = c.Links.FirstOrDefault(l => l.Type == LinkTypesEnum.GitHub)?.Url,
             OwnerName = c.CircleMembers.First(cm => cm.IsOwner).User.FirstName + " "
                         + c.CircleMembers.First(cm => cm.IsOwner).User.LastName,
         }).ToList();

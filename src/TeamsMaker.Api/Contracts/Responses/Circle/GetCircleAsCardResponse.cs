@@ -1,5 +1,3 @@
-using TeamsMaker.Api.Contracts.Responses.Profile;
-
 namespace TeamsMaker.Api.Contracts.Responses.Circle;
 
 public class GetCircleAsCardResponse
@@ -9,7 +7,7 @@ public class GetCircleAsCardResponse
     public string OwnerName { get; set; } = null!;
     public string? Summary { get; set; }
     public string? Avatar { get; set; }
-    public string? Keywords { get; set; }
+    public string? Github { get; set; }
     public long Rate { get; set; }
-    public ICollection<LinkInfo> Links { get; set; } = [];
+    public string? Keywords { get; set; }
 }
