@@ -8,6 +8,7 @@ public class GetPostResponse
     public long CommentsNumber { get; set; }
     public Guid AuthorId { get; set; }
     public string? AuthorAvatar { get; set; } = null!;
+    public string AuthorName { get; set; } = null!;
     public bool IsLiked { get; set; }
 
     public string? CreationDate { get; set; }

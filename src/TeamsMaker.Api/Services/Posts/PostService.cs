@@ -188,10 +188,15 @@ public class PostService(ICircleValidationService validationService, IUserInfo u
             await db.Posts
             .Include(ps => ps.Author)
                 .ThenInclude(a => a.User)
+            .Include(ps => ps.Author)
+                .ThenInclude(a => a.Circle)
             .Include(ps => ps.Reacts)
             .Include(ps => ps.Comments)
                 .ThenInclude(cm => cm.Author)
                     .ThenInclude(a => a.User)
+            .Include(ps => ps.Comments)
+                .ThenInclude(cm => cm.Author)
+                    .ThenInclude(a => a.Circle)
             .Include(ps => ps.Comments)
                 .ThenInclude(cm => cm.Reacts)
             .SingleOrDefaultAsync(ps => postId == ps.Id, ct) ??
@@ -205,7 +210,8 @@ public class PostService(ICircleValidationService validationService, IUserInfo u
             LikesNumber = post.LikesNumber,
             IsLiked = post.Reacts.Any(r => r.UserId == userInfo.UserId && r.PostId == postId),
             AuthorId = post.AuthorId,
-            AuthorAvatar = GetAuthorAvatar(post.Author),  
+            AuthorAvatar = GetAuthorAvatar(post.Author),
+            AuthorName = GetAuthorName(post.Author),
             CommentsNumber = post.Comments.Count,
             CreationDate = post.CreationDate.ToString(),
             Comments = post.Comments.Select(cm => new GetPostResponse
@@ -216,6 +222,7 @@ public class PostService(ICircleValidationService validationService, IUserInfo u
                 IsLiked = cm.Reacts.Any(r => r.UserId == userInfo.UserId && r.PostId == cm.Id),
                 AuthorId = cm.AuthorId,
                 AuthorAvatar = GetAuthorAvatar(cm.Author),
+                AuthorName = GetAuthorName(cm.Author),
                 CommentsNumber = cm.Comments.Count,
                 CreationDate = cm.CreationDate.ToString()
             })
@@ -224,6 +231,11 @@ public class PostService(ICircleValidationService validationService, IUserInfo u
     
         return response;
     }
+
+    private static string GetAuthorName(Author author)
+        => author.User is not null
+            ? author.User!.FirstName + " " + author.User!.LastName
+            : author.Circle!.Name;
 
     private string? GetAuthorAvatar(Author author)
     {
