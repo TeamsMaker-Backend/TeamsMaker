@@ -8,7 +8,7 @@ namespace TeamsMaker.Api.Controllers.Departments;
 [Authorize]
 public class ListDepatmentsAsLookupsEndpoint(IDepartmentService departmentService) : BaseApiController
 {
-    [HttpPost("api/departments/lookups")]
+    [HttpGet("api/departments/lookups")]
     public async Task<IActionResult> ListLookups(CancellationToken ct)
     {
         try
