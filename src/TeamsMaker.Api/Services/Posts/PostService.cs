@@ -248,7 +248,7 @@ public class PostService(ICircleValidationService validationService, IUserInfo u
                 : serviceProvider.GetRequiredKeyedService<IFileService>(BaseTypes.Staff);
 
 
-        string id = author.CircleId.ToString() ?? author.UserId!;
+        string id = author.CircleId?.ToString() ?? author.UserId!;
 
         return fileService.GetFileUrl(id, FileTypes.Avatar);
     }
