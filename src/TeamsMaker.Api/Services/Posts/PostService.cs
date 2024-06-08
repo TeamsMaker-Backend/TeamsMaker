@@ -7,14 +7,17 @@ using Microsoft.IdentityModel.Tokens;
 using TeamsMaker.Api.Contracts.QueryStringParameters;
 using TeamsMaker.Api.Contracts.Requests.Post;
 using TeamsMaker.Api.Contracts.Responses.Post;
+using TeamsMaker.Api.Core.Consts;
 using TeamsMaker.Api.Core.Enums;
 using TeamsMaker.Api.DataAccess.Context;
 using TeamsMaker.Api.Services.Circles.Interfaces;
+using TeamsMaker.Api.Services.Files.Interfaces;
 using TeamsMaker.Api.Services.Posts.Interfaces;
 
 namespace TeamsMaker.Api.Services.Posts;
 
-public class PostService(ICircleValidationService validationService, IUserInfo userInfo, AppDBContext db) : IPostService
+public class PostService(ICircleValidationService validationService, IUserInfo userInfo, 
+    AppDBContext db, IServiceProvider serviceProvider) : IPostService
 {
     public async Task<Guid> AddAsync(AddPostRequest request, CancellationToken ct)
     {
@@ -181,11 +184,29 @@ public class PostService(ICircleValidationService validationService, IUserInfo u
 
     public async Task<GetPostResponse> GetPostAsync(Guid postId, CancellationToken ct)
     {
+        IFileService? fileService = null;
+    
         var post =
             await db.Posts
             .Include(ps => ps.Comments)
+            .Include(ps => ps.Author)
+                .ThenInclude(a => a.User)
+            .Include(ps => ps.Author)
+                .ThenInclude(a => a.User)
             .SingleOrDefaultAsync(ps => postId == ps.Id, ct) ??
              throw new ArgumentException("Invalid Id");
+    
+
+        fileService = post.Author.Circle != null
+            ? serviceProvider.GetRequiredKeyedService<IFileService>(BaseTypes.Circle)
+            : post.Author.User is Student
+                ? serviceProvider.GetRequiredKeyedService<IFileService>(BaseTypes.Student)
+                : serviceProvider.GetRequiredKeyedService<IFileService>(BaseTypes.Staff);
+
+    
+        string? authorAvatar = post.Author.Circle != null
+            ? fileService.GetFileUrl(post.Author.Circle.Id.ToString(), FileTypes.Avatar)
+            : fileService.GetFileUrl(post.Author.User!.Id, FileTypes.Avatar);
 
 
         var response = new GetPostResponse
@@ -194,11 +215,9 @@ public class PostService(ICircleValidationService validationService, IUserInfo u
             Content = post.Content,
             LikesNumber = post.LikesNumber,
             AuthorId = post.AuthorId,
+            AuthorAvatar = authorAvatar!,  
             CommentsNumber = post.Comments.Count,
-            CreationDate = post.CreationDate,
-            CreatedBy = post.CreatedBy,
-            ModifiedBy = post.ModifiedBy,
-            LastModificationDate = post.LastModificationDate,
+            CreationDate = post.CreationDate.ToString(),
             Comments = post.Comments.Select(cm => new GetPostResponse
             {
                 Id = cm.Id,
@@ -206,13 +225,11 @@ public class PostService(ICircleValidationService validationService, IUserInfo u
                 LikesNumber = cm.LikesNumber,
                 AuthorId = cm.AuthorId,
                 CommentsNumber = cm.Comments.Count,
-                CreationDate = cm.CreationDate,
-                CreatedBy = cm.CreatedBy,
-                ModifiedBy = cm.ModifiedBy,
-                LastModificationDate = cm.LastModificationDate,
-            }).ToList()
+                CreationDate = cm.CreationDate.ToString()
+            })
+            .ToList()
         };
-
+    
         return response;
     }
 
