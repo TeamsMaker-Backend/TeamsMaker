@@ -184,29 +184,18 @@ public class PostService(ICircleValidationService validationService, IUserInfo u
 
     public async Task<GetPostResponse> GetPostAsync(Guid postId, CancellationToken ct)
     {
-        IFileService? fileService = null;
-    
         var post =
             await db.Posts
+            .Include(ps => ps.Author)
+                .ThenInclude(a => a.User)
+            .Include(ps => ps.Reacts)
             .Include(ps => ps.Comments)
-            .Include(ps => ps.Author)
-                .ThenInclude(a => a.User)
-            .Include(ps => ps.Author)
-                .ThenInclude(a => a.User)
+                .ThenInclude(cm => cm.Author)
+                    .ThenInclude(a => a.User)
+            .Include(ps => ps.Comments)
+                .ThenInclude(cm => cm.Reacts)
             .SingleOrDefaultAsync(ps => postId == ps.Id, ct) ??
              throw new ArgumentException("Invalid Id");
-    
-
-        fileService = post.Author.Circle != null
-            ? serviceProvider.GetRequiredKeyedService<IFileService>(BaseTypes.Circle)
-            : post.Author.User is Student
-                ? serviceProvider.GetRequiredKeyedService<IFileService>(BaseTypes.Student)
-                : serviceProvider.GetRequiredKeyedService<IFileService>(BaseTypes.Staff);
-
-    
-        string? authorAvatar = post.Author.Circle != null
-            ? fileService.GetFileUrl(post.Author.Circle.Id.ToString(), FileTypes.Avatar)
-            : fileService.GetFileUrl(post.Author.User!.Id, FileTypes.Avatar);
 
 
         var response = new GetPostResponse
@@ -214,8 +203,9 @@ public class PostService(ICircleValidationService validationService, IUserInfo u
             Id = postId,
             Content = post.Content,
             LikesNumber = post.LikesNumber,
+            IsLiked = post.Reacts.Any(r => r.UserId == userInfo.UserId && r.PostId == postId),
             AuthorId = post.AuthorId,
-            AuthorAvatar = authorAvatar!,  
+            AuthorAvatar = GetAuthorAvatar(post.Author),  
             CommentsNumber = post.Comments.Count,
             CreationDate = post.CreationDate.ToString(),
             Comments = post.Comments.Select(cm => new GetPostResponse
@@ -223,7 +213,9 @@ public class PostService(ICircleValidationService validationService, IUserInfo u
                 Id = cm.Id,
                 Content = cm.Content,
                 LikesNumber = cm.LikesNumber,
+                IsLiked = cm.Reacts.Any(r => r.UserId == userInfo.UserId && r.PostId == cm.Id),
                 AuthorId = cm.AuthorId,
+                AuthorAvatar = GetAuthorAvatar(cm.Author),
                 CommentsNumber = cm.Comments.Count,
                 CreationDate = cm.CreationDate.ToString()
             })
@@ -231,6 +223,22 @@ public class PostService(ICircleValidationService validationService, IUserInfo u
         };
     
         return response;
+    }
+
+    private string? GetAuthorAvatar(Author author)
+    {
+        IFileService fileService;
+
+        fileService = author.CircleId != null
+            ? serviceProvider.GetRequiredKeyedService<IFileService>(BaseTypes.Circle)
+            : author.User is Student
+                ? serviceProvider.GetRequiredKeyedService<IFileService>(BaseTypes.Student)
+                : serviceProvider.GetRequiredKeyedService<IFileService>(BaseTypes.Staff);
+
+
+        string id = author.CircleId.ToString() ?? author.UserId!;
+
+        return fileService.GetFileUrl(id, FileTypes.Avatar);
     }
 
     private async Task<Author?> GetAuthorAsync(string id, CancellationToken ct)
