@@ -257,8 +257,8 @@ public class ProfileUtilities //TODO: [Refactor] remove dublicates - Urgent
             Rate = c.Rate,
             TechStack = c.Skills.Select(sk => sk.Name).ToList(),
             Summary = c.SummaryData?.Summary,
-            ArchivedOn = c.ArchivedOn,
-            CreationDate = c.CreationDate,
+            ArchivedOn = c.ArchivedOn.ToString(),
+            CreationDate = c.CreationDate.ToString(),
             Avatar = fileService.GetFileUrl(c.Id.ToString(), FileTypes.Avatar),
             Github = c.Links.FirstOrDefault(l => l.Type == LinkTypesEnum.GitHub)?.Url,
             OwnerName = c.CircleMembers.First(cm => cm.IsOwner).User.FirstName + " "

@@ -311,8 +311,8 @@ public class CircleService
                 OwnerName = $"{card.CircleMembers.First(cm => cm.IsOwner).User.FirstName} {card.CircleMembers.First(cm => cm.IsOwner).User.LastName}",
                 Rate = card.Rate,
                 Summary = card.SummaryData != null ? card.SummaryData.Summary : null,
-                ArchivedOn = card.ArchivedOn,
-                CreationDate = card.CreationDate,
+                ArchivedOn = card.ArchivedOn.ToString(),
+                CreationDate = card.CreationDate.ToString(),
                 Supervisor = $"{card.CircleMembers.FirstOrDefault(cm => cm.IsSupervisor)!.User.FirstName} {card.CircleMembers.FirstOrDefault(cm => cm.IsSupervisor)!.User.LastName}"
             });
 
