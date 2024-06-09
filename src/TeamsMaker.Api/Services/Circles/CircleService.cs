@@ -517,6 +517,7 @@ public class CircleService
         await validationService.TryGetOwnerAsync(userInfo.UserId, circleId, ct);
 
         circle.Status = CircleStatusEnum.Archived;
+        circle.ArchivedOn = DateTime.UtcNow;
 
         await db.SaveChangesAsync(ct);
     }

@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 using TeamsMaker.Api.Contracts.QueryStringParameters;
 using TeamsMaker.Api.Services.Posts.Interfaces;
 
 namespace TeamsMaker.Api.Controllers.Posts;
 
+[Authorize]
 public class ListFeedPostsEndpoint(IPostService postService) : BaseApiController
 {
     [Tags("posts")]
