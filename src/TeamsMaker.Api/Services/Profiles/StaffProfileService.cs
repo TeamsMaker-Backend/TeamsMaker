@@ -2,6 +2,8 @@
 
 using TeamsMaker.Api.Contracts.Requests.Profile;
 using TeamsMaker.Api.Contracts.Responses.Profile;
+using TeamsMaker.Api.Core.Consts;
+using TeamsMaker.Api.Core.Enums;
 using TeamsMaker.Api.DataAccess.Context;
 using TeamsMaker.Api.Services.Profiles.Interfaces;
 
@@ -44,6 +46,48 @@ public class StaffProfileService
         response.StaffInfo!.Archive = await profileUtilities.GetStaffArchievedCircles(id, ct);
 
         return response;
+    }
+
+    public async Task<List<GetStaffAsLookupsResponse>> GetStaffLookupsAsync(PositionEnum position, CancellationToken ct)
+    {
+        var lookupsQuery = db.Roles
+            .Join(db.UserRoles,
+                role => role.Id,
+                userRole => userRole.RoleId,
+                (role, userRole) => new { role, userRole }
+            )
+            .Join(db.Staff,
+                userPermission => userPermission.userRole.UserId,
+                st => st.Id,
+                (userPermission, userRole) => new { userPermission, userRole })
+            .AsNoTracking()
+            .AsQueryable();
+
+
+        if (position == PositionEnum.Head)
+            lookupsQuery = lookupsQuery
+                .Where(q => q.userPermission.role.Name == AppRoles.HeadOfDept);
+
+        if (position == PositionEnum.Supervisor)
+            lookupsQuery = lookupsQuery
+                .Where(q => q.userPermission.role.Name == AppRoles.HeadOfDept
+                        || q.userPermission.role.Name == AppRoles.Professor);
+
+        if (position == PositionEnum.Supervisor)
+            lookupsQuery = lookupsQuery
+                .Where(q => q.userPermission.role.Name == AppRoles.HeadOfDept
+                        || q.userPermission.role.Name == AppRoles.Professor
+                        || q.userPermission.role.Name == AppRoles.Assistant);
+
+        var result = await lookupsQuery
+            .Select(staff => new GetStaffAsLookupsResponse
+            {
+                Id = staff.userRole.Id,
+                FullName = $"{staff.userRole.FirstName} {staff.userRole.FirstName}"
+            })
+            .ToListAsync(cancellationToken: ct);
+
+        throw new NotImplementedException();
     }
 
     public async Task UpdateAsync(UpdateProfileRequest profileRequest, CancellationToken ct)

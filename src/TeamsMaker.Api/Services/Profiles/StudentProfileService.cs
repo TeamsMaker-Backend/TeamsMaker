@@ -3,6 +3,7 @@
 using TeamsMaker.Api.Contracts.Requests.Profile;
 using TeamsMaker.Api.Contracts.Responses.Profile;
 using TeamsMaker.Api.Core.Consts;
+using TeamsMaker.Api.Core.Enums;
 using TeamsMaker.Api.DataAccess.Context;
 using TeamsMaker.Api.Services.Files.Interfaces;
 using TeamsMaker.Api.Services.Profiles.Interfaces;
@@ -55,6 +56,12 @@ public class StudentProfileService
 
         return response;
     }
+
+    public Task<List<GetStaffAsLookupsResponse>> GetStaffLookupsAsync(PositionEnum position, CancellationToken ct)
+    {   
+        throw new NotImplementedException();
+    }
+
 
     public async Task UpdateAsync(UpdateProfileRequest profileRequest, CancellationToken ct)
     {
