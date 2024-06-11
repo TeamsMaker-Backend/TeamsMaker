@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TeamsMaker.Api.DataAccess.Context;
 
@@ -11,9 +12,11 @@ using TeamsMaker.Api.DataAccess.Context;
 namespace TeamsMaker.Api.Migrations
 {
     [DbContext(typeof(AppDBContext))]
-    partial class AppDBContextModelSnapshot : ModelSnapshot
+    [Migration("20240605003808_add_aprroval_request_creation_date")]
+    partial class add_aprroval_request_creation_date
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -202,9 +205,6 @@ namespace TeamsMaker.Api.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime?>("ArchivedOn")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
 
@@ -255,13 +255,7 @@ namespace TeamsMaker.Api.Migrations
                     b.Property<Guid>("CircleId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<bool>("IsCosupervisor")
-                        .HasColumnType("bit");
-
                     b.Property<bool>("IsOwner")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsSupervisor")
                         .HasColumnType("bit");
 
                     b.Property<string>("Role")

@@ -13,6 +13,7 @@ public interface ICircleService
     Task<GetCircleResponse> GetAsync(Guid circleId, CancellationToken ct);
     Task<PagedList<GetCircleAsRowResponse>> GetAsync(BaseQueryStringWithQ query, CancellationToken ct);
     Task<List<GetCircleAsRowResponse>> GetAsync(CancellationToken ct);
+    Task<PagedList<GetCircleAsCardResponse>> ListArchivedAsync(ArchiveQueryString archiveQuery, CancellationToken ct);
     Task<GetCircleMembersResponse> GetMembersAsync(Guid circleId, CancellationToken ct);
     Task UpdateInfoAsync(Guid circleId, UpdateCircleInfoRequest request, CancellationToken ct);
     Task UpdatePrivacyAsync(Guid circleId, bool isPublic, CancellationToken ct);

@@ -7,14 +7,17 @@ using Microsoft.IdentityModel.Tokens;
 using TeamsMaker.Api.Contracts.QueryStringParameters;
 using TeamsMaker.Api.Contracts.Requests.Post;
 using TeamsMaker.Api.Contracts.Responses.Post;
+using TeamsMaker.Api.Core.Consts;
 using TeamsMaker.Api.Core.Enums;
 using TeamsMaker.Api.DataAccess.Context;
 using TeamsMaker.Api.Services.Circles.Interfaces;
+using TeamsMaker.Api.Services.Files.Interfaces;
 using TeamsMaker.Api.Services.Posts.Interfaces;
 
 namespace TeamsMaker.Api.Services.Posts;
 
-public class PostService(ICircleValidationService validationService, IUserInfo userInfo, AppDBContext db) : IPostService
+public class PostService(ICircleValidationService validationService, IUserInfo userInfo, 
+    AppDBContext db, IServiceProvider serviceProvider) : IPostService
 {
     public async Task<Guid> AddAsync(AddPostRequest request, CancellationToken ct)
     {
@@ -64,7 +67,7 @@ public class PostService(ICircleValidationService validationService, IUserInfo u
 
         isAuthorized = true;
 
-        if (post.LikesNumber > 0 && post.Reacts.Any())
+        if (post.LikesNumber > 0 && post.Reacts.Count != 0)
             db.Reacts.RemoveRange(post.Reacts);
 
         if (!post.Comments.IsNullOrEmpty())
@@ -183,7 +186,19 @@ public class PostService(ICircleValidationService validationService, IUserInfo u
     {
         var post =
             await db.Posts
+            .Include(ps => ps.Author)
+                .ThenInclude(a => a.User)
+            .Include(ps => ps.Author)
+                .ThenInclude(a => a.Circle)
+            .Include(ps => ps.Reacts)
             .Include(ps => ps.Comments)
+                .ThenInclude(cm => cm.Author)
+                    .ThenInclude(a => a.User)
+            .Include(ps => ps.Comments)
+                .ThenInclude(cm => cm.Author)
+                    .ThenInclude(a => a.Circle)
+            .Include(ps => ps.Comments)
+                .ThenInclude(cm => cm.Reacts)
             .SingleOrDefaultAsync(ps => postId == ps.Id, ct) ??
              throw new ArgumentException("Invalid Id");
 
@@ -193,27 +208,49 @@ public class PostService(ICircleValidationService validationService, IUserInfo u
             Id = postId,
             Content = post.Content,
             LikesNumber = post.LikesNumber,
+            IsLiked = post.Reacts.Any(r => r.UserId == userInfo.UserId),
             AuthorId = post.AuthorId,
+            AuthorAvatar = GetAuthorAvatar(post.Author),
+            AuthorName = GetAuthorName(post.Author),
             CommentsNumber = post.Comments.Count,
-            CreationDate = post.CreationDate,
-            CreatedBy = post.CreatedBy,
-            ModifiedBy = post.ModifiedBy,
-            LastModificationDate = post.LastModificationDate,
+            CreationDate = post.CreationDate.ToString(),
             Comments = post.Comments.Select(cm => new GetPostResponse
             {
                 Id = cm.Id,
                 Content = cm.Content,
                 LikesNumber = cm.LikesNumber,
+                IsLiked = cm.Reacts.Any(r => r.UserId == userInfo.UserId),
                 AuthorId = cm.AuthorId,
+                AuthorAvatar = GetAuthorAvatar(cm.Author),
+                AuthorName = GetAuthorName(cm.Author),
                 CommentsNumber = cm.Comments.Count,
-                CreationDate = cm.CreationDate,
-                CreatedBy = cm.CreatedBy,
-                ModifiedBy = cm.ModifiedBy,
-                LastModificationDate = cm.LastModificationDate,
-            }).ToList()
+                CreationDate = cm.CreationDate.ToString()
+            })
+            .ToList()
         };
-
+    
         return response;
+    }
+
+    private static string GetAuthorName(Author author)
+        => author.User is not null
+            ? author.User!.FirstName + " " + author.User!.LastName
+            : author.Circle!.Name;
+
+    private string? GetAuthorAvatar(Author author)
+    {
+        IFileService fileService;
+
+        fileService = author.CircleId != null
+            ? serviceProvider.GetRequiredKeyedService<IFileService>(BaseTypes.Circle)
+            : author.User is Student
+                ? serviceProvider.GetRequiredKeyedService<IFileService>(BaseTypes.Student)
+                : serviceProvider.GetRequiredKeyedService<IFileService>(BaseTypes.Staff);
+
+
+        string id = author.CircleId?.ToString() ?? author.UserId!;
+
+        return fileService.GetFileUrl(id, FileTypes.Avatar);
     }
 
     private async Task<Author?> GetAuthorAsync(string id, CancellationToken ct)
