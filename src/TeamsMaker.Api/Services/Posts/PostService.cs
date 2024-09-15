@@ -184,52 +184,70 @@ public class PostService(ICircleValidationService validationService, IUserInfo u
 
     public async Task<GetPostResponse> GetPostAsync(Guid postId, CancellationToken ct)
     {
-        var post =
-            await db.Posts
-            .Include(ps => ps.Author)
-                .ThenInclude(a => a.User)
-            .Include(ps => ps.Author)
-                .ThenInclude(a => a.Circle)
-            .Include(ps => ps.Reacts)
-            .Include(ps => ps.Comments)
-                .ThenInclude(cm => cm.Author)
-                    .ThenInclude(a => a.User)
-            .Include(ps => ps.Comments)
-                .ThenInclude(cm => cm.Author)
-                    .ThenInclude(a => a.Circle)
-            .Include(ps => ps.Comments)
-                .ThenInclude(cm => cm.Reacts)
-            .SingleOrDefaultAsync(ps => postId == ps.Id, ct) ??
-             throw new ArgumentException("Invalid Id");
-
-
-        var response = new GetPostResponse
+        try
         {
-            Id = postId,
-            Content = post.Content,
-            LikesNumber = post.LikesNumber,
-            IsLiked = post.Reacts.Any(r => r.UserId == userInfo.UserId),
-            AuthorId = post.AuthorId,
-            AuthorAvatar = GetAuthorAvatar(post.Author),
-            AuthorName = GetAuthorName(post.Author),
-            CommentsNumber = post.Comments.Count,
-            CreationDate = post.CreationDate.ToString(),
-            Comments = post.Comments.Select(cm => new GetPostResponse
+            var post = await db.Posts
+                .Include(ps => ps.Author)
+                    .ThenInclude(a => a.User)
+                .Include(ps => ps.Author)
+                    .ThenInclude(a => a.Circle)
+                .Include(ps => ps.Reacts)
+                .Include(ps => ps.Comments)
+                    .ThenInclude(cm => cm.Author)
+                        .ThenInclude(a => a.User)
+                .Include(ps => ps.Comments)
+                    .ThenInclude(cm => cm.Author)
+                        .ThenInclude(a => a.Circle)
+                .Include(ps => ps.Comments)
+                    .ThenInclude(cm => cm.Reacts)
+                .SingleOrDefaultAsync(ps => postId == ps.Id, ct);
+
+            if (post == null)
+                throw new ArgumentException($"Post with ID {postId} not found");
+
+            var response = new GetPostResponse
             {
-                Id = cm.Id,
-                Content = cm.Content,
-                LikesNumber = cm.LikesNumber,
-                IsLiked = cm.Reacts.Any(r => r.UserId == userInfo.UserId),
-                AuthorId = cm.AuthorId,
-                AuthorAvatar = GetAuthorAvatar(cm.Author),
-                AuthorName = GetAuthorName(cm.Author),
-                CommentsNumber = cm.Comments.Count,
-                CreationDate = cm.CreationDate.ToString()
-            })
-            .ToList()
-        };
-    
-        return response;
+                Id = postId,
+                Content = post.Content,
+                LikesNumber = post.LikesNumber,
+                IsLiked = post.Reacts.Any(r => r.UserId == userInfo.UserId),
+                AuthorId = post.AuthorId,
+                AuthorAvatar = GetAuthorAvatar(post.Author),
+                AuthorName = GetAuthorName(post.Author),
+                CommentsNumber = post.Comments.Count,
+                CreationDate = post.CreationDate.ToString(),
+                LastModificationDate = post.LastModificationDate,
+                Comments = post.Comments.Select(cm => new GetPostResponse
+                {
+                    Id = cm.Id,
+                    Content = cm.Content,
+                    LikesNumber = cm.LikesNumber,
+                    IsLiked = cm.Reacts.Any(r => r.UserId == userInfo.UserId),
+                    AuthorId = cm.AuthorId,
+                    AuthorAvatar = GetAuthorAvatar(cm.Author),
+                    AuthorName = GetAuthorName(cm.Author),
+                    CommentsNumber = cm.Comments.Count,
+                    CreationDate = cm.CreationDate.ToString()
+                })
+                .ToList()
+            };
+            
+            return response;
+        }
+        catch (ArgumentException ex)
+        {
+            // Log the exception
+            // TODO: Replace with your actual logging mechanism
+            Console.WriteLine($"ArgumentException in GetPostAsync: {ex.Message}");
+            throw; // Re-throw the exception to be handled by the caller
+        }
+        catch (Exception ex)
+        {
+            // Log the exception
+            // TODO: Replace with your actual logging mechanism
+            Console.WriteLine($"Unexpected error in GetPostAsync: {ex.Message}");
+            throw new InvalidOperationException("An error occurred while retrieving the post", ex);
+        }
     }
 
     private static string GetAuthorName(Author author)
